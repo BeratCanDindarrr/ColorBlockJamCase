@@ -12,6 +12,7 @@ namespace ColorBlockJam
         public void Init(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<ApplicationController>(Lifetime.Singleton);
+            builder.Register<ScreenController>(Lifetime.Singleton);
         }
     }
 }

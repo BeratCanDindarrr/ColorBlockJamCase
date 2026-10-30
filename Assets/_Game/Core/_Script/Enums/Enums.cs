@@ -5,4 +5,11 @@ namespace ColorBlockJam.Enums
         FirstLayer = 0,
         SecondLayer = 1,
     }
+    
+    public enum ScreenType
+    {
+        LoadingScreen = 0,
+        MainScreen = 1,
+        None = 99,
+    }
 }
