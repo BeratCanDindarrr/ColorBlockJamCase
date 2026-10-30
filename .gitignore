@@ -125,3 +125,6 @@ gemini.md
 .superpowers/
 .cursor/
 docs/
+
+# JetBrains Rider
+.idea/
