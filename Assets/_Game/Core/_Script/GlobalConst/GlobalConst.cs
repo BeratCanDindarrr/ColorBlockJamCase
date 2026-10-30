@@ -6,5 +6,10 @@ namespace ColorBlockJam.Const
         {
             public const string TestPopup = "TestPopup";
         }
+
+        public struct SceneName
+        {
+            public const string GamePlay = "GamePlayScene";
+        }
     }
 }

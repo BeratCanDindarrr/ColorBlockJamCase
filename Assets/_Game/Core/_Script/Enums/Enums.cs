@@ -10,6 +10,7 @@ namespace ColorBlockJam.Enums
     {
         LoadingScreen = 0,
         MainScreen = 1,
+        GamePlayScreen = 2,
         None = 99,
     }
 }

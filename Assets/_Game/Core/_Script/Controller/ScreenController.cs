@@ -10,6 +10,7 @@ namespace ColorBlockJam.Core.Controller
     {
         public LoadingScreenView LoadingScreenView;
         public MainScreenView MainScreenView;
+        public GamePlayScreenView GamePlayScreenView;
 
         private ScreenType _screenType = ScreenType.None;
         
@@ -26,10 +27,13 @@ namespace ColorBlockJam.Core.Controller
         {
             LoadingScreenView = _objectResolver.Instantiate(_screenViewSettings.loadingScreenView);
             MainScreenView = _objectResolver.Instantiate(_screenViewSettings.mainScreenView);
+            GamePlayScreenView = _objectResolver.Instantiate(_screenViewSettings.gamePlayScreenView);
             LoadingScreenView.Init();
             MainScreenView.Init();
+            GamePlayScreenView.Init();
             LoadingScreenView.Hide();
             MainScreenView.Hide();
+            GamePlayScreenView.Hide();
         }
 
         public void SetScreen(ScreenType screenType)
@@ -39,12 +43,19 @@ namespace ColorBlockJam.Core.Controller
             {
                 case ScreenType.MainScreen:
                     LoadingScreenView.Hide();
+                    GamePlayScreenView.Hide();
                     MainScreenView.Show();
                     break;
                 case ScreenType.LoadingScreen:
                     MainScreenView.Hide();
+                    GamePlayScreenView.Hide();
                     LoadingScreenView.Show();
                     LoadingScreenView.FakeLoading().Forget();
+                    break;
+                case ScreenType.GamePlayScreen:
+                    LoadingScreenView.Hide();
+                    MainScreenView.Hide();
+                    GamePlayScreenView.Show();
                     break;
             }
         }

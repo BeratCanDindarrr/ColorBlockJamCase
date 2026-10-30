@@ -13,6 +13,7 @@ namespace ColorBlockJam
         {
             builder.RegisterEntryPoint<ApplicationController>(Lifetime.Singleton);
             builder.Register<ScreenController>(Lifetime.Singleton);
+            builder.Register<SceneLoaderController>(Lifetime.Singleton);
             builder.RegisterEntryPoint<InputController>(Lifetime.Singleton).AsSelf();
         }
     }

@@ -11,5 +11,6 @@ namespace ColorBlockJam.Core.Settings
     {
         public LoadingScreenView loadingScreenView;
         public MainScreenView mainScreenView;
+        public GamePlayScreenView gamePlayScreenView;
     }
 }
