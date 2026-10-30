@@ -11,11 +11,13 @@ namespace ColorBlockJam.Core
         [SerializeField] private ControllerLifeTimeScope controllerLifeTimeScope;
         [SerializeField] private ServiceLifeTimeScope serviceLifeTimeScope;
         [SerializeField] private ViewLifeTimeScope viewLifeTimeScope;
+        [SerializeField] private SignalsLifeTimeScope signalsLifeTimeScope;
         [SerializeField] private GlobalSettings globalSettings;
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder);
             globalSettings.Init(builder);
+            signalsLifeTimeScope.Init(builder);
             controllerLifeTimeScope.Init(builder);
             serviceLifeTimeScope.Init(builder);
             viewLifeTimeScope.Init(builder);
