@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba1f77cdaaf447099ecf3fbf84c4f36, type: 3}
+  m_Name: Level_1
+  m_EditorClassIdentifier: 
+  Cols: 6
+  Rows: 6
+  TimeLimitSec: 120
+  Blocks:
+  - Id: A
+    Col: 1
+    Row: 2
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    Color: 0
+  - Id: B
+    Col: 3
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 0
+      Row: 1
+    - Col: 1
+      Row: 1
+    Color: 1
+  - Id: C
+    Col: 0
+    Row: 5
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 2
+  Gates:
+  - Edge: 3
+    Index: 2
+    Length: 1
+    Color: 0
+  - Edge: 1
+    Index: 3
+    Length: 2
+    Color: 1
+  - Edge: 2
+    Index: 5
+    Length: 1
+    Color: 2

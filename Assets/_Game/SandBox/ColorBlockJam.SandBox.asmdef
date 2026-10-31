@@ -1,0 +1,22 @@
+{
+    "name": "ColorBlockJam.SandBox",
+    "rootNamespace": "ColorBlockJam.SandBox",
+    "references": [
+        "ColorBlockJam.Core",
+        "ColorBlockJam.SandBox.Board",
+        "VContainer",
+        "MessagePipe",
+        "UniTask",
+        "DOTween.Modules",
+        "LeanTouch"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
