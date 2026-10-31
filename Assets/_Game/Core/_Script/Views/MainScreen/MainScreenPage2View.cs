@@ -9,6 +9,7 @@ namespace ColorBlockJam.Views
     public class MainScreenPage2View : MainScreenBasePageView
     {
         [SerializeField] private Button playButton;
+        [SerializeField] private MainScreenHeaderView header;
 
         private SceneLoaderController _sceneLoaderController;
 
@@ -21,11 +22,13 @@ namespace ColorBlockJam.Views
         public override void Initialize()
         {
             playButton.onClick.AddListener(OnPlayClicked);
+            header.Initialize();
         }
 
         public override void Dispose()
         {
             if (playButton != null) playButton.onClick.RemoveListener(OnPlayClicked);
+            if (header != null) header.Dispose();
         }
 
         private void OnPlayClicked()
