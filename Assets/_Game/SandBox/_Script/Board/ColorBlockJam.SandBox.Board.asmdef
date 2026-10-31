@@ -1,0 +1,14 @@
+{
+    "name": "ColorBlockJam.SandBox.Board",
+    "rootNamespace": "ColorBlockJam.SandBox.Board",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
