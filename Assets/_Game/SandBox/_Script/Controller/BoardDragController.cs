@@ -68,6 +68,9 @@ namespace ColorBlockJam.SandBox
                 Reset();
             }
 
+            // Pressed a HUD button (e.g. Home) over the board: let the UI handle it, don't pick up a block.
+            if (finger.StartedOverGui) return;
+
             if (!TryGetBoardPoint(finger.ScreenPosition, out var point)) return;
 
             var block = simulation.BlockAt(point);

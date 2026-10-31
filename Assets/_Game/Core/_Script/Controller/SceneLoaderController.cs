@@ -48,8 +48,10 @@ namespace ColorBlockJam.Core.Controller
             _isBusy = true;
             try
             {
-                await SceneManager.UnloadSceneAsync(GlobalConst.SceneName.GamePlay, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                // Switch the screen before the unload finishes: the Main Camera is Depth Only, so if the
+                // gameplay scene unloads first there are a few frames where nothing clears the screen.
                 _screenController.SetScreen(ScreenType.MainScreen);
+                await SceneManager.UnloadSceneAsync(GlobalConst.SceneName.GamePlay, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
             finally
             {

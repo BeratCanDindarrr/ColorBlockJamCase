@@ -16,6 +16,8 @@ MonoBehaviour:
   PickPlaneHeight: 0.5
   LiftHeight: 0.4
   FollowSharpness: 20
+  LiftDuration: 0.1
+  DropDuration: 0.15
   AssistRange: 0.3
   MaxFrameDelta: 0.1
   ClockWaitsForFirstMove: 1
@@ -23,6 +25,7 @@ MonoBehaviour:
   ExitSeconds: 0.5
   ShatterDuration: 0.4
   ShatterForce: 3
+  ShatterSpread: 1.5
   Colors:
   - Key: 0
     Value: {r: 0.9, g: 0.22, b: 0.21, a: 1}

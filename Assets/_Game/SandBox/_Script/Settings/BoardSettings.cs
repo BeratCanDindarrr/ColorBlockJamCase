@@ -1,6 +1,7 @@
 using ColorBlockJam.Core.Level;
 using System;
 using ColorBlockJam.Const;
+using ColorBlockJam.Pool;
 using ColorBlockJam.SandBox.Board;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace ColorBlockJam.SandBox
     {
         // Floor for values that must stay above zero; BoardRules does not validate and 0 would stall exits.
         private const float MinPositive = 0.001f;
+        // Core pools throw when initialSize > maxSize; mirror that ceiling here.
+        private const int MaxPoolSize = MemoryPoolBase<object>.DefaultMaxSize;
 
         [Serializable]
         public struct ColorEntry
@@ -87,14 +90,14 @@ namespace ColorBlockJam.SandBox
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             CellSize = Mathf.Max(MinPositive, CellSize);
             CameraMargin = Mathf.Max(0f, CameraMargin);
-            FollowSharpness = Mathf.Max(0f, FollowSharpness);
+            FollowSharpness = Mathf.Max(MinPositive, FollowSharpness);
             LiftDuration = Mathf.Max(0f, LiftDuration);
             DropDuration = Mathf.Max(0f, DropDuration);
             ShatterDuration = Mathf.Max(MinPositive, ShatterDuration);
             ShatterForce = Mathf.Max(0f, ShatterForce);
             ShatterSpread = Mathf.Max(0f, ShatterSpread);
-            BlockPoolSize = Mathf.Max(0, BlockPoolSize);
-            PiecePoolSize = Mathf.Max(0, PiecePoolSize);
+            BlockPoolSize = Mathf.Clamp(BlockPoolSize, 0, MaxPoolSize);
+            PiecePoolSize = Mathf.Clamp(PiecePoolSize, 0, MaxPoolSize);
         }
     }
 }

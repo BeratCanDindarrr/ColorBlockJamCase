@@ -23,8 +23,12 @@ namespace ColorBlockJam.SandBox
             builder.RegisterMonoPool(boardSettings.FloorTilePrefab, parent: poolRoot);
             builder.RegisterMonoPool(boardSettings.WallPiecePrefab, parent: poolRoot);
             builder.RegisterMonoPool(boardSettings.GatePrefab, parent: poolRoot);
-            builder.RegisterMonoPool(boardSettings.BlockPrefab, boardSettings.BlockPoolSize, parent: poolRoot);
-            builder.RegisterMonoPool(boardSettings.BlockPiecePrefab, boardSettings.PiecePoolSize, parent: poolRoot);
+            // OnValidate clamps these in the editor but does not run in builds, so clamp again here against
+            // the pool's own ceiling (MemoryPoolBase throws when initialSize > maxSize).
+            var blockPoolSize = Mathf.Clamp(boardSettings.BlockPoolSize, 0, MemoryPoolBase<object>.DefaultMaxSize);
+            var piecePoolSize = Mathf.Clamp(boardSettings.PiecePoolSize, 0, MemoryPoolBase<object>.DefaultMaxSize);
+            builder.RegisterMonoPool(boardSettings.BlockPrefab, blockPoolSize, parent: poolRoot);
+            builder.RegisterMonoPool(boardSettings.BlockPiecePrefab, piecePoolSize, parent: poolRoot);
             builder.RegisterEntryPoint<BoardController>().AsSelf();
             builder.RegisterEntryPoint<BoardDragController>();
         }
