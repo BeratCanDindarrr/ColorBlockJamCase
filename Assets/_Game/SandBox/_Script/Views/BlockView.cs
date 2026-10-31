@@ -34,6 +34,12 @@ namespace ColorBlockJam.SandBox
         private float _exitLine;
         private int _shattering;
         private Action<BlockView> _onShattered;
+        // Held pose: board-plane position, lift height and lean are kept apart and composed in ApplyHeldPose,
+        // so the lean pivots on the block's centre instead of its origin cell.
+        private Vector3 _planar;
+        private float _liftY;
+        private Quaternion _tilt = Quaternion.identity;
+        private Vector3 _centroid;
 
         public BlockState Block { get; private set; }
         // Every piece has shattered and finished its tween; the view is safe to despawn.
@@ -58,6 +64,11 @@ namespace ColorBlockJam.SandBox
 
             _cells.Clear();
             _cells.UnionWith(block.Cells);
+            _centroid = Vector3.zero;
+            foreach (var cell in block.Cells)
+                _centroid += new Vector3(cell.Col, 0f, -cell.Row);
+            if (block.Cells.Count > 0) _centroid /= block.Cells.Count;
+
             foreach (var cell in block.Cells)
             {
                 foreach (var quarter in Quarters)
@@ -73,22 +84,39 @@ namespace ColorBlockJam.SandBox
         public void Lift()
         {
             transform.DOKill();
-            transform.DOLocalMoveY(_boardSettings.LiftHeight, _boardSettings.LiftDuration).SetLink(gameObject);
+            var position = transform.localPosition;
+            _planar = new Vector3(position.x, 0f, position.z);
+            _liftY = position.y;
+            _tilt = transform.localRotation;
+            // Targeted at the transform so transform.DOKill() stops it with the other block tweens.
+            DOTween.To(() => _liftY, value => _liftY = value, _boardSettings.LiftHeight, _boardSettings.LiftDuration)
+                .SetTarget(transform).SetLink(gameObject);
         }
 
-        // Eases toward the target on the board plane (exponential smoothing); the height stays with Lift/Drop.
+        // Eases toward the target on the board plane (exponential smoothing) and leans toward the way it moves.
         public void Follow(Vector3 target, float dt)
         {
             var t = 1f - Mathf.Exp(-_boardSettings.FollowSharpness * dt);
-            var current = transform.localPosition;
-            transform.localPosition = new Vector3(Mathf.Lerp(current.x, target.x, t), current.y,
-                Mathf.Lerp(current.z, target.z, t));
+            var previous = _planar;
+            _planar = new Vector3(Mathf.Lerp(previous.x, target.x, t), 0f, Mathf.Lerp(previous.z, target.z, t));
+
+            var velocity = dt > 0f ? (_planar - previous) / dt : Vector3.zero;
+            var maxTilt = _boardSettings.MaxTilt;
+            // Pitch about x tips the top toward +z, roll about z toward -x: lean with the motion.
+            var lean = Quaternion.Euler(
+                Mathf.Clamp(velocity.z * _boardSettings.TiltPerSpeed, -maxTilt, maxTilt), 0f,
+                Mathf.Clamp(-velocity.x * _boardSettings.TiltPerSpeed, -maxTilt, maxTilt));
+            _tilt = Quaternion.Slerp(_tilt, lean, 1f - Mathf.Exp(-_boardSettings.TiltSharpness * dt));
+            ApplyHeldPose();
         }
 
         public void Drop(Vector3 localPosition)
         {
             transform.DOKill();
+            ResetHeldPose();
             transform.DOLocalMove(localPosition, _boardSettings.DropDuration).SetEase(Ease.OutQuad).SetLink(gameObject);
+            transform.DOLocalRotateQuaternion(Quaternion.identity, _boardSettings.DropDuration)
+                .SetEase(Ease.OutQuad).SetLink(gameObject);
         }
 
         // Slides `distance` (board local) along `direction` from the block's resting cell, back down onto the floor,
@@ -110,9 +138,17 @@ namespace ColorBlockJam.SandBox
             _exitLine = Vector3.Dot(target, direction) + rearmost;
 
             transform.DOKill();
-            // Linear, so the view keeps pace with the simulation, which removes the block after the same time.
-            transform.DOLocalMove(target, seconds).SetEase(Ease.Linear).SetLink(gameObject)
-                .OnUpdate(ShatterPiecesPastLine)
+            ResetHeldPose();
+            var align = _boardSettings.ExitAlignDuration;
+            // Straighten up while aligning; the exit line math assumes an upright block.
+            transform.DOLocalRotateQuaternion(Quaternion.identity, align).SetLink(gameObject);
+            // First settle onto the cell in front of the gate (the rules already moved the block there), then slide
+            // straight out. Sliding from a half-way drag pose would cut diagonally through the wall beside the gate.
+            // The view waits for the shatter before it is released, so the extra align time is safe.
+            DOTween.Sequence().SetTarget(transform).SetLink(gameObject)
+                .Append(transform.DOLocalMove(_layout.CellToLocal(Block.Origin), align).SetEase(Ease.OutQuad))
+                .Append(transform.DOLocalMove(target, seconds).SetEase(_boardSettings.ExitEase)
+                    .OnUpdate(ShatterPiecesPastLine))
                 .OnComplete(ShatterIntact);
         }
 
@@ -135,10 +171,26 @@ namespace ColorBlockJam.SandBox
 
             _pieces.Clear();
             _intact.Clear();
+            ResetHeldPose();
+            transform.localRotation = Quaternion.identity;
             _shattering = 0;
             _onShattered = null;
             _layout = null;
             Block = null;
+        }
+
+        // Rotates about the block centre: the origin-cell pivot is shifted by (c - R c).
+        private void ApplyHeldPose()
+        {
+            var centre = _centroid * transform.localScale.x;
+            transform.localRotation = _tilt;
+            transform.localPosition = _planar + Vector3.up * _liftY + (centre - _tilt * centre);
+        }
+
+        private void ResetHeldPose()
+        {
+            _liftY = 0f;
+            _tilt = Quaternion.identity;
         }
 
         private void ShatterPiecesPastLine()

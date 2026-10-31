@@ -18,11 +18,16 @@ MonoBehaviour:
   FollowSharpness: 20
   LiftDuration: 0.1
   DropDuration: 0.15
+  TiltPerSpeed: 3
+  MaxTilt: 12
+  TiltSharpness: 12
   AssistRange: 0.3
   MaxFrameDelta: 0.1
   ClockWaitsForFirstMove: 1
   PushThreshold: 0.35
   ExitSeconds: 0.5
+  ExitEase: 2
+  ExitAlignDuration: 0.08
   ShatterDuration: 0.4
   ShatterForce: 3
   ShatterSpread: 1.5

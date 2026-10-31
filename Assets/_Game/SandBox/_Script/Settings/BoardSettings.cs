@@ -28,12 +28,20 @@ namespace ColorBlockJam.SandBox
         public float FollowSharpness = 20f;
         public float LiftDuration = 0.1f;
         public float DropDuration = 0.15f;
+        // The held block leans toward where it moves: degrees per board unit per second, capped at MaxTilt.
+        public float TiltPerSpeed = 3f;
+        public float MaxTilt = 12f;
+        public float TiltSharpness = 12f;
 
         public float AssistRange = 0.3f;
         public float MaxFrameDelta = 0.1f;
         public bool ClockWaitsForFirstMove = true;
         public float PushThreshold = 0.35f;
         public float ExitSeconds = 0.5f;
+        // Easing of the slide through the gate; the duration stays ExitSeconds so it ends when the rules remove it.
+        public DG.Tweening.Ease ExitEase = DG.Tweening.Ease.InSine;
+        // Time to settle onto the cell in front of the gate before the slide starts.
+        public float ExitAlignDuration = 0.08f;
 
         public float ShatterDuration = 0.4f;
         public float ShatterForce = 3f;
@@ -88,11 +96,15 @@ namespace ColorBlockJam.SandBox
             MaxFrameDelta = Mathf.Max(MinPositive, MaxFrameDelta);
             PushThreshold = Mathf.Max(0f, PushThreshold);
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
+            ExitAlignDuration = Mathf.Max(0f, ExitAlignDuration);
             CellSize = Mathf.Max(MinPositive, CellSize);
             CameraMargin = Mathf.Max(0f, CameraMargin);
             FollowSharpness = Mathf.Max(MinPositive, FollowSharpness);
             LiftDuration = Mathf.Max(0f, LiftDuration);
             DropDuration = Mathf.Max(0f, DropDuration);
+            TiltPerSpeed = Mathf.Max(0f, TiltPerSpeed);
+            MaxTilt = Mathf.Clamp(MaxTilt, 0f, 45f);
+            TiltSharpness = Mathf.Max(MinPositive, TiltSharpness);
             ShatterDuration = Mathf.Max(MinPositive, ShatterDuration);
             ShatterForce = Mathf.Max(0f, ShatterForce);
             ShatterSpread = Mathf.Max(0f, ShatterSpread);
