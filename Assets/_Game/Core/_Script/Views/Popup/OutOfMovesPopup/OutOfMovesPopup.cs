@@ -79,7 +79,7 @@ namespace ColorBlockJam.Views
             ClosePopup();
         }
 
-        // The level was left from the HUD (Home) while this popup was open: nothing to play on or give up.
+        // The level was already left (e.g. quit from the settings popup queued before this one): nothing to play on or give up.
         private bool CloseIfLevelLeft()
         {
             if (_sceneLoaderController.IsGamePlaySceneLoaded()) return false;

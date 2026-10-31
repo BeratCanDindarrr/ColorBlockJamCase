@@ -17,6 +17,7 @@ namespace ColorBlockJam
             builder.Register<PlayerController>(Lifetime.Singleton);
             builder.Register<LifeController>(Lifetime.Singleton);
             builder.Register<CurrencyController>(Lifetime.Singleton);
+            builder.Register<SettingsController>(Lifetime.Singleton);
             builder.RegisterEntryPoint<InputController>(Lifetime.Singleton).AsSelf();
         }
     }

@@ -27,6 +27,7 @@ namespace ColorBlockJam.Core.Controller
         private readonly PlayerController _playerController;
         private readonly LifeController _lifeController;
         private readonly CurrencyController _currencyController;
+        private readonly SettingsController _settingsController;
         private readonly SceneLoaderController _sceneLoaderController;
         private readonly LevelSettings _levelSettings;
         private readonly ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
@@ -42,6 +43,7 @@ namespace ColorBlockJam.Core.Controller
         , PlayerController playerController
         , LifeController lifeController
         , CurrencyController currencyController
+        , SettingsController settingsController
         , SceneLoaderController sceneLoaderController
         , LevelSettings levelSettings
         , ISubscriber<LevelEndedSignal> levelEndedSubscriber)
@@ -55,6 +57,7 @@ namespace ColorBlockJam.Core.Controller
             _playerController = playerController;
             _lifeController = lifeController;
             _currencyController = currencyController;
+            _settingsController = settingsController;
             _sceneLoaderController = sceneLoaderController;
             _levelSettings = levelSettings;
             _levelEndedSubscriber = levelEndedSubscriber;
@@ -67,6 +70,7 @@ namespace ColorBlockJam.Core.Controller
             _playerController.Init();
             _lifeController.Init();
             _currencyController.Init();
+            _settingsController.Init();
             _taskService.Init();
             _popupService.Init();
             _screenController.Init();

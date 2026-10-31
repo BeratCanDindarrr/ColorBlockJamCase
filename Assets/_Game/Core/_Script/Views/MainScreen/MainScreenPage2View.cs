@@ -1,6 +1,7 @@
 using System;
 using ColorBlockJam.Core.Controller;
 using ColorBlockJam.Enums;
+using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
 using MessagePipe;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace ColorBlockJam.Views
 
         private ApplicationController _applicationController;
         private ScreenController _screenController;
+        private IPopupService _popupService;
         private CurrencyController _currencyController;
         private LifeController _lifeController;
         private ISubscriber<CurrencyUpdateSignal> _currencyUpdateSubscriber;
@@ -28,6 +30,7 @@ namespace ColorBlockJam.Views
         [Inject]
         public void Construct(ApplicationController applicationController
             , ScreenController screenController
+            , IPopupService popupService
             , CurrencyController currencyController
             , LifeController lifeController
             , ISubscriber<CurrencyUpdateSignal> currencyUpdateSubscriber
@@ -35,6 +38,7 @@ namespace ColorBlockJam.Views
         {
             _applicationController = applicationController;
             _screenController = screenController;
+            _popupService = popupService;
             _currencyController = currencyController;
             _lifeController = lifeController;
             _currencyUpdateSubscriber = currencyUpdateSubscriber;
@@ -47,6 +51,7 @@ namespace ColorBlockJam.Views
             header.Initialize();
             header.CoinClicked += OnCoinClicked;
             header.LifeClicked += OnLifeClicked;
+            header.SettingsClicked += OnSettingsClicked;
 
             _subscriptions = DisposableBag.Create(
                 _currencyUpdateSubscriber.Subscribe(_ => RefreshHeader()),
@@ -61,6 +66,7 @@ namespace ColorBlockJam.Views
             {
                 header.CoinClicked -= OnCoinClicked;
                 header.LifeClicked -= OnLifeClicked;
+                header.SettingsClicked -= OnSettingsClicked;
                 header.Dispose();
             }
             _subscriptions?.Dispose();
@@ -81,6 +87,11 @@ namespace ColorBlockJam.Views
         private void OnLifeClicked()
         {
             _applicationController.OpenMoreLivesPopup();
+        }
+
+        private void OnSettingsClicked()
+        {
+            _popupService.AddPopup(new MenuSettingsPopupParameters());
         }
 
         private void OnPlayClicked()

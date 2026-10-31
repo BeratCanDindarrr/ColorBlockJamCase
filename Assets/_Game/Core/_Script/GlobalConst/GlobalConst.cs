@@ -9,6 +9,8 @@ namespace ColorBlockJam.Const
             public const string QuitLevelPopup = "QuitLevelPopup";
             public const string LevelFailedPopup = "LevelFailedPopup";
             public const string MoreLivesPopup = "MoreLivesPopup";
+            public const string MenuSettingsPopup = "MenuSettingsPopup";
+            public const string InGameSettingsPopup = "InGameSettingsPopup";
         }
 
         public struct SceneName

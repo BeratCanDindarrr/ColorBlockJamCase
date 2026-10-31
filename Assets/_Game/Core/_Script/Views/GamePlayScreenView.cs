@@ -1,7 +1,6 @@
 using System;
-using ColorBlockJam.Core.Controller;
+using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
-using Cysharp.Threading.Tasks;
 using MessagePipe;
 using TMPro;
 using UnityEngine;
@@ -16,31 +15,31 @@ namespace ColorBlockJam.Views
         private const string WonText = "You Win!";
         private const string LostText = "Time's Up!";
 
-        [SerializeField] private Button homeButton;
+        [SerializeField] private Button settingsButton;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private TextMeshProUGUI resultText;
 
-        private SceneLoaderController _sceneLoaderController;
+        private IPopupService _popupService;
         private ISubscriber<LevelTimeChangedSignal> _timeChangedSubscriber;
         private ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
         private ISubscriber<TimePurchasedSignal> _timePurchasedSubscriber;
         private IDisposable _subscriptions;
 
         [Inject]
-        public void Construct(SceneLoaderController sceneLoaderController,
+        public void Construct(IPopupService popupService,
             ISubscriber<LevelTimeChangedSignal> timeChangedSubscriber,
             ISubscriber<LevelEndedSignal> levelEndedSubscriber,
             ISubscriber<TimePurchasedSignal> timePurchasedSubscriber)
         {
             _timePurchasedSubscriber = timePurchasedSubscriber;
-            _sceneLoaderController = sceneLoaderController;
+            _popupService = popupService;
             _timeChangedSubscriber = timeChangedSubscriber;
             _levelEndedSubscriber = levelEndedSubscriber;
         }
 
         public void Init()
         {
-            homeButton.onClick.AddListener(OnHomeClicked);
+            settingsButton.onClick.AddListener(OnSettingsClicked);
 
             var bag = DisposableBag.CreateBuilder();
             _timeChangedSubscriber.Subscribe(OnTimeChanged).AddTo(bag);
@@ -52,7 +51,7 @@ namespace ColorBlockJam.Views
 
         public override void Dispose()
         {
-            if (homeButton != null) homeButton.onClick.RemoveListener(OnHomeClicked);
+            if (settingsButton != null) settingsButton.onClick.RemoveListener(OnSettingsClicked);
             _subscriptions?.Dispose();
             _subscriptions = null;
         }
@@ -81,9 +80,10 @@ namespace ColorBlockJam.Views
             resultText.gameObject.SetActive(true);
         }
 
-        private void OnHomeClicked()
+        // Leaving the level goes through the settings popup (Quit), like knit_Out.
+        private void OnSettingsClicked()
         {
-            _sceneLoaderController.CloseGamePlayScene().Forget();
+            _popupService.AddPopup(new InGameSettingsPopupParameters());
         }
     }
 }
