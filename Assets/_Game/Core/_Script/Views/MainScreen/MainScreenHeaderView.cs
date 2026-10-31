@@ -28,9 +28,10 @@ namespace ColorBlockJam.Views
             if (settingsButton != null) settingsButton.onClick.RemoveListener(OnSettingsClicked);
         }
 
-        public void SetCoin(int amount) => coinText.SetText("{0}", amount);
+        public void SetCoin(long amount) => coinText.SetText(amount.ToString());
 
-        public void SetLife(int amount) => lifeText.SetText("{0}", amount);
+        // Text, so limitless life can show "∞".
+        public void SetLife(string life) => lifeText.SetText(life);
 
         private void OnProfileClicked() => ProfileClicked?.Invoke();
 

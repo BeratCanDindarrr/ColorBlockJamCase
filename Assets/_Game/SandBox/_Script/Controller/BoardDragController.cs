@@ -4,13 +4,12 @@ using ColorBlockJam.Signals;
 using Lean.Touch;
 using MessagePipe;
 using UnityEngine;
-using VContainer.Unity;
 
 namespace ColorBlockJam.SandBox
 {
     // Turns finger input into a block drag: picks the block under the finger on the board plane,
     // slides it with the board rules while the finger moves and snaps it to a cell on release.
-    public class BoardDragController : IInitializable, IDisposable
+    public class BoardDragController : IDisposable
     {
         private readonly BoardController _boardController;
         private readonly BoardViewController _boardViewController;
@@ -41,7 +40,7 @@ namespace ColorBlockJam.SandBox
             _fingerUpSubscriber = fingerUpSubscriber;
         }
 
-        public void Initialize()
+        public void Init()
         {
             _subscriptions = DisposableBag.Create(
                 _fingerDownSubscriber.Subscribe(signal => OnFingerDown(signal.Finger)),
@@ -65,6 +64,7 @@ namespace ColorBlockJam.SandBox
                 if (finger == _finger) return;
                 // The previous finger's up never came (input disabled mid-drag): end that drag first.
                 if (simulation.DraggedBlock == _heldBlock) simulation.EndDrag();
+                _boardController.Flush();
                 Reset();
             }
 
@@ -75,6 +75,7 @@ namespace ColorBlockJam.SandBox
 
             var block = simulation.BlockAt(point);
             if (!simulation.BeginDrag(block)) return;
+            _boardController.Flush();
 
             _heldBlock = block;
             _finger = finger;
@@ -88,6 +89,7 @@ namespace ColorBlockJam.SandBox
 
             var simulation = _boardController.Simulation;
             var position = simulation.MoveDrag(point - _grabOffset);
+            _boardController.Flush();
             // Pushed into a gate it fits: the rules let go of it; the view follows the BlockExitStarted event.
             if (simulation.DraggedBlock != _heldBlock)
             {
@@ -96,6 +98,7 @@ namespace ColorBlockJam.SandBox
             }
 
             _boardViewController.MoveBlock(_heldBlock, position);
+            _boardViewController.FollowHeld(Time.deltaTime);
         }
 
         private void OnFingerUp(LeanFinger finger)
@@ -103,6 +106,7 @@ namespace ColorBlockJam.SandBox
             if (finger != _finger || !IsDragging()) return;
 
             _boardController.Simulation.EndDrag();
+            _boardController.Flush();
             Reset();
         }
 

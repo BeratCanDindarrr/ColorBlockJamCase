@@ -1,3 +1,4 @@
+using ColorBlockJam.Core.Controller;
 using ColorBlockJam.Pool;
 using UnityEngine;
 using VContainer;
@@ -29,8 +30,16 @@ namespace ColorBlockJam.SandBox
             var piecePoolSize = Mathf.Clamp(boardSettings.PiecePoolSize, 0, MemoryPoolBase<object>.DefaultMaxSize);
             builder.RegisterMonoPool(boardSettings.BlockPrefab, blockPoolSize, parent: poolRoot);
             builder.RegisterMonoPool(boardSettings.BlockPiecePrefab, piecePoolSize, parent: poolRoot);
-            builder.RegisterEntryPoint<BoardController>().AsSelf();
-            builder.RegisterEntryPoint<BoardDragController>();
+            builder.Register<LevelController>(Lifetime.Singleton);
+            builder.Register<BoardController>(Lifetime.Singleton);
+            builder.Register<BoardDragController>(Lifetime.Singleton);
+            // No VContainer entry points in gameplay: the board starts here, explicitly, once the container is built.
+            builder.RegisterBuildCallback(container =>
+            {
+                var playerController = container.Resolve<PlayerController>();
+                container.Resolve<LevelController>().LoadLevel(playerController.GetDataLevel());
+                container.Resolve<BoardDragController>().Init();
+            });
         }
     }
 }

@@ -17,7 +17,6 @@ namespace ColorBlockJam.SandBox.Board
 
         public bool IsExiting { get; internal set; }
         public GateState ExitGate { get; internal set; }
-        public double ExitElapsed { get; internal set; }
 
         public BlockState(BlockData data)
         {

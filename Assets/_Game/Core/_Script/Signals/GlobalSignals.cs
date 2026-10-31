@@ -1,3 +1,5 @@
+using ColorBlockJam.Core.Model;
+using ColorBlockJam.Enums;
 using Lean.Touch;
 
 namespace ColorBlockJam.Signals
@@ -49,6 +51,52 @@ namespace ColorBlockJam.Signals
         public LevelEndedSignal(bool won)
         {
             Won = won;
+        }
+    }
+
+    public readonly struct LevelUpSignal
+    {
+    }
+
+    public readonly struct LevelSuccessSignal
+    {
+    }
+
+    public readonly struct CurrencyUpdateSignal
+    {
+        public readonly CurrencyData CurrencyData;
+        public readonly CurrencyUpdateType CurrencyUpdateType;
+
+        public CurrencyUpdateSignal(CurrencyData currencyData, CurrencyUpdateType currencyUpdateType)
+        {
+            CurrencyData = currencyData;
+            CurrencyUpdateType = currencyUpdateType;
+        }
+    }
+
+    public readonly struct CoinUpdateSignal
+    {
+        public readonly long RewardCount;
+
+        public CoinUpdateSignal(long rewardCount)
+        {
+            RewardCount = rewardCount;
+        }
+    }
+
+    // The life count or its timer changed.
+    public readonly struct LifeModelSync
+    {
+    }
+
+    // "Play On" in the out-of-time popup bought more time for the running level.
+    public readonly struct TimePurchasedSignal
+    {
+        public readonly float Seconds;
+
+        public TimePurchasedSignal(float seconds)
+        {
+            Seconds = seconds;
         }
     }
 }

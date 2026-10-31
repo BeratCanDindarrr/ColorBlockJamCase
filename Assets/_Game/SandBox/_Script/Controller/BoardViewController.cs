@@ -21,8 +21,6 @@ namespace ColorBlockJam.SandBox
         private readonly List<WallPieceView> _wallPieces = new List<WallPieceView>();
         private readonly List<GateView> _gates = new List<GateView>();
         private readonly Dictionary<BlockState, BlockView> _blocks = new Dictionary<BlockState, BlockView>();
-        // Blocks the simulation has removed whose shatter is still playing; released when it ends.
-        private readonly HashSet<BlockState> _removed = new HashSet<BlockState>();
 
         private BoardSettings _boardSettings;
         private BoardCameraView _cameraView;
@@ -88,9 +86,6 @@ namespace ColorBlockJam.SandBox
                         ReleaseHeld(boardEvent.Block);
                         PlayExit(boardEvent.Block, boardEvent.Gate);
                         break;
-                    case BoardEventType.BlockRemoved:
-                        OnBlockRemoved(boardEvent.Block);
-                        break;
                     case BoardEventType.Won:
                     case BoardEventType.Lost:
                         // The level end drops the drag without a DragEnded; set the held block back down.
@@ -100,8 +95,8 @@ namespace ColorBlockJam.SandBox
             }
         }
 
-        // Slides the block out through the gate over ExitSeconds (the simulation's removal time), far enough that
-        // its rear edge clears the outer face of the wall, then it shatters.
+        // Slides the block out through the gate over ExitSeconds, far enough that its rear edge clears the outer
+        // face of the wall, then it shatters and goes back to the pool.
         public void PlayExit(BlockState block, GateState gate)
         {
             var view = GetView(block);
@@ -116,19 +111,7 @@ namespace ColorBlockJam.SandBox
             view.PlayExit(direction, wall - rearEdge, _boardSettings.ExitSeconds, OnBlockShattered);
         }
 
-        // Removal can land before the shatter ends (it ends ShatterDuration after the slide); the view waits for it.
-        public void OnBlockRemoved(BlockState block)
-        {
-            var view = GetView(block);
-            if (!view) return;
-            if (view.IsShattered) ReleaseBlock(block);
-            else _removed.Add(block);
-        }
-
-        private void OnBlockShattered(BlockView view)
-        {
-            if (_removed.Remove(view.Block)) ReleaseBlock(view.Block);
-        }
+        private void OnBlockShattered(BlockView view) => ReleaseBlock(view.Block);
 
         private void ReleaseBlock(BlockState block)
         {
@@ -169,7 +152,7 @@ namespace ColorBlockJam.SandBox
             return view;
         }
 
-        // Called every frame so the held block keeps easing toward the finger even when the finger is still.
+        // Called on every finger update (each frame while the finger is down), also when the finger is still.
         public void FollowHeld(float deltaTime)
         {
             if (_heldView) _heldView.Follow(_heldTarget, deltaTime);
@@ -182,7 +165,6 @@ namespace ColorBlockJam.SandBox
             DespawnAll(_gatePool, _gates);
             DespawnAll(_blockPool, _blocks.Values);
             _blocks.Clear();
-            _removed.Clear();
             _heldView = null;
             Layout = null;
         }

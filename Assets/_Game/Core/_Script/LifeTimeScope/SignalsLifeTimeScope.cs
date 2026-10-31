@@ -15,6 +15,12 @@ namespace ColorBlockJam.Core
             builder.RegisterMessageBroker<OnFingerUpSignal>(options);
             builder.RegisterMessageBroker<LevelTimeChangedSignal>(options);
             builder.RegisterMessageBroker<LevelEndedSignal>(options);
+            builder.RegisterMessageBroker<LevelUpSignal>(options);
+            builder.RegisterMessageBroker<LevelSuccessSignal>(options);
+            builder.RegisterMessageBroker<CurrencyUpdateSignal>(options);
+            builder.RegisterMessageBroker<CoinUpdateSignal>(options);
+            builder.RegisterMessageBroker<LifeModelSync>(options);
+            builder.RegisterMessageBroker<TimePurchasedSignal>(options);
         }
     }
 }

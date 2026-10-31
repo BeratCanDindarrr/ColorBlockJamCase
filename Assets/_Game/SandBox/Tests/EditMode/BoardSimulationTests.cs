@@ -7,11 +7,8 @@ namespace ColorBlockJam.SandBox.Board.Tests
 {
     public class BoardSimulationTests
     {
-        private const double ExitSeconds = 0.5;
-        private const double MaxFrameDelta = 0.05;
-
         private static BoardRules Rules(bool clockWaitsForFirstMove = true) =>
-            new BoardRules(0.3, MaxFrameDelta, clockWaitsForFirstMove, 0.35, ExitSeconds);
+            new BoardRules(0.3, clockWaitsForFirstMove, 0.35);
 
         private static BlockState Find(BoardSimulation sim, string id) => sim.Blocks.First(b => b.Id == id);
 
@@ -24,14 +21,6 @@ namespace ColorBlockJam.SandBox.Board.Tests
             return block;
         }
 
-        private static List<BoardEvent> TickFor(BoardSimulation sim, double seconds)
-        {
-            var events = new List<BoardEvent>();
-            for (var t = 0.0; t < seconds; t += MaxFrameDelta)
-                events.AddRange(sim.Tick(MaxFrameDelta));
-            return events;
-        }
-
         private static bool HasEvent(IEnumerable<BoardEvent> events, BoardEventType type) => events.Any(e => e.Type == type);
 
         [Test]
@@ -40,26 +29,52 @@ namespace ColorBlockJam.SandBox.Board.Tests
             var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
             Assert.That(sim.IsClockRunning, Is.False);
 
-            sim.Tick(MaxFrameDelta);
-            Assert.That(sim.TimeLeft, Is.EqualTo(60));
-
             Assert.That(sim.BeginDrag(Find(sim, "A")), Is.True);
             Assert.That(sim.IsClockRunning, Is.True);
-            Assert.That(HasEvent(sim.Tick(MaxFrameDelta), BoardEventType.DragStarted), Is.True);
-            Assert.That(sim.TimeLeft, Is.LessThan(60));
+            Assert.That(HasEvent(sim.TakeEvents(), BoardEventType.DragStarted), Is.True);
+            sim.AdvanceClock(1);
+            Assert.That(sim.TimeLeft, Is.EqualTo(59));
         }
 
         [Test]
-        public void MoveDrag_IntoMatchingGate_StartsExit_AndClearsDrag()
+        public void TakeEvents_HandsEachEventOverOnce()
         {
             var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
-            var block = PushAIntoLeftGate(sim);
+            sim.BeginDrag(Find(sim, "A"));
+
+            Assert.That(sim.TakeEvents().Count, Is.EqualTo(1));
+            Assert.That(sim.TakeEvents(), Is.Empty);
+        }
+
+        [Test]
+        public void AdvanceClock_BeforeFirstMove_KeepsTime()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
+
+            sim.AdvanceClock(10);
+
+            Assert.That(sim.TimeLeft, Is.EqualTo(60));
+            Assert.That(sim.TakeEvents(), Is.Empty);
+        }
+
+        [Test]
+        public void MoveDrag_IntoMatchingGate_RemovesBlock_AndClearsDrag()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
+            sim.BeginDrag(Find(sim, "A"));
+            sim.TakeEvents();
+            var block = Find(sim, "A");
+            sim.MoveDrag(new BoardPoint(-1, 0));
 
             Assert.That(block.IsExiting, Is.True);
             Assert.That(block.ExitGate, Is.SameAs(sim.Gates[0]));
             Assert.That(sim.DraggedBlock, Is.Null);
+            Assert.That(sim.Blocks, Has.No.Member(block));
+            Assert.That(sim.BlockAt(new BoardPoint(0.5, 0.5)), Is.Null);
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Playing));
 
-            var exit = sim.Tick(MaxFrameDelta).Single(e => e.Type == BoardEventType.BlockExitStarted);
+            var exit = sim.TakeEvents().Single();
+            Assert.That(exit.Type, Is.EqualTo(BoardEventType.BlockExitStarted));
             Assert.That(exit.Block, Is.SameAs(block));
             Assert.That(exit.Gate, Is.SameAs(sim.Gates[0]));
         }
@@ -77,60 +92,32 @@ namespace ColorBlockJam.SandBox.Board.Tests
         }
 
         [Test]
-        public void Tick_AfterExitSeconds_RemovesBlock_EmitsBlockRemoved()
-        {
-            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
-            var block = PushAIntoLeftGate(sim);
-
-            var early = TickFor(sim, ExitSeconds / 2);
-            Assert.That(sim.Blocks, Has.Member(block));
-            Assert.That(HasEvent(early, BoardEventType.BlockRemoved), Is.False);
-
-            var later = TickFor(sim, ExitSeconds);
-            Assert.That(sim.Blocks, Has.No.Member(block));
-            Assert.That(later.Single(e => e.Type == BoardEventType.BlockRemoved).Block, Is.SameAs(block));
-            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Playing));
-            Assert.That(sim.BlockAt(new BoardPoint(0.5, 0.5)), Is.Null);
-        }
-
-        [Test]
-        public void Tick_LastBlockRemoved_Won()
+        public void MoveDrag_LastBlockIntoGate_Won()
         {
             var sim = new BoardSimulation(OneBlockOneGate(60), Rules());
             PushAIntoLeftGate(sim);
 
-            var events = TickFor(sim, ExitSeconds * 2);
+            var events = sim.TakeEvents();
 
             Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
             Assert.That(sim.Blocks, Is.Empty);
-            Assert.That(events.Count(e => e.Type == BoardEventType.Won), Is.EqualTo(1));
+            // The exit is reported before the win, so the view still slides the block out.
+            Assert.That(events.Select(e => e.Type), Is.EqualTo(new[]
+            {
+                BoardEventType.DragStarted, BoardEventType.BlockExitStarted, BoardEventType.Won
+            }));
         }
 
         [Test]
-        public void Tick_ClockRunsOut_WithBlocksLeft_Lost()
+        public void AdvanceClock_RunsOut_WithBlocksLeft_Lost()
         {
             var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules(clockWaitsForFirstMove: false));
 
-            var events = sim.Tick(61);
+            sim.AdvanceClock(61);
 
             Assert.That(sim.TimeLeft, Is.EqualTo(0));
             Assert.That(sim.Status, Is.EqualTo(BoardStatus.Lost));
-            Assert.That(HasEvent(events, BoardEventType.Lost), Is.True);
-        }
-
-        [Test]
-        public void Tick_ClockRunsOut_WhileLastBlockExiting_Won()
-        {
-            var sim = new BoardSimulation(OneBlockOneGate(1), Rules());
-            PushAIntoLeftGate(sim);
-
-            // The clock is not clamped to MaxFrameDelta, so it runs out while the exit is still under way.
-            sim.Tick(5);
-            Assert.That(sim.TimeLeft, Is.EqualTo(0));
-            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Playing));
-
-            TickFor(sim, ExitSeconds * 2);
-            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+            Assert.That(HasEvent(sim.TakeEvents(), BoardEventType.Lost), Is.True);
         }
 
         [Test]
@@ -144,16 +131,43 @@ namespace ColorBlockJam.SandBox.Board.Tests
         }
 
         [Test]
-        public void Tick_AfterWon_NoFurtherEvents()
+        public void AfterWon_NoFurtherEvents()
         {
             var sim = new BoardSimulation(OneBlockOneGate(60), Rules());
             PushAIntoLeftGate(sim);
-            TickFor(sim, ExitSeconds * 2);
+            sim.TakeEvents();
             Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
 
-            Assert.That(sim.Tick(MaxFrameDelta), Is.Empty);
-            Assert.That(sim.Tick(100), Is.Empty);
+            sim.AdvanceClock(100);
+            Assert.That(sim.TakeEvents(), Is.Empty);
             Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+        }
+
+        [Test]
+        public void AddTime_AfterLost_ResumesPlaying()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules(clockWaitsForFirstMove: false));
+            sim.AdvanceClock(61);
+            sim.TakeEvents();
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Lost));
+
+            sim.AddTime(30);
+
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Playing));
+            Assert.That(sim.TimeLeft, Is.EqualTo(30));
+            Assert.That(sim.BeginDrag(Find(sim, "A")), Is.True);
+        }
+
+        [Test]
+        public void AddTime_AfterWon_DoesNothing()
+        {
+            var sim = new BoardSimulation(OneBlockOneGate(60), Rules());
+            PushAIntoLeftGate(sim);
+
+            sim.AddTime(30);
+
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+            Assert.That(sim.TimeLeft, Is.EqualTo(60));
         }
     }
 }

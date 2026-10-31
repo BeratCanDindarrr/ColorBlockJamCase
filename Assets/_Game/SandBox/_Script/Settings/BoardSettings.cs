@@ -34,11 +34,10 @@ namespace ColorBlockJam.SandBox
         public float TiltSharpness = 12f;
 
         public float AssistRange = 0.3f;
-        public float MaxFrameDelta = 0.1f;
         public bool ClockWaitsForFirstMove = true;
         public float PushThreshold = 0.35f;
+        // How long an exiting block slides through its gate, and its easing.
         public float ExitSeconds = 0.5f;
-        // Easing of the slide through the gate; the duration stays ExitSeconds so it ends when the rules remove it.
         public DG.Tweening.Ease ExitEase = DG.Tweening.Ease.InSine;
         // Time to settle onto the cell in front of the gate before the slide starts.
         public float ExitAlignDuration = 0.08f;
@@ -74,10 +73,8 @@ namespace ColorBlockJam.SandBox
 
         public BoardRules ToRules() => new BoardRules(
             Mathf.Max(0f, AssistRange),
-            Mathf.Max(MinPositive, MaxFrameDelta),
             ClockWaitsForFirstMove,
-            Mathf.Max(0f, PushThreshold),
-            Mathf.Max(MinPositive, ExitSeconds));
+            Mathf.Max(0f, PushThreshold));
 
         public Color GetColor(BlockColor color)
         {
@@ -93,7 +90,6 @@ namespace ColorBlockJam.SandBox
         private void OnValidate()
         {
             AssistRange = Mathf.Max(0f, AssistRange);
-            MaxFrameDelta = Mathf.Max(MinPositive, MaxFrameDelta);
             PushThreshold = Mathf.Max(0f, PushThreshold);
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             ExitAlignDuration = Mathf.Max(0f, ExitAlignDuration);

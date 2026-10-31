@@ -14,7 +14,7 @@ namespace ColorBlockJam.SandBox.Board
         private readonly List<GateState> _gates;
         private readonly BoardMovement _movement;
         private readonly List<BoardEvent> _events = new List<BoardEvent>();
-        // Events raised outside Tick (drag start/end, exit start); the next Tick reports them first.
+        // Events raised since the last TakeEvents.
         private readonly List<BoardEvent> _pendingEvents = new List<BoardEvent>();
 
         public int Cols { get; }
@@ -99,28 +99,40 @@ namespace ColorBlockJam.SandBox.Board
             _pendingEvents.Add(new BoardEvent(BoardEventType.DragEnded, block));
         }
 
-        // Reports queued events, then advances exits and the clock. The returned list is reused; it is
-        // only valid until the next Tick.
-        public IReadOnlyList<BoardEvent> Tick(double deltaTime)
+        // Hands over the events raised since the last call. The returned list is reused; it is only valid until the
+        // next call.
+        public IReadOnlyList<BoardEvent> TakeEvents()
         {
             _events.Clear();
-            if (Status != BoardStatus.Playing)
-                return _events;
-
             _events.AddRange(_pendingEvents);
             _pendingEvents.Clear();
-
-            var seconds = double.IsNaN(deltaTime) || double.IsInfinity(deltaTime) ? 0 : Math.Max(deltaTime, 0);
-            AdvanceExits(Math.Min(seconds, _rules.MaxFrameDelta));
-            if (_blocks.Count == 0)
-            {
-                EndLevel(BoardStatus.Won);
-                return _events;
-            }
-
-            AdvanceClock(seconds);
             return _events;
         }
+
+        // Runs the level clock down; running out of time with blocks left loses the level.
+        public void AdvanceClock(double seconds)
+        {
+            if (Status != BoardStatus.Playing || !IsClockRunning)
+                return;
+
+            TimeLeft = Math.Max(0, TimeLeft - Sanitize(seconds));
+            if (TimeLeft <= 0)
+                EndLevel(BoardStatus.Lost);
+        }
+
+        // Puts more time on the clock ("Play On"); a level lost on time resumes where it stopped.
+        public void AddTime(double seconds)
+        {
+            if (Status == BoardStatus.Won || double.IsNaN(seconds) || double.IsInfinity(seconds) || seconds <= 0)
+                return;
+
+            TimeLeft += seconds;
+            if (Status == BoardStatus.Lost)
+                Status = BoardStatus.Playing;
+        }
+
+        private static double Sanitize(double seconds) =>
+            double.IsNaN(seconds) || double.IsInfinity(seconds) ? 0 : Math.Max(seconds, 0);
 
         // The finger's target lies past the wall the held block stands against: the gate it fits that is
         // pushed into furthest, by at least the threshold, takes it.
@@ -150,47 +162,12 @@ namespace ColorBlockJam.SandBox.Board
             block.MoveTo(drop);
             block.IsExiting = true;
             block.ExitGate = best;
-            block.ExitElapsed = 0;
             ClearDrag();
+            // The rules are done with it at once; the slide through the gate is the view's animation.
+            _blocks.Remove(block);
             _pendingEvents.Add(new BoardEvent(BoardEventType.BlockExitStarted, block, best));
-        }
-
-        private void AdvanceExits(double step)
-        {
-            for (var i = 0; i < _blocks.Count; i++)
-            {
-                var block = _blocks[i];
-                if (!block.IsExiting)
-                    continue;
-
-                block.ExitElapsed += step;
-                if (block.ExitElapsed < _rules.ExitSeconds)
-                    continue;
-
-                _blocks.RemoveAt(i);
-                i--;
-                _events.Add(new BoardEvent(BoardEventType.BlockRemoved, block, block.ExitGate));
-            }
-        }
-
-        // Running out of time loses the level, unless every block left is already exiting: that board
-        // is cleared and wins once they are gone.
-        private void AdvanceClock(double seconds)
-        {
-            if (!IsClockRunning)
-                return;
-
-            TimeLeft = Math.Max(0, TimeLeft - seconds);
-            if (TimeLeft <= 0 && HasPlacedBlock())
-                EndLevel(BoardStatus.Lost);
-        }
-
-        private bool HasPlacedBlock()
-        {
-            for (var i = 0; i < _blocks.Count; i++)
-                if (!_blocks[i].IsExiting)
-                    return true;
-            return false;
+            if (_blocks.Count == 0)
+                EndLevel(BoardStatus.Won);
         }
 
         private void ClearDrag()
@@ -204,8 +181,7 @@ namespace ColorBlockJam.SandBox.Board
         {
             Status = status;
             ClearDrag();
-            _pendingEvents.Clear();
-            _events.Add(new BoardEvent(status == BoardStatus.Won ? BoardEventType.Won : BoardEventType.Lost));
+            _pendingEvents.Add(new BoardEvent(status == BoardStatus.Won ? BoardEventType.Won : BoardEventType.Lost));
         }
     }
 }

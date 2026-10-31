@@ -4,9 +4,8 @@ namespace ColorBlockJam.SandBox.Board
     {
         DragStarted,
         DragEnded,
-        // Block was pushed into Gate and starts sliding through it.
+        // Block was pushed into Gate and left the board; its view slides out through the gate.
         BlockExitStarted,
-        BlockRemoved,
         Won,
         Lost
     }

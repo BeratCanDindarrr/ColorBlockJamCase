@@ -23,13 +23,16 @@ namespace ColorBlockJam.Views
         private SceneLoaderController _sceneLoaderController;
         private ISubscriber<LevelTimeChangedSignal> _timeChangedSubscriber;
         private ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
+        private ISubscriber<TimePurchasedSignal> _timePurchasedSubscriber;
         private IDisposable _subscriptions;
 
         [Inject]
         public void Construct(SceneLoaderController sceneLoaderController,
             ISubscriber<LevelTimeChangedSignal> timeChangedSubscriber,
-            ISubscriber<LevelEndedSignal> levelEndedSubscriber)
+            ISubscriber<LevelEndedSignal> levelEndedSubscriber,
+            ISubscriber<TimePurchasedSignal> timePurchasedSubscriber)
         {
+            _timePurchasedSubscriber = timePurchasedSubscriber;
             _sceneLoaderController = sceneLoaderController;
             _timeChangedSubscriber = timeChangedSubscriber;
             _levelEndedSubscriber = levelEndedSubscriber;
@@ -42,6 +45,8 @@ namespace ColorBlockJam.Views
             var bag = DisposableBag.CreateBuilder();
             _timeChangedSubscriber.Subscribe(OnTimeChanged).AddTo(bag);
             _levelEndedSubscriber.Subscribe(OnLevelEnded).AddTo(bag);
+            // Play On resumes the lost level.
+            _timePurchasedSubscriber.Subscribe(_ => resultText.gameObject.SetActive(false)).AddTo(bag);
             _subscriptions = bag.Build();
         }
 

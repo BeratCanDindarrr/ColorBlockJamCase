@@ -17,6 +17,9 @@ namespace ColorBlockJam.Core.Controller
             _screenController = screenController;
         }
 
+        // A load or unload is under way.
+        public bool IsBusy => _isBusy;
+
         public bool IsGamePlaySceneLoaded() => SceneManager.GetSceneByName(GlobalConst.SceneName.GamePlay).isLoaded;
 
         public async UniTask OpenGamePlayScene()

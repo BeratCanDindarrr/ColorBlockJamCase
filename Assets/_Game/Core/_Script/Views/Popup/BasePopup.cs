@@ -10,9 +10,12 @@ namespace ColorBlockJam.Views
         private T _popupParameters;
         private bool _isPopupClosed = false;
 
+        protected T Parameters => _popupParameters;
+
         public void Init(BasePopupParameters parameters)
         {
             _popupParameters = (T)parameters;
+            ShowPopup();
         }
 
         public virtual void ShowPopup()
