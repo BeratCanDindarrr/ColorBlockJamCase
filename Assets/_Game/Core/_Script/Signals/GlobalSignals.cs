@@ -31,4 +31,24 @@ namespace ColorBlockJam.Signals
             Finger = finger;
         }
     }
+
+    public readonly struct LevelTimeChangedSignal
+    {
+        public readonly int SecondsLeft;
+
+        public LevelTimeChangedSignal(int secondsLeft)
+        {
+            SecondsLeft = secondsLeft;
+        }
+    }
+
+    public readonly struct LevelEndedSignal
+    {
+        public readonly bool Won;
+
+        public LevelEndedSignal(bool won)
+        {
+            Won = won;
+        }
+    }
 }
