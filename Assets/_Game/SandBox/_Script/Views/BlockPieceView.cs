@@ -1,5 +1,6 @@
 using ColorBlockJam.Pool;
 using ColorBlockJam.SandBox.Board;
+using DG.Tweening;
 using UnityEngine;
 
 namespace ColorBlockJam.SandBox
@@ -33,6 +34,9 @@ namespace ColorBlockJam.SandBox
 
         public void OnDespawned()
         {
+            // A shatter may still be running (block cleared mid-exit); the pool must get an intact piece back.
+            transform.DOKill();
+            transform.localScale = Vector3.one;
             transform.localRotation = Quaternion.identity;
         }
 

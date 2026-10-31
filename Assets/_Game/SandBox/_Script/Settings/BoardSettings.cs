@@ -34,6 +34,8 @@ namespace ColorBlockJam.SandBox
 
         public float ShatterDuration = 0.4f;
         public float ShatterForce = 3f;
+        // Random sideways/upward speed added to each shattering piece, world units per second.
+        public float ShatterSpread = 1.5f;
 
         public ColorEntry[] Colors =
         {
@@ -88,6 +90,9 @@ namespace ColorBlockJam.SandBox
             FollowSharpness = Mathf.Max(0f, FollowSharpness);
             LiftDuration = Mathf.Max(0f, LiftDuration);
             DropDuration = Mathf.Max(0f, DropDuration);
+            ShatterDuration = Mathf.Max(MinPositive, ShatterDuration);
+            ShatterForce = Mathf.Max(0f, ShatterForce);
+            ShatterSpread = Mathf.Max(0f, ShatterSpread);
             BlockPoolSize = Mathf.Max(0, BlockPoolSize);
             PiecePoolSize = Mathf.Max(0, PiecePoolSize);
         }

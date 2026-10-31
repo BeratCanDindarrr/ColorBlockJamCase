@@ -15,11 +15,14 @@ namespace ColorBlockJam.SandBox
         private const double WallPieceReach = 0.25;
         // The outer corner pieces sit a quarter cell past the first/last cell's outer edge.
         private const double CornerReach = 0.75;
+        private const float HalfCell = 0.5f;
 
         private readonly List<FloorTileView> _floorTiles = new List<FloorTileView>();
         private readonly List<WallPieceView> _wallPieces = new List<WallPieceView>();
         private readonly List<GateView> _gates = new List<GateView>();
         private readonly Dictionary<BlockState, BlockView> _blocks = new Dictionary<BlockState, BlockView>();
+        // Blocks the simulation has removed whose shatter is still playing; released when it ends.
+        private readonly HashSet<BlockState> _removed = new HashSet<BlockState>();
 
         private BoardSettings _boardSettings;
         private BoardCameraView _cameraView;
@@ -83,9 +86,11 @@ namespace ColorBlockJam.SandBox
                     case BoardEventType.BlockExitStarted:
                         // The rules let go of the block without a DragEnded; it stops following here.
                         ReleaseHeld(boardEvent.Block);
-                        break; // Task 10: exit animation.
+                        PlayExit(boardEvent.Block, boardEvent.Gate);
+                        break;
                     case BoardEventType.BlockRemoved:
-                        break; // Task 10
+                        OnBlockRemoved(boardEvent.Block);
+                        break;
                     case BoardEventType.Won:
                     case BoardEventType.Lost:
                         // The level end drops the drag without a DragEnded; set the held block back down.
@@ -93,6 +98,43 @@ namespace ColorBlockJam.SandBox
                         break; // Task 10: win/lose flow.
                 }
             }
+        }
+
+        // Slides the block out through the gate over ExitSeconds (the simulation's removal time), far enough that
+        // its rear edge clears the outer face of the wall, then it shatters.
+        public void PlayExit(BlockState block, GateState gate)
+        {
+            var view = GetView(block);
+            if (!view) return;
+
+            var direction = Layout.OutwardLocal(gate.Edge);
+            var wall = Vector3.Dot(Layout.GateOuterLocal(gate.Edge, gate.Index, gate.Length), direction);
+            var rearEdge = float.MaxValue;
+            foreach (var cell in block.OccupiedCells(block.Origin))
+                rearEdge = Mathf.Min(rearEdge, Vector3.Dot(Layout.CellToLocal(cell), direction) - HalfCell * Layout.CellSize);
+
+            view.PlayExit(direction, wall - rearEdge, _boardSettings.ExitSeconds, OnBlockShattered);
+        }
+
+        // Removal can land before the shatter ends (it ends ShatterDuration after the slide); the view waits for it.
+        public void OnBlockRemoved(BlockState block)
+        {
+            var view = GetView(block);
+            if (!view) return;
+            if (view.IsShattered) ReleaseBlock(block);
+            else _removed.Add(block);
+        }
+
+        private void OnBlockShattered(BlockView view)
+        {
+            if (_removed.Remove(view.Block)) ReleaseBlock(view.Block);
+        }
+
+        private void ReleaseBlock(BlockState block)
+        {
+            var view = _blocks[block];
+            _blocks.Remove(block);
+            _blockPool.Despawn(view);
         }
 
         // Lifts the held block and draws it with the SelectedItem camera, above walls and other blocks.
@@ -140,6 +182,7 @@ namespace ColorBlockJam.SandBox
             DespawnAll(_gatePool, _gates);
             DespawnAll(_blockPool, _blocks.Values);
             _blocks.Clear();
+            _removed.Clear();
             _heldView = null;
             Layout = null;
         }

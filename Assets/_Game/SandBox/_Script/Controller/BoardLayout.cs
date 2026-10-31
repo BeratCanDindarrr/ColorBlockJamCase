@@ -43,6 +43,17 @@ namespace ColorBlockJam.SandBox
         // A gate stands in the wall line, centred on the cells it covers.
         public Vector3 GateLocal(BoardEdge edge, int index, int length) => EdgeLocal(edge, index + (length - 1) * Half);
 
+        // The gate's opening on the outside face of the wall.
+        public Vector3 GateOuterLocal(BoardEdge edge, int index, int length) =>
+            GateLocal(edge, index, length) + OutwardLocal(edge) * (WallOffset * CellSize);
+
+        // Unit direction out of the board through an edge (GateFit.Normal in local space; rows grow along -z).
+        public Vector3 OutwardLocal(BoardEdge edge)
+        {
+            var normal = GateFit.Normal(edge);
+            return new Vector3(normal.Col, 0f, -normal.Row);
+        }
+
         // A gate (and a wall piece) faces the board.
         public Quaternion GateRotation(BoardEdge edge)
         {
