@@ -98,13 +98,20 @@ namespace ColorBlockJam.Core.Controller
 
             if (!_lifeController.HasLife())
             {
-                // TODO: open MoreLivesPopup (not in this project yet).
-                DebugExtension.Log("No life left to play");
+                OpenMoreLivesPopup();
                 return;
             }
 
             _lifeController.RemoveLife();
             _sceneLoaderController.OpenGamePlayScene().Forget();
+        }
+
+        // Only while lives are refilling; the popup closes itself once they are full.
+        public void OpenMoreLivesPopup()
+        {
+            if (_lifeController.IsLimitless() || !_lifeController.IsTimerActive()) return;
+
+            _popupService.AddPopup(new MoreLivesPopupParameters());
         }
 
         private void OnLevelEnded(LevelEndedSignal signal)

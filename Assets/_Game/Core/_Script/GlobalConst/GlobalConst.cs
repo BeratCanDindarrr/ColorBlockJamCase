@@ -8,6 +8,7 @@ namespace ColorBlockJam.Const
             public const string OutOfMovesPopup = "OutOfMovesPopup";
             public const string QuitLevelPopup = "QuitLevelPopup";
             public const string LevelFailedPopup = "LevelFailedPopup";
+            public const string MoreLivesPopup = "MoreLivesPopup";
         }
 
         public struct SceneName
