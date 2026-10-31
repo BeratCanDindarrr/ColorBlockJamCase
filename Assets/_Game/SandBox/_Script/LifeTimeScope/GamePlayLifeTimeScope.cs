@@ -26,6 +26,7 @@ namespace ColorBlockJam.SandBox
             builder.RegisterMonoPool(boardSettings.BlockPrefab, boardSettings.BlockPoolSize, parent: poolRoot);
             builder.RegisterMonoPool(boardSettings.BlockPiecePrefab, boardSettings.PiecePoolSize, parent: poolRoot);
             builder.RegisterEntryPoint<BoardController>().AsSelf();
+            builder.RegisterEntryPoint<BoardDragController>();
         }
     }
 }

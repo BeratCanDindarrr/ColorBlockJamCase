@@ -39,6 +39,11 @@ namespace ColorBlockJam.SandBox
 
         public void Tick()
         {
+            if (Simulation == null) return;
+
+            // Drains queued events; exit, removal and win/lose events have no views yet.
+            Simulation.Tick(Time.deltaTime);
+            _boardViewController.FollowHeld(Time.deltaTime);
         }
 
         public void Dispose()

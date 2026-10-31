@@ -35,7 +35,8 @@ namespace ColorBlockJam.SandBox
         // Local position of the center of the cell at the given (possibly fractional) board coordinates.
         public Vector3 PointToLocal(BoardPoint point) => ToLocal(point.Col, point.Row);
 
-        // Inverse of PointToLocal for a point on the board plane: the cell at (c, r) covers [c, c+1) x [r, r+1).
+        // Board coordinates of a local point on the board plane, corner-origin: the cell at (c, r) covers [c, c+1) x [r, r+1),
+        // so a cell centre maps to (c + 0.5, r + 0.5). Not the inverse of PointToLocal, which takes cell-centre coordinates.
         public BoardPoint LocalToBoard(Vector3 local) =>
             new BoardPoint(local.x / CellSize + Cols * Half, -local.z / CellSize + Rows * Half);
 

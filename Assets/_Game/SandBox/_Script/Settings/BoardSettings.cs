@@ -23,6 +23,8 @@ namespace ColorBlockJam.SandBox
         public float PickPlaneHeight = 0.5f;
         public float LiftHeight = 0.4f;
         public float FollowSharpness = 20f;
+        public float LiftDuration = 0.1f;
+        public float DropDuration = 0.15f;
 
         public float AssistRange = 0.3f;
         public float MaxFrameDelta = 0.1f;
@@ -83,6 +85,9 @@ namespace ColorBlockJam.SandBox
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             CellSize = Mathf.Max(MinPositive, CellSize);
             CameraMargin = Mathf.Max(0f, CameraMargin);
+            FollowSharpness = Mathf.Max(0f, FollowSharpness);
+            LiftDuration = Mathf.Max(0f, LiftDuration);
+            DropDuration = Mathf.Max(0f, DropDuration);
             BlockPoolSize = Mathf.Max(0, BlockPoolSize);
             PiecePoolSize = Mathf.Max(0, PiecePoolSize);
         }

@@ -2,6 +2,7 @@ using ColorBlockJam.Core.Level;
 using System.Collections.Generic;
 using ColorBlockJam.Pool;
 using ColorBlockJam.SandBox.Board;
+using DG.Tweening;
 using UnityEngine;
 using VContainer;
 
@@ -23,14 +24,16 @@ namespace ColorBlockJam.SandBox
         private readonly List<BlockPieceView> _pieces = new List<BlockPieceView>();
         private readonly HashSet<CellCoord> _cells = new HashSet<CellCoord>();
         private IMemoryPool<BlockPieceView> _piecePool;
+        private BoardSettings _boardSettings;
 
         public BlockState Block { get; private set; }
         public Transform Root => transform;
 
         [Inject]
-        public void Construct(IMemoryPool<BlockPieceView> piecePool)
+        public void Construct(IMemoryPool<BlockPieceView> piecePool, BoardSettings boardSettings)
         {
             _piecePool = piecePool;
+            _boardSettings = boardSettings;
         }
 
         public void Init(BlockState block, BoardLayout layout, Color color)
@@ -53,8 +56,39 @@ namespace ColorBlockJam.SandBox
         {
         }
 
+        // Lifts the block off the board; Follow moves it across while the height tween runs.
+        public void Lift()
+        {
+            transform.DOKill();
+            transform.DOLocalMoveY(_boardSettings.LiftHeight, _boardSettings.LiftDuration).SetLink(gameObject);
+        }
+
+        // Eases toward the target on the board plane (exponential smoothing); the height stays with Lift/Drop.
+        public void Follow(Vector3 target, float dt)
+        {
+            var t = 1f - Mathf.Exp(-_boardSettings.FollowSharpness * dt);
+            var current = transform.localPosition;
+            transform.localPosition = new Vector3(Mathf.Lerp(current.x, target.x, t), current.y,
+                Mathf.Lerp(current.z, target.z, t));
+        }
+
+        public void Drop(Vector3 localPosition)
+        {
+            transform.DOKill();
+            transform.DOLocalMove(localPosition, _boardSettings.DropDuration).SetEase(Ease.OutQuad).SetLink(gameObject);
+        }
+
+        public void SetLayer(int layer)
+        {
+            foreach (var child in GetComponentsInChildren<Transform>(true))
+                child.gameObject.layer = layer;
+        }
+
         public void OnDespawned()
         {
+            transform.DOKill();
+            // A block let go mid-drag (scene unload) must not hand SelectedItem pieces back to the pool.
+            SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
             foreach (var piece in _pieces)
             {
                 // Pieces may already be gone when the scene unloads before the scope is disposed.

@@ -27,6 +27,8 @@ namespace ColorBlockJam.SandBox
         private IMemoryPool<WallPieceView> _wallPool;
         private IMemoryPool<GateView> _gatePool;
         private IMemoryPool<BlockView> _blockPool;
+        private BlockView _heldView;
+        private Vector3 _heldTarget;
 
         public BoardLayout Layout { get; private set; }
 
@@ -65,6 +67,40 @@ namespace ColorBlockJam.SandBox
 
         public BlockView GetView(BlockState block) => _blocks.TryGetValue(block, out var view) ? view : null;
 
+        // Lifts the held block and draws it with the SelectedItem camera, above walls and other blocks.
+        public void BeginBlockDrag(BlockState block)
+        {
+            _heldView = GetView(block);
+            if (!_heldView) return;
+
+            _heldTarget = _heldView.transform.localPosition;
+            _heldView.SetLayer(LayerMask.NameToLayer(BoardLayers.SelectedItem));
+            _heldView.Lift();
+        }
+
+        // position is the simulation's drag position (origin cell space).
+        public void MoveBlock(BlockState block, BoardPoint position)
+        {
+            if (_heldView && _heldView.Block == block) _heldTarget = Layout.PointToLocal(position);
+        }
+
+        // Sets the block down on the cell it now stands on and returns it to the Board layer.
+        public void EndBlockDrag(BlockState block)
+        {
+            var view = GetView(block);
+            if (view == _heldView) _heldView = null;
+            if (!view) return;
+
+            view.SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
+            view.Drop(Layout.CellToLocal(block.Origin));
+        }
+
+        // Called every frame so the held block keeps easing toward the finger even when the finger is still.
+        public void FollowHeld(float deltaTime)
+        {
+            if (_heldView) _heldView.Follow(_heldTarget, deltaTime);
+        }
+
         public void Clear()
         {
             DespawnAll(_floorPool, _floorTiles);
@@ -72,6 +108,7 @@ namespace ColorBlockJam.SandBox
             DespawnAll(_gatePool, _gates);
             DespawnAll(_blockPool, _blocks.Values);
             _blocks.Clear();
+            _heldView = null;
             Layout = null;
         }
 
