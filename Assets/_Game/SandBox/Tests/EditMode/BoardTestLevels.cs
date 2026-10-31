@@ -45,5 +45,13 @@ namespace ColorBlockJam.SandBox.Board.Tests
             };
             return Create(GridSize, GridSize, 60, blocks, gates);
         }
+
+        // One red block in the top-left corner, next to a red gate on the left wall.
+        public static BoardLevelDefinition OneBlockOneGate(double timeLimit)
+        {
+            var blocks = new[] { Block("A", 0, 0, BlockColor.Red, Cells(0, 0)) };
+            var gates = new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) };
+            return Create(GridSize, GridSize, timeLimit, blocks, gates);
+        }
     }
 }
