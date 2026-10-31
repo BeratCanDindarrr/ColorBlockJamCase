@@ -59,7 +59,15 @@ namespace ColorBlockJam.SandBox
         private void OnFingerDown(LeanFinger finger)
         {
             var simulation = _boardController.Simulation;
-            if (simulation == null || _heldBlock != null) return;
+            if (simulation == null) return;
+            if (_heldBlock != null)
+            {
+                if (finger == _finger) return;
+                // The previous finger's up never came (input disabled mid-drag): end that drag first.
+                if (simulation.DraggedBlock == _heldBlock) simulation.EndDrag();
+                Reset();
+            }
+
             if (!TryGetBoardPoint(finger.ScreenPosition, out var point)) return;
 
             var block = simulation.BlockAt(point);
@@ -68,7 +76,6 @@ namespace ColorBlockJam.SandBox
             _heldBlock = block;
             _finger = finger;
             _grabOffset = point - BoardPoint.From(block.Origin);
-            _boardViewController.BeginBlockDrag(block);
         }
 
         private void OnFingerUpdate(LeanFinger finger)
@@ -78,10 +85,10 @@ namespace ColorBlockJam.SandBox
 
             var simulation = _boardController.Simulation;
             var position = simulation.MoveDrag(point - _grabOffset);
-            // Pushed into a gate it fits: the rules let go of it without a DragEnded, so only the view is released.
+            // Pushed into a gate it fits: the rules let go of it; the view follows the BlockExitStarted event.
             if (simulation.DraggedBlock != _heldBlock)
             {
-                ReleaseView();
+                Reset();
                 return;
             }
 
@@ -93,7 +100,7 @@ namespace ColorBlockJam.SandBox
             if (finger != _finger || !IsDragging()) return;
 
             _boardController.Simulation.EndDrag();
-            ReleaseView();
+            Reset();
         }
 
         // The simulation drops the drag by itself when the block exits or the level ends.
@@ -104,16 +111,8 @@ namespace ColorBlockJam.SandBox
             var simulation = _boardController.Simulation;
             if (simulation != null && simulation.DraggedBlock == _heldBlock) return true;
 
-            if (simulation != null) ReleaseView();
-            else Reset();
-            return false;
-        }
-
-        private void ReleaseView()
-        {
-            var block = _heldBlock;
             Reset();
-            _boardViewController.EndBlockDrag(block);
+            return false;
         }
 
         private void Reset()

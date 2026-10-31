@@ -67,6 +67,34 @@ namespace ColorBlockJam.SandBox
 
         public BlockView GetView(BlockState block) => _blocks.TryGetValue(block, out var view) ? view : null;
 
+        // Simulation events drive the held block's lift and drop, whatever ended the drag.
+        public void Apply(IReadOnlyList<BoardEvent> events)
+        {
+            foreach (var boardEvent in events)
+            {
+                switch (boardEvent.Type)
+                {
+                    case BoardEventType.DragStarted:
+                        BeginBlockDrag(boardEvent.Block);
+                        break;
+                    case BoardEventType.DragEnded:
+                        EndBlockDrag(boardEvent.Block);
+                        break;
+                    case BoardEventType.BlockExitStarted:
+                        // The rules let go of the block without a DragEnded; it stops following here.
+                        ReleaseHeld(boardEvent.Block);
+                        break; // Task 10: exit animation.
+                    case BoardEventType.BlockRemoved:
+                        break; // Task 10
+                    case BoardEventType.Won:
+                    case BoardEventType.Lost:
+                        // The level end drops the drag without a DragEnded; set the held block back down.
+                        if (_heldView) EndBlockDrag(_heldView.Block);
+                        break; // Task 10: win/lose flow.
+                }
+            }
+        }
+
         // Lifts the held block and draws it with the SelectedItem camera, above walls and other blocks.
         public void BeginBlockDrag(BlockState block)
         {
@@ -87,12 +115,16 @@ namespace ColorBlockJam.SandBox
         // Sets the block down on the cell it now stands on and returns it to the Board layer.
         public void EndBlockDrag(BlockState block)
         {
+            var view = ReleaseHeld(block);
+            if (view) view.Drop(Layout.CellToLocal(block.Origin));
+        }
+
+        private BlockView ReleaseHeld(BlockState block)
+        {
             var view = GetView(block);
             if (view == _heldView) _heldView = null;
-            if (!view) return;
-
-            view.SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
-            view.Drop(Layout.CellToLocal(block.Origin));
+            if (view) view.SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
+            return view;
         }
 
         // Called every frame so the held block keeps easing toward the finger even when the finger is still.
