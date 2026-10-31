@@ -1,3 +1,4 @@
+using System;
 using ColorBlockJam.Core.Settings;
 using ColorBlockJam.Enums;
 using ColorBlockJam.Views;
@@ -36,6 +37,9 @@ namespace ColorBlockJam.Core.Controller
             GamePlayScreenView.Hide();
         }
 
+        // After a screen is shown (e.g. the main menu once loading is over).
+        public event Action<ScreenType> ScreenChanged;
+
         public void SetScreen(ScreenType screenType)
         {
             _screenType = screenType;
@@ -58,6 +62,8 @@ namespace ColorBlockJam.Core.Controller
                     GamePlayScreenView.Show();
                     break;
             }
+
+            ScreenChanged?.Invoke(screenType);
         }
     }
 }

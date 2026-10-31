@@ -1,4 +1,5 @@
 using System;
+using ColorBlockJam.Const;
 using ColorBlockJam.Core.Model;
 using ColorBlockJam.Core.Service;
 using ColorBlockJam.Core.Settings;
@@ -93,7 +94,23 @@ namespace ColorBlockJam.Core.Controller
             });
             _taskService.AddTask(callBackGameTask);
             _popupService.AddPopup(new TestPopupParameter());
+#if UNITY_EDITOR
+            // Started from the level editor's Play: go straight into its level once loading is over.
+            if (UnityEditor.SessionState.GetInt(GlobalConst.LevelEditor.PlayLevelKey, GlobalConst.LevelEditor.NoPlayLevel)
+                != GlobalConst.LevelEditor.NoPlayLevel)
+                _screenController.ScreenChanged += PlayEditorLevelOnMenu;
+#endif
         }
+
+#if UNITY_EDITOR
+        // A test run from the editor costs no life, so running out of lives never blocks it.
+        private void PlayEditorLevelOnMenu(ScreenType screen)
+        {
+            if (screen != ScreenType.MainScreen) return;
+            _screenController.ScreenChanged -= PlayEditorLevelOnMenu;
+            _sceneLoaderController.OpenGamePlayScene().Forget();
+        }
+#endif
 
         // Starting a level costs a life; it comes back if the level is won.
         public void PlayLevel()

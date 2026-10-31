@@ -4,7 +4,6 @@ using ColorBlockJam.Const;
 using ColorBlockJam.Core.Level;
 using ColorBlockJam.Core.Settings;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace ColorBlockJam.LevelEditor
@@ -20,8 +19,6 @@ namespace ColorBlockJam.LevelEditor
     // State and saving live here; input in LevelEditorWindow.Input.cs, panels in LevelEditorWindow.Gui.cs.
     public sealed partial class LevelEditorWindow : EditorWindow
     {
-        private const string MainScenePath = "Assets/Scenes/SampleScene.unity";
-
         [SerializeField] private LevelData source;
         [SerializeField] private LevelData working;
         [SerializeField] private string savedJson;
@@ -148,7 +145,7 @@ namespace ColorBlockJam.LevelEditor
             LoadWorkingCopy(level);
         }
 
-        // Saves, then starts the game from the main scene with this level in place of the player's own.
+        // Saves, then starts the game (from the main scene, see PlayModeStartScene) straight into this level.
         private void PlayLevel()
         {
             if (IsDirty && !Save()) return;
@@ -161,15 +158,13 @@ namespace ColorBlockJam.LevelEditor
             }
 
             SessionState.SetInt(GlobalConst.LevelEditor.PlayLevelKey, index);
-            EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(MainScenePath);
             EditorApplication.EnterPlaymode();
         }
 
         private static void OnPlayModeChanged(PlayModeStateChange change)
         {
-            if (change != PlayModeStateChange.EnteredEditMode) return;
-            SessionState.EraseInt(GlobalConst.LevelEditor.PlayLevelKey);
-            EditorSceneManager.playModeStartScene = null;
+            // The next Play from the toolbar is a normal game again.
+            if (change == PlayModeStateChange.EnteredEditMode) SessionState.EraseInt(GlobalConst.LevelEditor.PlayLevelKey);
         }
 
         private void OnUndoRedo()
