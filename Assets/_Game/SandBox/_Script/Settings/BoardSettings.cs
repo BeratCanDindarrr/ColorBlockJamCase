@@ -44,7 +44,15 @@ namespace ColorBlockJam.SandBox
             new ColorEntry { Key = BlockColor.Cyan, Value = new Color(0.25f, 0.82f, 0.88f) },
         };
 
-        // Prefab references (FloorTileView, WallPieceView, GateView, BlockView, BlockPieceView) arrive with the view types.
+        public Color FloorColor = new Color(0.82f, 0.86f, 0.92f);
+        // World units kept free around the walled board when the camera frames it.
+        public float CameraMargin = 0.5f;
+
+        public FloorTileView FloorTilePrefab;
+        public WallPieceView WallPiecePrefab;
+        public GateView GatePrefab;
+        public BlockView BlockPrefab;
+        public BlockPieceView BlockPiecePrefab;
         public int BlockPoolSize = 8;
         public int PiecePoolSize = 64;
 
@@ -73,6 +81,7 @@ namespace ColorBlockJam.SandBox
             PushThreshold = Mathf.Max(0f, PushThreshold);
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             CellSize = Mathf.Max(MinPositive, CellSize);
+            CameraMargin = Mathf.Max(0f, CameraMargin);
             BlockPoolSize = Mathf.Max(0, BlockPoolSize);
             PiecePoolSize = Mathf.Max(0, PiecePoolSize);
         }

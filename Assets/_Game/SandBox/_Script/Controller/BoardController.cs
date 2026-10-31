@@ -12,11 +12,14 @@ namespace ColorBlockJam.SandBox
 
         private readonly BoardSettings _boardSettings;
         private readonly LevelSettings _levelSettings;
+        private readonly BoardViewController _boardViewController;
 
         public BoardSimulation Simulation { get; private set; }
 
-        public BoardController(BoardSettings boardSettings, LevelSettings levelSettings)
+        public BoardController(BoardSettings boardSettings, LevelSettings levelSettings,
+            BoardViewController boardViewController)
         {
+            _boardViewController = boardViewController;
             _boardSettings = boardSettings;
             _levelSettings = levelSettings;
         }
@@ -31,6 +34,7 @@ namespace ColorBlockJam.SandBox
             }
 
             Simulation = new BoardSimulation(level.CreateBoardDefinition(), _boardSettings.ToRules());
+            _boardViewController.Build(Simulation);
             DebugExtension.Log($"{nameof(BoardController)}: built '{level.name}' with {Simulation.Blocks.Count} blocks");
         }
 
@@ -40,6 +44,8 @@ namespace ColorBlockJam.SandBox
 
         public void Dispose()
         {
+            // The view root may already be destroyed when the gameplay scene unloads first.
+            if (_boardViewController) _boardViewController.Clear();
             Simulation = null;
         }
     }

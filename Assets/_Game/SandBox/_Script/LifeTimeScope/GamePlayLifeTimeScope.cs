@@ -1,3 +1,4 @@
+using ColorBlockJam.Pool;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -10,12 +11,22 @@ namespace ColorBlockJam.SandBox
         [SerializeField] private BoardSettings boardSettings;
         [SerializeField] private LevelSettings levelSettings;
         [SerializeField] private BoardCameraView boardCameraView;
+        [SerializeField] private BoardViewController boardViewController;
 
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterInstance(boardSettings);
             builder.RegisterInstance(levelSettings);
             builder.RegisterComponent(boardCameraView);
+            builder.RegisterComponent(boardViewController);
+            // Idle pool items park under the board root so they unload with the gameplay scene. Not under this
+            // scope: the scope is mid-destroy when its container disposes, and re-parenting onto it then fails.
+            var poolRoot = boardViewController.transform;
+            builder.RegisterMonoPool(boardSettings.FloorTilePrefab, parent: poolRoot);
+            builder.RegisterMonoPool(boardSettings.WallPiecePrefab, parent: poolRoot);
+            builder.RegisterMonoPool(boardSettings.GatePrefab, parent: poolRoot);
+            builder.RegisterMonoPool(boardSettings.BlockPrefab, boardSettings.BlockPoolSize, parent: poolRoot);
+            builder.RegisterMonoPool(boardSettings.BlockPiecePrefab, boardSettings.PiecePoolSize, parent: poolRoot);
             builder.RegisterEntryPoint<BoardController>().AsSelf();
         }
     }

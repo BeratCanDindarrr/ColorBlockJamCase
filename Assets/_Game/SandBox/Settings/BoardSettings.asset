@@ -40,5 +40,12 @@ MonoBehaviour:
     Value: {r: 0.96, g: 0.45, b: 0.7, a: 1}
   - Key: 7
     Value: {r: 0.25, g: 0.82, b: 0.88, a: 1}
+  FloorColor: {r: 0.82, g: 0.86, b: 0.92, a: 1}
+  CameraMargin: 0.5
+  FloorTilePrefab: {fileID: 5239408864572576000, guid: 39372db85ff79414885187f9b365c474, type: 3}
+  WallPiecePrefab: {fileID: 8809354281171706736, guid: 02f8e35e6be5e4b3da3608474175b9f2, type: 3}
+  GatePrefab: {fileID: 7828083420127014481, guid: 325523fc44e044e538b17a2eea5edef9, type: 3}
+  BlockPrefab: {fileID: 4877809047318550616, guid: c465a1ce241ec431f8d1b7534d969018, type: 3}
+  BlockPiecePrefab: {fileID: 3063669627905734192, guid: f3e94e414e090441cb21ecc53ceee841, type: 3}
   BlockPoolSize: 8
   PiecePoolSize: 64
