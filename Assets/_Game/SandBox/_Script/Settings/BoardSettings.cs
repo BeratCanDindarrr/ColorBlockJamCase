@@ -1,3 +1,4 @@
+using ColorBlockJam.Core.Level;
 using System;
 using ColorBlockJam.Const;
 using ColorBlockJam.SandBox.Board;

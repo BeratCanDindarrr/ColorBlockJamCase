@@ -1,8 +1,8 @@
 using ColorBlockJam.Const;
-using ColorBlockJam.SandBox.Board;
+using ColorBlockJam.Core.Level;
 using UnityEngine;
 
-namespace ColorBlockJam.SandBox
+namespace ColorBlockJam.Core.Settings
 {
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(LevelData), fileName = nameof(LevelData))]
     public class LevelData : ScriptableObject
@@ -12,9 +12,6 @@ namespace ColorBlockJam.SandBox
         public float TimeLimitSec = 120f;
         public BlockData[] Blocks;
         public GateData[] Gates;
-
-        public BoardLevelDefinition CreateBoardDefinition() =>
-            new BoardLevelDefinition(Cols, Rows, TimeLimitSec, Blocks, Gates);
 
         private void OnValidate()
         {

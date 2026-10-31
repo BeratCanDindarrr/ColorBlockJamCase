@@ -1,7 +1,7 @@
 using ColorBlockJam.Const;
 using UnityEngine;
 
-namespace ColorBlockJam.SandBox
+namespace ColorBlockJam.Core.Settings
 {
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(LevelSettings), fileName = nameof(LevelSettings))]
     public class LevelSettings : ScriptableObject

@@ -13,6 +13,7 @@ namespace ColorBlockJam
             builder.Register<TaskService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<PopupService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<AudioService>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<LevelService>(Lifetime.Singleton).AsImplementedInterfaces();
         }
     }
 }

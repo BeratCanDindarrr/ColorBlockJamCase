@@ -337,8 +337,6 @@ MonoBehaviour:
     TypeName: ColorBlockJam.Core.GameLifeTimeScope
   autoRun: 1
   autoInjectGameObjects: []
-  boardSettings: {fileID: 11400000, guid: 8b8bbff094eef402da503fbf3ef140d3, type: 2}
-  levelSettings: {fileID: 11400000, guid: b99828493b9af4117a5ab61bb696a793, type: 2}
   boardCameraView: {fileID: 345296148}
   boardViewController: {fileID: 1480197215}
 --- !u!4 &745591491

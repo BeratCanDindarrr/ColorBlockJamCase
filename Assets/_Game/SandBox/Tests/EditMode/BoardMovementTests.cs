@@ -1,3 +1,4 @@
+using ColorBlockJam.Core.Level;
 using NUnit.Framework;
 
 namespace ColorBlockJam.SandBox.Board.Tests

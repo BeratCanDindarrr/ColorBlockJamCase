@@ -2,6 +2,7 @@
     "name": "ColorBlockJam.SandBox",
     "rootNamespace": "ColorBlockJam.SandBox",
     "references": [
+        "ColorBlockJam.Core.LevelData",
         "ColorBlockJam.Core",
         "ColorBlockJam.SandBox.Board",
         "VContainer",

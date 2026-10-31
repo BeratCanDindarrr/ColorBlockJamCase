@@ -1,7 +1,9 @@
 {
     "name": "ColorBlockJam.SandBox.Board",
     "rootNamespace": "ColorBlockJam.SandBox.Board",
-    "references": [],
+    "references": [
+        "ColorBlockJam.Core.LevelData"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

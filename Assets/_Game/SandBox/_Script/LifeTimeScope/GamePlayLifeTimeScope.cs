@@ -8,15 +8,13 @@ namespace ColorBlockJam.SandBox
     // Child of GameLifeTimeScope (set via parentReference) so gameplay can resolve Core services.
     public class GamePlayLifeTimeScope : LifetimeScope
     {
-        [SerializeField] private BoardSettings boardSettings;
-        [SerializeField] private LevelSettings levelSettings;
         [SerializeField] private BoardCameraView boardCameraView;
         [SerializeField] private BoardViewController boardViewController;
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterInstance(boardSettings);
-            builder.RegisterInstance(levelSettings);
+            // BoardSettings is registered in the root scope (GlobalSettings); the pools need its prefabs now, at build time.
+            var boardSettings = Parent.Container.Resolve<BoardSettings>();
             builder.RegisterComponent(boardCameraView);
             builder.RegisterComponent(boardViewController);
             // Idle pool items park under the board root so they unload with the gameplay scene. Not under this

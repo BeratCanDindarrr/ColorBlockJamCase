@@ -1,29 +1,9 @@
 using System;
 using System.Collections.Generic;
+using ColorBlockJam.Core.Level;
 
 namespace ColorBlockJam.SandBox.Board
 {
-    [Serializable]
-    public class BlockData
-    {
-        public string Id;
-        public int Col;
-        public int Row;
-        public CellCoord[] Cells;
-        public BlockColor Color;
-    }
-
-    // A gate on one wall of the board: every cell from Index to Index + Length - 1 along that
-    // edge accepts a block of its Color.
-    [Serializable]
-    public class GateData
-    {
-        public BoardEdge Edge;
-        public int Index;
-        public int Length;
-        public BlockColor Color;
-    }
-
     public sealed class BoardLevelDefinition
     {
         public int Cols { get; }

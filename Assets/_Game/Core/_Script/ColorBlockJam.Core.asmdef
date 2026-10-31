@@ -2,6 +2,7 @@
     "name": "ColorBlockJam.Core",
     "rootNamespace": "ColorBlockJam",
     "references": [
+        "ColorBlockJam.Core.LevelData",
         "VContainer",
         "MessagePipe",
         "MessagePipe.VContainer",

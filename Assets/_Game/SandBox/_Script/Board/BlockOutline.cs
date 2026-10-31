@@ -1,3 +1,4 @@
+using ColorBlockJam.Core.Level;
 using System.Collections.Generic;
 
 namespace ColorBlockJam.SandBox.Board

@@ -2,6 +2,7 @@
     "name": "ColorBlockJam.SandBox.Board.Tests",
     "rootNamespace": "ColorBlockJam.SandBox.Board.Tests",
     "references": [
+        "ColorBlockJam.Core.LevelData",
         "ColorBlockJam.SandBox.Board",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

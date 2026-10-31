@@ -1,3 +1,4 @@
+using ColorBlockJam.Core.Level;
 using NUnit.Framework;
 using static ColorBlockJam.SandBox.Board.Tests.BoardTestLevels;
 
