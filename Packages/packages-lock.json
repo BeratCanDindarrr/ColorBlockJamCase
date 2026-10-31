@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.ami.broaudio": {
+      "version": "https://github.com/man572142/Bro_Audio.git?path=/Assets/BroAudio",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f3e34191f6a25078e3ba75edd04185aa46f8f143"
+    },
     "com.coplaydev.unity-mcp": {
       "version": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
       "depth": 0,
