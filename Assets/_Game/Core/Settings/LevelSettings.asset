@@ -14,3 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Levels:
   - {fileID: 11400000, guid: c9353d1c29f814edb82c156da76bbc76, type: 2}
+  EndlessLoopCount: 5
+  LevelReward: 20
+  WinLevelDelaySeconds: 1.5
+  PlayOnCoinCost: 900
+  PlayOnSeconds: 30

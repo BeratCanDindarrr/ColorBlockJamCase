@@ -1,4 +1,5 @@
 using System;
+using ColorBlockJam.Const;
 using ColorBlockJam.Core.Settings;
 
 namespace ColorBlockJam.SandBox
@@ -19,6 +20,11 @@ namespace ColorBlockJam.SandBox
 
         public void LoadLevel(int levelIndex)
         {
+#if UNITY_EDITOR
+            // The level editor's Play loads its level instead of the player's own.
+            var editorLevel = UnityEditor.SessionState.GetInt(GlobalConst.LevelEditor.PlayLevelKey, GlobalConst.LevelEditor.NoPlayLevel);
+            if (editorLevel != GlobalConst.LevelEditor.NoPlayLevel) levelIndex = editorLevel;
+#endif
             LevelData = _levelSettings.GetLevel(levelIndex);
             _boardController.CreateLevel(LevelData);
         }

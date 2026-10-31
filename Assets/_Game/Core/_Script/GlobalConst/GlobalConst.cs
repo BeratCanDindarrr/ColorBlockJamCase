@@ -18,6 +18,14 @@ namespace ColorBlockJam.Const
             public const string GamePlay = "GamePlayScene";
         }
 
+        // Shared by the level editor (Core.Editor) and LevelController (SandBox).
+        public struct LevelEditor
+        {
+            // SessionState key: the LevelSettings index to play instead of the player's own level.
+            public const string PlayLevelKey = "LevelEditor.PlayLevelIndex";
+            public const int NoPlayLevel = -1;
+        }
+
         // PlayerPrefs keys of StorageService.
         public struct Storage
         {

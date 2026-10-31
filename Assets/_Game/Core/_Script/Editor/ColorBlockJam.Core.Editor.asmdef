@@ -2,7 +2,8 @@
     "name": "ColorBlockJam.Core.Editor",
     "rootNamespace": "",
     "references": [
-        "ColorBlockJam.Core"
+        "ColorBlockJam.Core",
+        "ColorBlockJam.Core.LevelData"
     ],
     "includePlatforms": [
         "Editor"

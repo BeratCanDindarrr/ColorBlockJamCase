@@ -1,0 +1,192 @@
+using System.Collections.Generic;
+using System.Linq;
+using ColorBlockJam.Core.Level;
+using ColorBlockJam.Core.Settings;
+
+namespace ColorBlockJam.LevelEditor
+{
+    // Block edits on a level. A block is stored as an origin plus cell offsets; the editor keeps the origin at the
+    // block's top-left corner so the offsets never go negative.
+    internal static class LevelEditorBlockOps
+    {
+        private static readonly CellCoord[] Sides =
+        {
+            new CellCoord(1, 0), new CellCoord(-1, 0), new CellCoord(0, 1), new CellCoord(0, -1)
+        };
+
+        public static int BlockAt(LevelData level, CellCoord cell)
+        {
+            var blocks = level.Blocks ?? new BlockData[0];
+            for (var i = 0; i < blocks.Length; i++)
+            {
+                if (LevelValidator.AbsoluteCells(blocks[i]).Contains(cell)) return i;
+            }
+
+            return -1;
+        }
+
+        // Paints a cell: joins it to the selected block when that block has the brush colour and touches the cell,
+        // otherwise starts a new block. An occupied cell just selects its block. Returns the block that owns the cell.
+        public static int AddCell(LevelData level, CellCoord cell, BlockColor color, int selected, out bool changed)
+        {
+            changed = false;
+            var owner = BlockAt(level, cell);
+            if (owner >= 0) return owner;
+
+            var blocks = (level.Blocks ?? new BlockData[0]).ToList();
+            if (selected >= 0 && selected < blocks.Count && blocks[selected].Color == color)
+            {
+                var cells = LevelValidator.AbsoluteCells(blocks[selected]);
+                if (cells.Any(c => Sides.Any(s => c + s == cell)))
+                {
+                    cells.Add(cell);
+                    SetCells(blocks[selected], cells);
+                    changed = true;
+                    return selected;
+                }
+            }
+
+            var block = new BlockData { Id = NextId(blocks), Color = color };
+            SetCells(block, new List<CellCoord> { cell });
+            blocks.Add(block);
+            level.Blocks = blocks.ToArray();
+            changed = true;
+            return blocks.Count - 1;
+        }
+
+        // Erases a cell; a block left with no cells is deleted. Returns true when something was erased.
+        public static bool RemoveCell(LevelData level, CellCoord cell, out bool blockDeleted)
+        {
+            blockDeleted = false;
+            var index = BlockAt(level, cell);
+            if (index < 0) return false;
+
+            var cells = LevelValidator.AbsoluteCells(level.Blocks[index]);
+            cells.Remove(cell);
+            if (cells.Count == 0)
+            {
+                Delete(level, index);
+                blockDeleted = true;
+                return true;
+            }
+
+            SetCells(level.Blocks[index], cells);
+            return true;
+        }
+
+        // Quarter turn clockwise (rows grow downwards), kept at the same top-left corner.
+        public static void Rotate(LevelData level, int index) =>
+            Transform(level.Blocks[index], c => new CellCoord(-c.Row, c.Col));
+
+        public static void Mirror(LevelData level, int index) =>
+            Transform(level.Blocks[index], c => new CellCoord(-c.Col, c.Row));
+
+        // Moves several blocks together by whole cells; the group stops as a whole at the board edge.
+        public static bool MoveMany(LevelData level, List<int> indices, int deltaCol, int deltaRow)
+        {
+            var cells = indices.SelectMany(i => LevelValidator.AbsoluteCells(level.Blocks[i])).ToList();
+            if (cells.Count == 0) return false;
+            deltaCol = ClampDelta(deltaCol, cells.Min(c => c.Col), cells.Max(c => c.Col), level.Cols);
+            deltaRow = ClampDelta(deltaRow, cells.Min(c => c.Row), cells.Max(c => c.Row), level.Rows);
+            if (deltaCol == 0 && deltaRow == 0) return false;
+
+            foreach (var i in indices)
+            {
+                level.Blocks[i].Col += deltaCol;
+                level.Blocks[i].Row += deltaRow;
+            }
+
+            return true;
+        }
+
+        // Adds a copy of the template (any block, also one from another level) at the first free place of the
+        // board, scanning rows top to bottom. Returns its index, or -1 when it fits nowhere.
+        public static int AddCopy(LevelData level, BlockData template)
+        {
+            var offsets = template.Cells ?? new CellCoord[0];
+            if (offsets.Length == 0) return -1;
+
+            var taken = new HashSet<CellCoord>(level.Blocks.SelectMany(LevelValidator.AbsoluteCells));
+            for (var row = 0; row < level.Rows; row++)
+            for (var col = 0; col < level.Cols; col++)
+            {
+                var origin = new CellCoord(col, row);
+                if (!offsets.All(o => Fits(origin + o, level, taken))) continue;
+
+                var blocks = level.Blocks.ToList();
+                blocks.Add(new BlockData
+                {
+                    Id = NextId(blocks), Col = col, Row = row, Color = template.Color,
+                    Cells = (CellCoord[])offsets.Clone()
+                });
+                level.Blocks = blocks.ToArray();
+                return blocks.Count - 1;
+            }
+
+            return -1;
+        }
+
+        private static bool Fits(CellCoord cell, LevelData level, HashSet<CellCoord> taken) =>
+            cell.Col >= 0 && cell.Row >= 0 && cell.Col < level.Cols && cell.Row < level.Rows && !taken.Contains(cell);
+
+        public static void Delete(LevelData level, int index) => DeleteMany(level, new List<int> { index });
+
+        public static void DeleteMany(LevelData level, List<int> indices)
+        {
+            var blocks = level.Blocks.ToList();
+            foreach (var i in indices.OrderByDescending(i => i)) blocks.RemoveAt(i);
+            level.Blocks = blocks.ToArray();
+        }
+
+        // After the board shrinks, slides blocks back in where they can go.
+        public static void PullInside(LevelData level)
+        {
+            for (var i = 0; i < (level.Blocks?.Length ?? 0); i++)
+            {
+                var cells = LevelValidator.AbsoluteCells(level.Blocks[i]);
+                if (cells.Count == 0) continue;
+                var maxCol = cells.Max(c => c.Col);
+                var maxRow = cells.Max(c => c.Row);
+                if (maxCol >= level.Cols) level.Blocks[i].Col -= maxCol - level.Cols + 1;
+                if (maxRow >= level.Rows) level.Blocks[i].Row -= maxRow - level.Rows + 1;
+                if (level.Blocks[i].Col < 0) level.Blocks[i].Col = 0;
+                if (level.Blocks[i].Row < 0) level.Blocks[i].Row = 0;
+            }
+        }
+
+        private static void Transform(BlockData block, System.Func<CellCoord, CellCoord> map)
+        {
+            var cells = LevelValidator.AbsoluteCells(block);
+            var corner = new CellCoord(cells.Min(c => c.Col), cells.Min(c => c.Row));
+            var turned = cells.Select(c => map(new CellCoord(c.Col - corner.Col, c.Row - corner.Row))).ToList();
+            var turnedCorner = new CellCoord(turned.Min(c => c.Col), turned.Min(c => c.Row));
+            SetCells(block, turned.Select(c => new CellCoord(c.Col - turnedCorner.Col + corner.Col,
+                c.Row - turnedCorner.Row + corner.Row)).ToList());
+        }
+
+        private static void SetCells(BlockData block, List<CellCoord> cells)
+        {
+            var corner = new CellCoord(cells.Min(c => c.Col), cells.Min(c => c.Row));
+            block.Col = corner.Col;
+            block.Row = corner.Row;
+            block.Cells = cells.Select(c => new CellCoord(c.Col - corner.Col, c.Row - corner.Row)).ToArray();
+        }
+
+        private static int ClampDelta(int delta, int min, int max, int size) =>
+            delta < 0 ? System.Math.Max(delta, -min) : System.Math.Min(delta, size - 1 - max);
+
+        // A, B, ... Z, then B27, B28, ... so ids stay short and readable on the board.
+        private static string NextId(List<BlockData> blocks)
+        {
+            var used = new HashSet<string>(blocks.Select(b => b.Id));
+            for (var c = 'A'; c <= 'Z'; c++)
+            {
+                if (!used.Contains(c.ToString())) return c.ToString();
+            }
+
+            var n = 27;
+            while (used.Contains("B" + n)) n++;
+            return "B" + n;
+        }
+    }
+}
