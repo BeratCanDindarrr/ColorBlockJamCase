@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,14 +9,25 @@ namespace ColorBlockJam.Views
         [SerializeField] private GraphicRaycaster[] raycasterArray;
         [SerializeField] private MainScreenPageSnapperView pageSnapper;
         [SerializeField] private MainScreenBasePageView[] pages;
+        // Same order as pages: menuButtons[i] opens pages[i].
+        [SerializeField] private MainScreenMenuButtonView[] menuButtons;
         [SerializeField] private int startPage = 1;
 
         public void Init()
         {
+            if (menuButtons.Length != pages.Length)
+                Debug.LogError($"{nameof(MainScreenView)}: {menuButtons.Length} menu buttons for {pages.Length} pages", this);
+
             foreach (var page in pages) page.Initialize();
+            foreach (var menuButton in menuButtons)
+            {
+                menuButton.Initialize();
+                menuButton.Clicked += OnMenuButtonClicked;
+            }
+
             pageSnapper.Init(pages.Length, startPage);
             pageSnapper.PageChanged += OnPageChanged;
-            pages[pageSnapper.CurrentPage].OnPageSelected();
+            SelectPage(pageSnapper.CurrentPage);
         }
 
         public void SnapToPage(int page) => pageSnapper.SnapTo(page);
@@ -24,12 +36,30 @@ namespace ColorBlockJam.Views
         {
             if (pageSnapper != null) pageSnapper.PageChanged -= OnPageChanged;
             foreach (var page in pages) page.Dispose();
+            foreach (var menuButton in menuButtons)
+            {
+                menuButton.Clicked -= OnMenuButtonClicked;
+                menuButton.Dispose();
+            }
+        }
+
+        private void OnMenuButtonClicked(MainScreenMenuButtonView menuButton)
+        {
+            var index = Array.IndexOf(menuButtons, menuButton);
+            if (index >= 0) SnapToPage(index);
         }
 
         private void OnPageChanged(int previous, int current)
         {
             pages[previous].OnPageDeselected();
-            pages[current].OnPageSelected();
+            if (previous < menuButtons.Length) menuButtons[previous].CancelHighlight();
+            SelectPage(current);
+        }
+
+        private void SelectPage(int page)
+        {
+            pages[page].OnPageSelected();
+            if (page < menuButtons.Length) menuButtons[page].Highlight();
         }
 
         public void Hide()
