@@ -265,7 +265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2074265954953726733}
   - component: {fileID: 2538512016484656721}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: GamePlayScreenView
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1980779142926485775}
   - component: {fileID: 281034483505900164}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LoadingScreenView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
