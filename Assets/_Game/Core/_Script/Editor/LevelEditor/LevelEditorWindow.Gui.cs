@@ -89,7 +89,7 @@ namespace ColorBlockJam.LevelEditor
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(SideWidth));
             GUILayout.Label("Tool", EditorStyles.boldLabel);
-            tool = (LevelEditorTool)GUILayout.SelectionGrid((int)tool, ToolNames, 1);
+            CurrentTool = (LevelEditorTool)GUILayout.SelectionGrid((int)tool, ToolNames, 1);
 
             GUILayout.Space(8f);
             GUILayout.Label("Colour", EditorStyles.boldLabel);
@@ -130,6 +130,7 @@ namespace ColorBlockJam.LevelEditor
         private void PickColor(BlockColor color)
         {
             brush = color;
+            RaiseStateChanged();
             var blocks = SelectedBlockIndices();
             var gates = SelectedGateIndices();
             if (blocks.Count + gates.Count == 0) return;
@@ -176,7 +177,7 @@ namespace ColorBlockJam.LevelEditor
             _board.Layout(new Rect(rect.x + 8f, rect.y + 8f, rect.width - 16f, rect.height - 16f), working);
             if (Event.current.type == EventType.Repaint)
             {
-                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover);
+                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, GrowPlaces());
                 if (_boxing) _board.DrawBox(BoxMin, BoxMax);
             }
             HandleBoardInput(rect);

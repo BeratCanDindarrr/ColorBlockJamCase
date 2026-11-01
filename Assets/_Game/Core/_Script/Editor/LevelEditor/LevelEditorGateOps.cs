@@ -54,6 +54,30 @@ namespace ColorBlockJam.LevelEditor
             return true;
         }
 
+        // Free wall cells right before and after the gate on its wall: where it can grow.
+        public static List<int> GrowSlots(LevelData level, int index)
+        {
+            var gate = level.Gates[index];
+            var wall = LevelValidator.EdgeLength(gate.Edge, level.Cols, level.Rows);
+            var slots = new List<int>();
+            foreach (var slot in new[] { gate.Index - 1, gate.Index + gate.Length })
+            {
+                if (slot >= 0 && slot < wall && GateAt(level, gate.Edge, slot) < 0) slots.Add(slot);
+            }
+
+            return slots;
+        }
+
+        // Grows the gate by one wall cell on the side of the slot (one of its "+" places).
+        public static bool Grow(LevelData level, int index, int slot)
+        {
+            var gate = level.Gates[index];
+            if (!GrowSlots(level, index).Contains(slot)) return false;
+            if (slot < gate.Index) gate.Index = slot;
+            gate.Length++;
+            return true;
+        }
+
         // After the board shrinks, keeps every gate on its wall.
         public static void ClampAll(LevelData level)
         {

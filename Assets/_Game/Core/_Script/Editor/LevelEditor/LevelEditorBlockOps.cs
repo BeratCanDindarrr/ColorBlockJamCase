@@ -25,33 +25,43 @@ namespace ColorBlockJam.LevelEditor
             return -1;
         }
 
-        // Paints a cell: joins it to the selected block when that block has the brush colour and touches the cell,
-        // otherwise starts a new block. An occupied cell just selects its block. Returns the block that owns the cell.
-        public static int AddCell(LevelData level, CellCoord cell, BlockColor color, int selected, out bool changed)
+        // Starts a new one-cell block on a free cell. Returns its index.
+        public static int AddBlock(LevelData level, CellCoord cell, BlockColor color)
         {
-            changed = false;
-            var owner = BlockAt(level, cell);
-            if (owner >= 0) return owner;
-
             var blocks = (level.Blocks ?? new BlockData[0]).ToList();
-            if (selected >= 0 && selected < blocks.Count && blocks[selected].Color == color)
-            {
-                var cells = LevelValidator.AbsoluteCells(blocks[selected]);
-                if (cells.Any(c => Sides.Any(s => c + s == cell)))
-                {
-                    cells.Add(cell);
-                    SetCells(blocks[selected], cells);
-                    changed = true;
-                    return selected;
-                }
-            }
-
             var block = new BlockData { Id = NextId(blocks), Color = color };
             SetCells(block, new List<CellCoord> { cell });
             blocks.Add(block);
             level.Blocks = blocks.ToArray();
-            changed = true;
             return blocks.Count - 1;
+        }
+
+        // Adds a free cell next to the block to it (one of the block's "+" places).
+        public static bool Grow(LevelData level, int index, CellCoord cell)
+        {
+            if (BlockAt(level, cell) >= 0) return false;
+            var cells = LevelValidator.AbsoluteCells(level.Blocks[index]);
+            cells.Add(cell);
+            SetCells(level.Blocks[index], cells);
+            return true;
+        }
+
+        // Free board cells side by side with the block: where it can grow.
+        public static List<CellCoord> GrowCells(LevelData level, int index)
+        {
+            var cells = LevelValidator.AbsoluteCells(level.Blocks[index]);
+            var result = new List<CellCoord>();
+            foreach (var cell in cells)
+            {
+                foreach (var side in Sides)
+                {
+                    var next = cell + side;
+                    var inside = next.Col >= 0 && next.Row >= 0 && next.Col < level.Cols && next.Row < level.Rows;
+                    if (inside && !result.Contains(next) && BlockAt(level, next) < 0) result.Add(next);
+                }
+            }
+
+            return result;
         }
 
         // Erases a cell; a block left with no cells is deleted. Returns true when something was erased.

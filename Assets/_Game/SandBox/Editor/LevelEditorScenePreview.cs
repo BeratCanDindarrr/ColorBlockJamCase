@@ -25,6 +25,10 @@ namespace ColorBlockJam.SandBox.Editor
         private static GameObject _root;
         private static LevelData _alignedFor;
 
+        // The board the preview built, for SceneView editing; null when no preview is shown.
+        public static BoardViewController Board { get; private set; }
+        public static BoardSettings Settings { get; private set; }
+
         static LevelEditorScenePreview()
         {
             LevelEditorWindow.WorkingLevelChanged += Rebuild;
@@ -63,6 +67,7 @@ namespace ColorBlockJam.SandBox.Editor
 
             var settings = LoadSettings<BoardSettings>();
             if (settings == null) return;
+            Settings = settings;
 
             try
             {
@@ -110,6 +115,7 @@ namespace ColorBlockJam.SandBox.Editor
                 new EditorInstantiatePool<BlockView>(settings.BlockPrefab, parent, view => view.Construct(piecePool, settings)));
 
             board.Build(new BoardSimulation(LevelDefinitionFactory.Create(level), settings.ToRules()));
+            Board = board;
 
             foreach (var child in _root.GetComponentsInChildren<Transform>(true))
                 child.gameObject.hideFlags = HideFlags.DontSave;
@@ -119,6 +125,7 @@ namespace ColorBlockJam.SandBox.Editor
         {
             if (_root != null) Object.DestroyImmediate(_root);
             _root = null;
+            Board = null;
 
             var scene = SceneManager.GetActiveScene();
             if (!scene.IsValid() || !scene.isLoaded) return;

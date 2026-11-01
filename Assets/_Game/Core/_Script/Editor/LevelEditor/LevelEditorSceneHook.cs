@@ -7,7 +7,7 @@ namespace ColorBlockJam.LevelEditor
     [InitializeOnLoad]
     internal static class LevelEditorSceneHook
     {
-        private const string EditorScenePath = "Assets/Scenes/EditorScene.unity";
+        internal const string EditorScenePath = "Assets/Scenes/EditorScene.unity";
 
         static LevelEditorSceneHook()
         {

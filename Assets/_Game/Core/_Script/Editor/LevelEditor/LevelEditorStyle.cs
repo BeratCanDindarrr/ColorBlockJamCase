@@ -13,6 +13,8 @@ namespace ColorBlockJam.LevelEditor
         public static readonly Color WallSlotHover = new Color(1f, 1f, 1f, 0.08f);
         public static readonly Color Selection = Color.white;
         public static readonly Color Error = new Color(1f, 0.25f, 0.25f);
+        // "+" places where the picked block or gate can grow.
+        public static readonly Color Grow = new Color(0.20f, 0.72f, 0.30f, 0.9f);
 
         public static Color Of(BlockColor color)
         {

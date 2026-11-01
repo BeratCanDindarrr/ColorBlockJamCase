@@ -74,7 +74,14 @@ namespace ColorBlockJam.LevelEditor
         {
             if (tool == LevelEditorTool.Block)
             {
-                if (hit.Kind == BoardHitKind.Cell) PaintCell(hit.Cell);
+                if (hit.Kind == BoardHitKind.Cell) DragPaint(hit.Cell);
+                return;
+            }
+
+            if (tool == LevelEditorTool.Gate)
+            {
+                // Dragging along the wall keeps growing the picked gate.
+                if (hit.Kind == BoardHitKind.Wall && !_erasing && IsGrowPlace(hit.Cell)) GrowGate(hit);
                 return;
             }
 
@@ -164,34 +171,59 @@ namespace ColorBlockJam.LevelEditor
             _dragCell = _dragCell + new CellCoord(first.Col - before.Col, first.Row - before.Row);
         }
 
-        // Paints with the brush colour; Shift (held from the press) erases.
+        // Block tool press: Shift erases; a block picks it (its "+" places show); a "+" grows the picked block; any
+        // other free cell leaves the picked block, or starts a new one when nothing is picked.
         private void PaintCell(CellCoord cell)
         {
             if (_erasing)
             {
-                Edit("Erase Cell", l => LevelEditorBlockOps.RemoveCell(l, cell, out _));
-                PruneSelection();
+                EraseCell(cell);
                 return;
             }
 
             var owner = LevelEditorBlockOps.BlockAt(working, cell);
             if (owner >= 0)
             {
-                // A press on a block picks it, so the next painted cells grow it.
-                if (owner != PrimaryBlock) SelectOnly(owner, -1);
+                if (owner != PrimaryBlock || selectedBlocks.Count + selectedGates.Count != 1) SelectOnly(owner, -1);
                 return;
             }
 
-            var grown = -1;
-            Edit("Paint Cell", l =>
+            if (IsGrowPlace(cell))
             {
-                grown = LevelEditorBlockOps.AddCell(l, cell, brush, PrimaryBlock, out var changed);
-                return changed;
+                GrowBlock(cell);
+                return;
+            }
+
+            if (HasSelection)
+            {
+                ClearSelection();
+                return;
+            }
+
+            var added = -1;
+            Edit("Add Block", l =>
+            {
+                added = LevelEditorBlockOps.AddBlock(l, cell, brush);
+                return true;
             });
-            if (grown >= 0 && grown != PrimaryBlock) SelectOnly(grown, -1);
+            SelectOnly(added, -1);
         }
 
-        // Adds a gate on an empty wall slot, picks an existing one; Shift deletes it.
+        // Block tool drag: keeps erasing, or keeps growing the picked block through its "+" places.
+        private void DragPaint(CellCoord cell)
+        {
+            if (_erasing) EraseCell(cell);
+            else if (IsGrowPlace(cell)) GrowBlock(cell);
+        }
+
+        private void EraseCell(CellCoord cell)
+        {
+            Edit("Erase Cell", l => LevelEditorBlockOps.RemoveCell(l, cell, out _));
+            PruneSelection();
+        }
+
+        // Gate tool press: Shift deletes; a gate picks it (its "+" places show); a "+" grows the picked gate; any other
+        // free slot leaves the picked gate, or adds a new one when nothing is picked.
         private void PressGate(BoardHit hit)
         {
             var gate = LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index);
@@ -213,6 +245,19 @@ namespace ColorBlockJam.LevelEditor
                 return;
             }
 
+            // A "+" next to the picked gate makes it longer; any other free slot leaves it first.
+            if (IsGrowPlace(hit.Cell))
+            {
+                GrowGate(hit);
+                return;
+            }
+
+            if (HasSelection)
+            {
+                ClearSelection();
+                return;
+            }
+
             var added = -1;
             Edit("Add Gate", l =>
             {
@@ -225,28 +270,62 @@ namespace ColorBlockJam.LevelEditor
         private void HandleShortcuts()
         {
             var e = Event.current;
-            if (e.type != EventType.KeyDown || EditorGUIUtility.editingTextField) return;
+            if (HandleShortcut(e)) e.Use();
+        }
+
+        // The editor's keys, from the window or the SceneView. Returns whether the key was one of them.
+        internal bool HandleShortcut(Event e)
+        {
+            if (e.type != EventType.KeyDown || EditorGUIUtility.editingTextField || working == null) return false;
 
             var command = e.control || e.command;
             switch (e.keyCode)
             {
-                case KeyCode.Alpha1: tool = LevelEditorTool.Select; break;
-                case KeyCode.Alpha2: tool = LevelEditorTool.Block; break;
-                case KeyCode.Alpha3: tool = LevelEditorTool.Gate; break;
+                case KeyCode.Alpha1: SwitchTool(LevelEditorTool.Select); break;
+                case KeyCode.Alpha2: SwitchTool(LevelEditorTool.Block); break;
+                case KeyCode.Alpha3: SwitchTool(LevelEditorTool.Gate); break;
                 case KeyCode.Delete:
                 case KeyCode.Backspace: DeleteSelection(); break;
                 case KeyCode.R when !command: RotateSelection(); break;
                 case KeyCode.D when command: DuplicateSelection(); break;
-                case KeyCode.C when command: LevelEditorClipboard.Copy(working, SelectedBlockIndices()); break;
+                case KeyCode.C when command: CopySelection(); break;
                 case KeyCode.V when command: PasteBlocks(LevelEditorClipboard.Paste(), "Paste"); break;
                 case KeyCode.S when command: Save(); break;
                 case KeyCode.Escape: ClearSelection(); break;
-                default: return;
+                default: return false;
             }
 
-            e.Use();
             Repaint();
+            return true;
         }
+
+        // Edit menu commands (Cmd/Ctrl+D, C, V, Delete) as Unity sends them to a focused view. Returns whether the
+        // command is one the editor takes; execute false only asks.
+        internal bool HandleCommand(string name, bool execute)
+        {
+            if (working == null || EditorGUIUtility.editingTextField) return false;
+
+            switch (name)
+            {
+                case "Duplicate":
+                    if (execute) DuplicateSelection();
+                    return true;
+                case "Copy":
+                    if (execute) CopySelection();
+                    return true;
+                case "Paste":
+                    if (execute) PasteBlocks(LevelEditorClipboard.Paste(), "Paste");
+                    return true;
+                case "Delete":
+                case "SoftDelete":
+                    if (execute) DeleteSelection();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void CopySelection() => LevelEditorClipboard.Copy(working, SelectedBlockIndices());
 
         private void DeleteSelection()
         {

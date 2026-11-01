@@ -45,7 +45,7 @@ namespace ColorBlockJam.LevelEditor
         }
 
         public void Draw(LevelData level, Func<int, bool> isBlockSelected, Func<int, bool> isGateSelected,
-            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover)
+            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces)
         {
             EditorGUI.DrawRect(new Rect(_origin, new Vector2((_cols + 2) * _cell, (_rows + 2) * _cell)), LevelEditorStyle.Wall);
             for (var row = 0; row < _rows; row++)
@@ -59,6 +59,18 @@ namespace ColorBlockJam.LevelEditor
 
             var blocks = level.Blocks ?? new BlockData[0];
             for (var i = 0; i < blocks.Length; i++) DrawBlock(blocks[i], isBlockSelected(i), errorBlocks.Contains(i));
+            foreach (var place in growPlaces) DrawPlus(CellRect(place.Col, place.Row));
+        }
+
+        // A green "+" where the picked block or gate can grow.
+        private void DrawPlus(Rect rect)
+        {
+            var inner = Inset(rect, Mathf.Max(Gap, rect.width * 0.12f));
+            EditorGUI.DrawRect(inner, LevelEditorStyle.Grow);
+            var bar = Mathf.Max(2f, inner.width * 0.12f);
+            var arm = inner.width * 0.6f;
+            EditorGUI.DrawRect(new Rect(inner.center.x - arm / 2f, inner.center.y - bar / 2f, arm, bar), Color.white);
+            EditorGUI.DrawRect(new Rect(inner.center.x - bar / 2f, inner.center.y - arm / 2f, bar, arm), Color.white);
         }
 
         // Outline of a selection box from cell min to cell max (wall cells included).
@@ -93,29 +105,35 @@ namespace ColorBlockJam.LevelEditor
 
         public BoardHit HitTest(Vector2 mouse)
         {
-            var hit = new BoardHit();
-            if (_cell <= 0f) return hit;
-
+            if (_cell <= 0f) return new BoardHit();
             var col = Mathf.FloorToInt((mouse.x - _origin.x) / _cell) - 1;
             var row = Mathf.FloorToInt((mouse.y - _origin.y) / _cell) - 1;
-            var inCols = col >= 0 && col < _cols;
-            var inRows = row >= 0 && row < _rows;
+            return HitAt(new CellCoord(col, row), _cols, _rows);
+        }
+
+        // What a grid position is: a board cell, a wall slot in the ring around the board (corners excluded), or nothing.
+        // Shared by the window and the SceneView, which map the mouse to grid positions their own way.
+        public static BoardHit HitAt(CellCoord point, int cols, int rows)
+        {
+            // Cell is the grid position for wall slots too (the wall ring), as the "+" places use.
+            var hit = new BoardHit { Cell = point };
+            var inCols = point.Col >= 0 && point.Col < cols;
+            var inRows = point.Row >= 0 && point.Row < rows;
             if (inCols && inRows)
             {
                 hit.Kind = BoardHitKind.Cell;
-                hit.Cell = new CellCoord(col, row);
             }
-            else if (inCols && (row == -1 || row == _rows))
+            else if (inCols && (point.Row == -1 || point.Row == rows))
             {
                 hit.Kind = BoardHitKind.Wall;
-                hit.Edge = row == -1 ? BoardEdge.Top : BoardEdge.Bottom;
-                hit.Index = col;
+                hit.Edge = point.Row == -1 ? BoardEdge.Top : BoardEdge.Bottom;
+                hit.Index = point.Col;
             }
-            else if (inRows && (col == -1 || col == _cols))
+            else if (inRows && (point.Col == -1 || point.Col == cols))
             {
                 hit.Kind = BoardHitKind.Wall;
-                hit.Edge = col == -1 ? BoardEdge.Left : BoardEdge.Right;
-                hit.Index = row;
+                hit.Edge = point.Col == -1 ? BoardEdge.Left : BoardEdge.Right;
+                hit.Index = point.Row;
             }
 
             return hit;

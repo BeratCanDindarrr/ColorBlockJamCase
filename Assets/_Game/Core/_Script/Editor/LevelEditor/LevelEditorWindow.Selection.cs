@@ -68,7 +68,7 @@ namespace ColorBlockJam.LevelEditor
             selectedBlocks.Clear();
             selectedGates.Clear();
             GUI.FocusControl(null);
-            Repaint();
+            RaiseStateChanged();
         }
 
         // Picks only this block and/or gate (-1 for none).
@@ -94,20 +94,20 @@ namespace ColorBlockJam.LevelEditor
                 selectedGates.Add(key);
             }
 
-            Repaint();
+            RaiseStateChanged();
         }
 
         private void ToggleBlock(int index)
         {
             if (!selectedBlocks.Remove(working.Blocks[index].Id)) selectedBlocks.Add(working.Blocks[index].Id);
-            Repaint();
+            RaiseStateChanged();
         }
 
         private void ToggleGate(int index)
         {
             var key = GateKey.Of(working.Gates[index]);
             if (!selectedGates.Remove(key)) selectedGates.Add(key);
-            Repaint();
+            RaiseStateChanged();
         }
 
         // A selected gate moved: it keeps being selected under its new place.

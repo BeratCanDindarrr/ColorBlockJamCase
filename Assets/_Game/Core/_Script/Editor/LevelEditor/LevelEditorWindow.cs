@@ -35,6 +35,37 @@ namespace ColorBlockJam.LevelEditor
         public static event Action<LevelData> WorkingLevelChanged;
         public static LevelData CurrentWorking { get; private set; }
 
+        // Tool, brush, selection or level changed: the SceneView overlays and marks refresh.
+        internal static event Action StateChanged;
+
+        internal static LevelEditorWindow Current => _current;
+
+        internal LevelEditorTool CurrentTool
+        {
+            get => tool;
+            set
+            {
+                if (tool == value) return;
+                SwitchTool(value);
+            }
+        }
+
+        // Picking a tool (also the same one again, with its number key) leaves what was picked.
+        internal void SwitchTool(LevelEditorTool next)
+        {
+            tool = next;
+            selectedBlocks.Clear();
+            selectedGates.Clear();
+            RaiseStateChanged();
+        }
+
+        internal void RaiseStateChanged()
+        {
+            Repaint();
+            StateChanged?.Invoke();
+            SceneView.RepaintAll();
+        }
+
         private bool IsDirty => working != null && JsonUtility.ToJson(working) != savedJson;
         private bool HasErrors => _issues.Exists(i => i.IsError);
 
@@ -47,6 +78,7 @@ namespace ColorBlockJam.LevelEditor
 
         private void OnEnable()
         {
+            _current = this;
             wantsMouseMove = true;
             Undo.undoRedoPerformed += OnUndoRedo;
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
@@ -60,10 +92,13 @@ namespace ColorBlockJam.LevelEditor
 
             RefreshIssues();
             NotifyWorkingChanged();
+            RaiseStateChanged();
         }
 
         private void OnDisable()
         {
+            if (_current == this) _current = null;
+            StateChanged?.Invoke();
             Undo.undoRedoPerformed -= OnUndoRedo;
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
             DestroyRawEditor();
@@ -87,7 +122,7 @@ namespace ColorBlockJam.LevelEditor
             EditorUtility.SetDirty(working);
             RefreshIssues();
             NotifyWorkingChanged();
-            Repaint();
+            RaiseStateChanged();
         }
 
         private void NotifyWorkingChanged()
@@ -129,6 +164,7 @@ namespace ColorBlockJam.LevelEditor
             DestroyRawEditor();
             RefreshIssues();
             NotifyWorkingChanged();
+            RaiseStateChanged();
         }
 
         private bool Save()
@@ -189,7 +225,7 @@ namespace ColorBlockJam.LevelEditor
             PruneSelection();
             RefreshIssues();
             NotifyWorkingChanged();
-            Repaint();
+            RaiseStateChanged();
         }
 
         private void RefreshIssues()

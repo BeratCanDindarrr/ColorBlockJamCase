@@ -11,13 +11,7 @@ namespace ColorBlockJam.LevelEditor
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(InspectorWidth));
             _inspectorScroll = EditorGUILayout.BeginScrollView(_inspectorScroll);
-            PruneSelection();
-
-            var count = selectedBlocks.Count + selectedGates.Count;
-            if (count > 1) DrawManyInspector();
-            else if (PrimaryBlock >= 0) DrawBlockInspector(PrimaryBlock);
-            else if (PrimaryGate >= 0) DrawGateInspector(PrimaryGate);
-            else EditorGUILayout.HelpBox("Nothing selected.\nSelect tool: click a block or gate, or drag a box.", MessageType.None);
+            DrawSelectionInspector();
 
             GUILayout.Space(8f);
             _showRaw = EditorGUILayout.Foldout(_showRaw, "Raw data", true);
@@ -26,6 +20,29 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
+
+        private void DrawSelectionInspector()
+        {
+            PruneSelection();
+            var count = selectedBlocks.Count + selectedGates.Count;
+            if (count > 1) DrawManyInspector();
+            else if (PrimaryBlock >= 0) DrawBlockInspector(PrimaryBlock);
+            else if (PrimaryGate >= 0) DrawGateInspector(PrimaryGate);
+            else EditorGUILayout.HelpBox("Nothing selected.\nSelect tool: click a block or gate, or drag a box.", MessageType.None);
+        }
+
+        // The SceneView properties overlay: the colour palette (brush, and recolours what is selected) and the
+        // selected block or gate.
+        internal void DrawScenePanel()
+        {
+            if (working == null) return;
+            GUILayout.Label("Colour", EditorStyles.boldLabel);
+            DrawSwatches();
+            GUILayout.Space(6f);
+            DrawSelectionInspector();
+        }
+
+        internal bool HasAnySelection => HasSelection;
 
         private void DrawBlockInspector(int index)
         {
