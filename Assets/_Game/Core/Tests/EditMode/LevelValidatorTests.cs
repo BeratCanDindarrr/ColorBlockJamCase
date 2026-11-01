@@ -12,8 +12,8 @@ namespace ColorBlockJam.Core.Level.Tests
                 Cells = cells.Select(c => new CellCoord(c.Item1, c.Item2)).ToArray()
             };
 
-        private static GateData Gate(BoardEdge edge, int index, int length, BlockColor color) =>
-            new GateData { Edge = edge, Index = index, Length = length, Color = color };
+        private static GateData Gate(BoardEdge edge, int index, int length, BlockColor color, int depth = 0) =>
+            new GateData { Edge = edge, Index = index, Length = length, Color = color, Depth = depth };
 
         private static LevelIssue[] Errors(BlockData[] blocks, GateData[] gates, int cols = 4, int rows = 4) =>
             LevelValidator.Validate(cols, rows, 60, blocks, gates).Where(i => i.IsError).ToArray();
@@ -87,6 +87,61 @@ namespace ColorBlockJam.Core.Level.Tests
                 new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) });
 
             Assert.That(issues.Single().IsError, Is.False);
+        }
+
+        [Test]
+        public void BlockOnRemovedCell_IsError()
+        {
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 1, 1, BlockColor.Red, (0, 0)) },
+                new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) },
+                new[] { new CellCoord(1, 1) });
+
+            Assert.That(issues.Single(i => i.IsError).BlockIndex, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void InnerGateOnRemovedCellsEdge_IsValid()
+        {
+            // Cell (1,1) removed: the Top side of (1,2) is a wall, a gate at depth 2 may stand there.
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 3, 3, BlockColor.Red, (0, 0)) },
+                new[] { Gate(BoardEdge.Top, 1, 1, BlockColor.Red, depth: 2) },
+                new[] { new CellCoord(1, 1) });
+
+            Assert.That(issues, Is.Empty);
+        }
+
+        [Test]
+        public void InnerGateWithBoardOnBothSides_IsError()
+        {
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 3, 3, BlockColor.Red, (0, 0)) },
+                new[] { Gate(BoardEdge.Top, 1, 1, BlockColor.Red, depth: 2) });
+
+            Assert.That(issues.Single(i => i.IsError).GateIndex, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GateOnRemovedCell_IsError()
+        {
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 2, 2, BlockColor.Red, (0, 0)) },
+                new[] { Gate(BoardEdge.Left, 0, 2, BlockColor.Red) },
+                new[] { new CellCoord(0, 1) });
+
+            Assert.That(issues.Single(i => i.IsError).GateIndex, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void RemovedCellOffBoard_IsError()
+        {
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 0, 0, BlockColor.Red, (0, 0)) },
+                new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) },
+                new[] { new CellCoord(4, 0) });
+
+            Assert.That(issues.Single(i => i.IsError).Message, Does.Contain("off the board"));
         }
     }
 }

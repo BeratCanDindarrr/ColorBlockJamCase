@@ -12,6 +12,8 @@ namespace ColorBlockJam.Core.Settings
         public float TimeLimitSec = 120f;
         public BlockData[] Blocks;
         public GateData[] Gates;
+        // Board cells taken out of the grid: nothing stands or slides there, and the walls follow the board's shape.
+        public CellCoord[] Holes;
 
         private void OnValidate()
         {

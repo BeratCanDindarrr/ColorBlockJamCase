@@ -56,8 +56,9 @@ namespace ColorBlockJam.LevelEditor
                 foreach (var side in Sides)
                 {
                     var next = cell + side;
-                    var inside = next.Col >= 0 && next.Row >= 0 && next.Col < level.Cols && next.Row < level.Rows;
-                    if (inside && !result.Contains(next) && BlockAt(level, next) < 0) result.Add(next);
+                    var holes = level.Holes ?? new CellCoord[0];
+                    if (GateGeometry.IsBoardCell(next, level.Cols, level.Rows, holes) && !result.Contains(next) &&
+                        BlockAt(level, next) < 0) result.Add(next);
                 }
             }
 
@@ -117,6 +118,7 @@ namespace ColorBlockJam.LevelEditor
             if (offsets.Length == 0) return -1;
 
             var taken = new HashSet<CellCoord>(level.Blocks.SelectMany(LevelValidator.AbsoluteCells));
+            taken.UnionWith(level.Holes ?? new CellCoord[0]);
             for (var row = 0; row < level.Rows; row++)
             for (var col = 0; col < level.Cols; col++)
             {
@@ -148,9 +150,24 @@ namespace ColorBlockJam.LevelEditor
             level.Blocks = blocks.ToArray();
         }
 
-        // After the board shrinks, slides blocks back in where they can go.
+        // Takes a board cell out (removed) or puts it back. A cell under a block is not removed.
+        public static bool SetRemoved(LevelData level, CellCoord cell, bool removed)
+        {
+            var holes = (level.Holes ?? new CellCoord[0]).ToList();
+            if (removed == holes.Contains(cell)) return false;
+            if (removed && BlockAt(level, cell) >= 0) return false;
+
+            if (removed) holes.Add(cell);
+            else holes.Remove(cell);
+            level.Holes = holes.ToArray();
+            return true;
+        }
+
+        // After the board shrinks, slides blocks back in where they can go and drops removed cells off the board.
         public static void PullInside(LevelData level)
         {
+            level.Holes = (level.Holes ?? new CellCoord[0])
+                .Where(h => h.Col >= 0 && h.Row >= 0 && h.Col < level.Cols && h.Row < level.Rows).ToArray();
             for (var i = 0; i < (level.Blocks?.Length ?? 0); i++)
             {
                 var cells = LevelValidator.AbsoluteCells(level.Blocks[i]);

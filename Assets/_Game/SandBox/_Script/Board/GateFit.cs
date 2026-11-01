@@ -8,37 +8,23 @@ namespace ColorBlockJam.SandBox.Board
     public static class GateFit
     {
         // The direction out of the board through the given wall, as (col, row).
-        public static CellCoord Normal(BoardEdge edge)
-        {
-            switch (edge)
-            {
-                case BoardEdge.Top: return new CellCoord(0, -1);
-                case BoardEdge.Bottom: return new CellCoord(0, 1);
-                case BoardEdge.Left: return new CellCoord(-1, 0);
-                default: return new CellCoord(1, 0);
-            }
-        }
+        public static CellCoord Normal(BoardEdge edge) => GateGeometry.Normal(edge);
 
-        // True when a cell is on the line of cells right inside the wall.
-        public static bool IsOnWall(CellCoord cell, BoardEdge edge, int cols, int rows)
+        // True when a cell is on the line of cells right inside the wall (depth cells in from the outer edge).
+        public static bool IsOnWall(CellCoord cell, BoardEdge edge, int depth, int cols, int rows)
         {
-            switch (edge)
-            {
-                case BoardEdge.Top: return cell.Row == 0;
-                case BoardEdge.Bottom: return cell.Row == rows - 1;
-                case BoardEdge.Left: return cell.Col == 0;
-                default: return cell.Col == cols - 1;
-            }
+            var line = GateGeometry.Line(edge, depth, cols, rows);
+            return edge == BoardEdge.Top || edge == BoardEdge.Bottom ? cell.Row == line : cell.Col == line;
         }
 
         // The cell's position along the wall: its column on the top and bottom walls, its row on the sides.
-        public static int AlongWall(CellCoord cell, BoardEdge edge) =>
-            edge == BoardEdge.Top || edge == BoardEdge.Bottom ? cell.Col : cell.Row;
+        public static int AlongWall(CellCoord cell, BoardEdge edge) => GateGeometry.Along(cell, edge);
 
-        public static bool TouchesWall(IReadOnlyList<CellCoord> cells, CellCoord origin, BoardEdge edge, int cols, int rows)
+        public static bool TouchesWall(IReadOnlyList<CellCoord> cells, CellCoord origin, BoardEdge edge, int depth,
+            int cols, int rows)
         {
             for (var i = 0; i < cells.Count; i++)
-                if (IsOnWall(Absolute(cells[i], origin), edge, cols, rows))
+                if (IsOnWall(Absolute(cells[i], origin), edge, depth, cols, rows))
                     return true;
             return false;
         }
@@ -50,7 +36,7 @@ namespace ColorBlockJam.SandBox.Board
                 return false;
             if (block.Color != gate.Color || block.Cells.Count == 0)
                 return false;
-            if (!TouchesWall(block.Cells, origin, gate.Edge, cols, rows))
+            if (!TouchesWall(block.Cells, origin, gate.Edge, gate.Depth, cols, rows))
                 return false;
 
             for (var i = 0; i < block.Cells.Count; i++)

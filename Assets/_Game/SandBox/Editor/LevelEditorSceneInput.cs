@@ -42,7 +42,7 @@ namespace ColorBlockJam.SandBox.Editor
             // Clicks on the board edit the level instead of picking scene objects.
             if (e.type == EventType.Layout) HandleUtility.AddDefaultControl(id);
 
-            var point = PointUnderMouse(board, e.mousePosition);
+            var point = PointUnderMouse(board, e.mousePosition, out var within);
             switch (e.GetTypeForControl(id))
             {
                 case EventType.MouseMove:
@@ -54,11 +54,11 @@ namespace ColorBlockJam.SandBox.Editor
                     break;
                 case EventType.MouseDown when e.button == 0 && !e.alt && point.HasValue:
                     GUIUtility.hotControl = id;
-                    LevelEditorWindow.ScenePress(point.Value, e.shift, e.control || e.command);
+                    LevelEditorWindow.ScenePress(point.Value, within, e.shift, e.control || e.command);
                     e.Use();
                     break;
                 case EventType.MouseDrag when GUIUtility.hotControl == id:
-                    if (point.HasValue) LevelEditorWindow.SceneDrag(point.Value);
+                    if (point.HasValue) LevelEditorWindow.SceneDrag(point.Value, within);
                     _hover = point;
                     e.Use();
                     break;
@@ -92,8 +92,9 @@ namespace ColorBlockJam.SandBox.Editor
 
         // The grid position under the mouse, held to the wall ring around the board; null off the board plane or
         // beyond the ring.
-        private static CellCoord? PointUnderMouse(BoardViewController board, Vector2 mouse)
+        private static CellCoord? PointUnderMouse(BoardViewController board, Vector2 mouse, out Vector2 within)
         {
+            within = new Vector2(0.5f, 0.5f);
             var root = board.transform;
             var plane = new Plane(root.up, root.position + root.up * LevelEditorScenePreview.Settings.PickPlaneHeight);
             var ray = HandleUtility.GUIPointToWorldRay(mouse);
@@ -104,6 +105,7 @@ namespace ColorBlockJam.SandBox.Editor
             var col = Mathf.FloorToInt((float)point.Col);
             var row = Mathf.FloorToInt((float)point.Row);
             if (col < -1 || row < -1 || col > layout.Cols || row > layout.Rows) return null;
+            within = new Vector2((float)point.Col - col, (float)point.Row - row);
             return new CellCoord(col, row);
         }
 

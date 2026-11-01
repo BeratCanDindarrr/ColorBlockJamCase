@@ -13,8 +13,14 @@ namespace ColorBlockJam.SandBox
     {
         // Wall pieces are half a cell long: two per edge cell, centred a quarter cell either side of it.
         private const double WallPieceReach = 0.25;
-        // The outer corner pieces sit a quarter cell past the first/last cell's outer edge.
+        // The corner pieces sit a quarter cell past a cell's corner (0.75 from its centre) on both sides.
         private const double CornerReach = 0.75;
+        private const float CornerYawTopRight = 0f;
+        private const float CornerYawBottomRight = 90f;
+        private const float CornerYawBottomLeft = 180f;
+        private const float CornerYawTopLeft = 270f;
+
+        private static readonly BoardEdge[] Edges = { BoardEdge.Top, BoardEdge.Bottom, BoardEdge.Left, BoardEdge.Right };
         private const float HalfCell = 0.5f;
 
         private readonly List<FloorTileView> _floorTiles = new List<FloorTileView>();
@@ -51,8 +57,8 @@ namespace ColorBlockJam.SandBox
             Clear();
             Layout = new BoardLayout(_boardSettings, simulation.Cols, simulation.Rows);
 
-            BuildFloor();
-            BuildWalls(simulation.Gates);
+            BuildFloor(simulation.Holes);
+            BuildWalls(simulation.Gates, simulation.Holes);
             foreach (var gate in simulation.Gates)
                 Spawn(_gatePool, _gates).Init(gate, Layout, _boardSettings.GetColor(gate.Color));
             foreach (var block in simulation.Blocks)
@@ -103,7 +109,7 @@ namespace ColorBlockJam.SandBox
             if (!view) return;
 
             var direction = Layout.OutwardLocal(gate.Edge);
-            var wall = Vector3.Dot(Layout.GateOuterLocal(gate.Edge, gate.Index, gate.Length), direction);
+            var wall = Vector3.Dot(Layout.GateOuterLocal(gate.Edge, gate.Index, gate.Length, gate.Depth), direction);
             var rearEdge = float.MaxValue;
             foreach (var cell in block.OccupiedCells(block.Origin))
                 rearEdge = Mathf.Min(rearEdge, Vector3.Dot(Layout.CellToLocal(cell), direction) - HalfCell * Layout.CellSize);
@@ -169,37 +175,65 @@ namespace ColorBlockJam.SandBox
             Layout = null;
         }
 
-        private void BuildFloor()
+        private void BuildFloor(IReadOnlyCollection<CellCoord> removed)
         {
+            var holes = removed as ICollection<CellCoord> ?? new HashSet<CellCoord>(removed);
             for (var row = 0; row < Layout.Rows; row++)
             {
                 for (var col = 0; col < Layout.Cols; col++)
                 {
+                    var cell = new CellCoord(col, row);
+                    if (holes.Contains(cell)) continue;
+
                     var tile = Spawn(_floorPool, _floorTiles);
-                    Place(tile.transform, Layout.CellToLocal(new CellCoord(col, row)), Quaternion.identity);
+                    Place(tile.transform, Layout.CellToLocal(cell), Quaternion.identity);
                     tile.SetColor(_boardSettings.FloorColor);
                 }
             }
         }
 
-        private void BuildWalls(IReadOnlyList<GateState> gates)
+        // Walls follow the board's shape: every side of a board cell that faces off the board or a removed cell gets a
+        // wall (two half pieces), unless a gate stands there; every corner where two such sides meet gets a corner piece.
+        private void BuildWalls(IReadOnlyList<GateState> gates, IReadOnlyCollection<CellCoord> holes)
         {
-            foreach (var edge in new[] { BoardEdge.Top, BoardEdge.Bottom, BoardEdge.Left, BoardEdge.Right })
+            var holeSet = holes as ICollection<CellCoord> ?? new HashSet<CellCoord>(holes);
+            for (var row = 0; row < Layout.Rows; row++)
             {
-                var rotation = Layout.GateRotation(edge);
-                for (var i = 0; i < Layout.EdgeLength(edge); i++)
+                for (var col = 0; col < Layout.Cols; col++)
                 {
-                    if (IsGateCell(gates, edge, i)) continue;
-                    AddWallPiece(Layout.EdgeLocal(edge, i - WallPieceReach), rotation, false);
-                    AddWallPiece(Layout.EdgeLocal(edge, i + WallPieceReach), rotation, false);
+                    var cell = new CellCoord(col, row);
+                    if (holeSet.Contains(cell)) continue;
+
+                    foreach (var edge in Edges)
+                    {
+                        if (!GateGeometry.IsWallSide(cell, edge, Layout.Cols, Layout.Rows, holeSet)) continue;
+                        GateGeometry.PlaceOf(cell, edge, Layout.Cols, Layout.Rows, out var index, out var depth);
+                        if (IsGateCell(gates, edge, index, depth)) continue;
+
+                        var rotation = Layout.GateRotation(edge);
+                        AddWallPiece(Layout.EdgeLocal(edge, index - WallPieceReach, depth), rotation, false);
+                        AddWallPiece(Layout.EdgeLocal(edge, index + WallPieceReach, depth), rotation, false);
+                    }
+
+                    AddCornerIfWalls(cell, BoardEdge.Top, BoardEdge.Right, CornerYawTopRight, holeSet);
+                    AddCornerIfWalls(cell, BoardEdge.Bottom, BoardEdge.Right, CornerYawBottomRight, holeSet);
+                    AddCornerIfWalls(cell, BoardEdge.Bottom, BoardEdge.Left, CornerYawBottomLeft, holeSet);
+                    AddCornerIfWalls(cell, BoardEdge.Top, BoardEdge.Left, CornerYawTopLeft, holeSet);
                 }
             }
+        }
 
-            // The corner mesh rounds toward +x/+z at yaw 0; each yaw step turns it a quarter clockwise.
-            AddWallPiece(Layout.EdgeLocal(BoardEdge.Top, Layout.Cols - 1 + CornerReach), Quaternion.Euler(0f, 0f, 0f), true);
-            AddWallPiece(Layout.EdgeLocal(BoardEdge.Bottom, Layout.Cols - 1 + CornerReach), Quaternion.Euler(0f, 90f, 0f), true);
-            AddWallPiece(Layout.EdgeLocal(BoardEdge.Bottom, -CornerReach), Quaternion.Euler(0f, 180f, 0f), true);
-            AddWallPiece(Layout.EdgeLocal(BoardEdge.Top, -CornerReach), Quaternion.Euler(0f, 270f, 0f), true);
+        // The corner mesh rounds toward +x/+z at yaw 0; each yaw step turns it a quarter clockwise. It sits a quarter cell
+        // past the cell's corner on both sides, where the two walls' centre lines meet.
+        private void AddCornerIfWalls(CellCoord cell, BoardEdge vertical, BoardEdge horizontal, float yaw,
+            ICollection<CellCoord> holes)
+        {
+            if (!GateGeometry.IsWallSide(cell, vertical, Layout.Cols, Layout.Rows, holes) ||
+                !GateGeometry.IsWallSide(cell, horizontal, Layout.Cols, Layout.Rows, holes)) return;
+
+            GateGeometry.PlaceOf(cell, vertical, Layout.Cols, Layout.Rows, out var index, out var depth);
+            var sideways = horizontal == BoardEdge.Right ? CornerReach : -CornerReach;
+            AddWallPiece(Layout.EdgeLocal(vertical, index + sideways, depth), Quaternion.Euler(0f, yaw, 0f), true);
         }
 
         private void AddWallPiece(Vector3 local, Quaternion rotation, bool isCorner)
@@ -209,11 +243,12 @@ namespace ColorBlockJam.SandBox
             piece.SetCorner(isCorner);
         }
 
-        private static bool IsGateCell(IReadOnlyList<GateState> gates, BoardEdge edge, int index)
+        private static bool IsGateCell(IReadOnlyList<GateState> gates, BoardEdge edge, int index, int depth)
         {
             foreach (var gate in gates)
             {
-                if (gate.Edge == edge && index >= gate.Index && index < gate.Index + gate.Length) return true;
+                if (gate.Edge == edge && gate.Depth == depth && index >= gate.Index && index < gate.Index + gate.Length)
+                    return true;
             }
 
             return false;

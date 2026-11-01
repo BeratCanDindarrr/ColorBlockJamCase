@@ -41,11 +41,12 @@ namespace ColorBlockJam.SandBox
             new BoardPoint(local.x / CellSize + Cols * Half, -local.z / CellSize + Rows * Half);
 
         // A gate stands in the wall line, centred on the cells it covers.
-        public Vector3 GateLocal(BoardEdge edge, int index, int length) => EdgeLocal(edge, index + (length - 1) * Half);
+        public Vector3 GateLocal(BoardEdge edge, int index, int length, int depth = 0) =>
+            EdgeLocal(edge, index + (length - 1) * Half, depth);
 
         // The gate's opening on the outside face of the wall.
-        public Vector3 GateOuterLocal(BoardEdge edge, int index, int length) =>
-            GateLocal(edge, index, length) + OutwardLocal(edge) * (WallOffset * CellSize);
+        public Vector3 GateOuterLocal(BoardEdge edge, int index, int length, int depth = 0) =>
+            GateLocal(edge, index, length, depth) + OutwardLocal(edge) * (WallOffset * CellSize);
 
         // Unit direction out of the board through an edge (GateFit.Normal in local space; rows grow along -z).
         public Vector3 OutwardLocal(BoardEdge edge)
@@ -66,16 +67,16 @@ namespace ColorBlockJam.SandBox
             }
         }
 
-        // A point on the wall centre line of an edge; `along` is a column (top/bottom) or row (left/right) coordinate.
-        // Values past the grid (-0.75, Cols - 0.25) reach the outer corners.
-        public Vector3 EdgeLocal(BoardEdge edge, double along)
+        // A point on the wall centre line of an edge, `depth` cells in from the outer edge; `along` is a column
+        // (top/bottom) or row (left/right) coordinate. Values past the grid (-0.75, Cols - 0.25) reach the outer corners.
+        public Vector3 EdgeLocal(BoardEdge edge, double along, int depth = 0)
         {
             switch (edge)
             {
-                case BoardEdge.Top: return ToLocal(along, -Half - WallOffset);
-                case BoardEdge.Bottom: return ToLocal(along, Rows - Half + WallOffset);
-                case BoardEdge.Left: return ToLocal(-Half - WallOffset, along);
-                default: return ToLocal(Cols - Half + WallOffset, along);
+                case BoardEdge.Top: return ToLocal(along, depth - Half - WallOffset);
+                case BoardEdge.Bottom: return ToLocal(along, Rows - depth - Half + WallOffset);
+                case BoardEdge.Left: return ToLocal(depth - Half - WallOffset, along);
+                default: return ToLocal(Cols - depth - Half + WallOffset, along);
             }
         }
 

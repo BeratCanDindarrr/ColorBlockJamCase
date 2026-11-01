@@ -21,9 +21,9 @@ namespace ColorBlockJam.SandBox.Board.Tests
             return new BlockData { Id = id, Col = col, Row = row, Cells = cells, Color = color };
         }
 
-        public static GateData Gate(BoardEdge edge, int index, int length, BlockColor color)
+        public static GateData Gate(BoardEdge edge, int index, int length, BlockColor color, int depth = 0)
         {
-            return new GateData { Edge = edge, Index = index, Length = length, Color = color };
+            return new GateData { Edge = edge, Index = index, Length = length, Color = color, Depth = depth };
         }
 
         public static BoardLevelDefinition Create(int cols, int rows, double timeLimit, IReadOnlyList<BlockData> blocks, IReadOnlyList<GateData> gates)

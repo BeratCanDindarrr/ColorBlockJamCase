@@ -14,7 +14,7 @@ namespace ColorBlockJam.LevelEditor
         private const float StatusHeight = 120f;
         private const float SwatchSize = 26f;
 
-        private static readonly string[] ToolNames = { "1 Select", "2 Block", "3 Gate" };
+        private static readonly string[] ToolNames = { "1 Select", "2 Block", "3 Gate", "4 Cell" };
 
         private Vector2 _statusScroll;
         private Vector2 _inspectorScroll;
@@ -101,6 +101,7 @@ namespace ColorBlockJam.LevelEditor
 
             GUILayout.Space(8f);
             EditorGUILayout.HelpBox("Select: Shift/Ctrl+click adds,\ndrag on empty = box\nBlock/Gate: Shift erases\n" +
+                                    "Cell: click/drag removes or\nrestores cells, Shift restores\n" +
                                     "Del: delete   R: rotate\nCtrl+D: duplicate\nCtrl+C / Ctrl+V: copy, paste\n" +
                                     "Ctrl+S: save   Esc: deselect", MessageType.None);
             EditorGUILayout.EndVertical();

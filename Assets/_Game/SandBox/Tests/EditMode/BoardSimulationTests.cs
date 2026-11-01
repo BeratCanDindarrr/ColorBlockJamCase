@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using ColorBlockJam.Core.Level;
 using NUnit.Framework;
 using static ColorBlockJam.SandBox.Board.Tests.BoardTestLevels;
 
@@ -168,6 +169,41 @@ namespace ColorBlockJam.SandBox.Board.Tests
 
             Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
             Assert.That(sim.TimeLeft, Is.EqualTo(60));
+        }
+
+        // Cell (2,2) of a 6x6 board removed; a red gate at depth 3 stands on the Top side of (2,3), just below the hole.
+        [Test]
+        public void MoveDrag_IntoInnerGateBesideRemovedCell_Exits()
+        {
+            var level = new BoardLevelDefinition(6, 6, 60,
+                new[] { Block("A", 2, 5, BlockColor.Red, Cells(0, 0)) },
+                new[] { Gate(BoardEdge.Top, 2, 1, BlockColor.Red, depth: 3) },
+                new[] { new CellCoord(2, 2) });
+            var sim = new BoardSimulation(level, Rules());
+            var block = sim.Blocks[0];
+
+            Assert.That(sim.BeginDrag(block), Is.True);
+            sim.MoveDrag(new BoardPoint(2, 1));
+
+            Assert.That(sim.Blocks, Has.No.Member(block));
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+        }
+
+        [Test]
+        public void MoveDrag_PastRemovedCellWithoutGate_Stops()
+        {
+            var level = new BoardLevelDefinition(6, 6, 60,
+                new[] { Block("A", 2, 5, BlockColor.Red, Cells(0, 0)), Block("B", 0, 0, BlockColor.Blue, Cells(0, 0)) },
+                new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Blue) },
+                new[] { new CellCoord(2, 2) });
+            var sim = new BoardSimulation(level, Rules());
+            var block = sim.Blocks[0];
+
+            sim.BeginDrag(block);
+            var position = sim.MoveDrag(new BoardPoint(2, 0));
+
+            Assert.That(position.Row, Is.EqualTo(3).Within(1e-9));
+            Assert.That(sim.DraggedBlock, Is.SameAs(block));
         }
     }
 }

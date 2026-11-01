@@ -19,7 +19,7 @@ namespace ColorBlockJam.SandBox
         public void Init(GateState gate, BoardLayout layout, Color color)
         {
             Gate = gate;
-            transform.localPosition = layout.GateLocal(gate.Edge, gate.Index, gate.Length);
+            transform.localPosition = layout.GateLocal(gate.Edge, gate.Index, gate.Length, gate.Depth);
             transform.localRotation = layout.GateRotation(gate.Edge);
             transform.localScale = Vector3.one * layout.CellSize;
 

@@ -10,22 +10,23 @@ namespace ColorBlockJam.LevelEditor
     // Left/Right).
     internal static class LevelEditorGateOps
     {
-        public static int GateAt(LevelData level, BoardEdge edge, int index)
+        public static int GateAt(LevelData level, BoardEdge edge, int index, int depth)
         {
             var gates = level.Gates ?? new GateData[0];
             for (var i = 0; i < gates.Length; i++)
             {
-                if (gates[i].Edge == edge && index >= gates[i].Index && index < gates[i].Index + gates[i].Length)
+                var gate = gates[i];
+                if (gate.Edge == edge && gate.Depth == depth && index >= gate.Index && index < gate.Index + gate.Length)
                     return i;
             }
 
             return -1;
         }
 
-        public static int Add(LevelData level, BoardEdge edge, int index, BlockColor color)
+        public static int Add(LevelData level, BoardEdge edge, int index, int depth, BlockColor color)
         {
             var gates = (level.Gates ?? new GateData[0]).ToList();
-            gates.Add(new GateData { Edge = edge, Index = index, Length = 1, Color = color });
+            gates.Add(new GateData { Edge = edge, Index = index, Length = 1, Color = color, Depth = depth });
             level.Gates = gates.ToArray();
             return gates.Count - 1;
         }
@@ -39,30 +40,36 @@ namespace ColorBlockJam.LevelEditor
             level.Gates = gates.ToArray();
         }
 
-        // Carries a gate to another wall or place; it stays whole on the wall.
-        public static bool Move(LevelData level, int index, BoardEdge edge, int slot)
+        // Carries a gate to another wall place; it stays whole on the wall line (the validator flags a line that is not
+        // wall all along).
+        public static bool Move(LevelData level, int index, BoardEdge edge, int slot, int depth)
         {
             var gate = level.Gates[index];
             var wall = LevelValidator.EdgeLength(edge, level.Cols, level.Rows);
             var length = Mathf.Clamp(gate.Length, 1, wall);
             var start = Mathf.Clamp(slot, 0, wall - length);
-            if (gate.Edge == edge && gate.Index == start && gate.Length == length) return false;
+            depth = Mathf.Clamp(depth, 0, GateGeometry.MaxDepth(edge, level.Cols, level.Rows) - 1);
+            if (gate.Edge == edge && gate.Index == start && gate.Length == length && gate.Depth == depth) return false;
 
             gate.Edge = edge;
             gate.Index = start;
             gate.Length = length;
+            gate.Depth = depth;
             return true;
         }
 
-        // Free wall cells right before and after the gate on its wall: where it can grow.
+        // Free wall places right before and after the gate on its wall line: where it can grow.
         public static List<int> GrowSlots(LevelData level, int index)
         {
             var gate = level.Gates[index];
             var wall = LevelValidator.EdgeLength(gate.Edge, level.Cols, level.Rows);
+            var holes = new HashSet<CellCoord>(level.Holes ?? new CellCoord[0]);
             var slots = new List<int>();
             foreach (var slot in new[] { gate.Index - 1, gate.Index + gate.Length })
             {
-                if (slot >= 0 && slot < wall && GateAt(level, gate.Edge, slot) < 0) slots.Add(slot);
+                if (slot < 0 || slot >= wall || GateAt(level, gate.Edge, slot, gate.Depth) >= 0) continue;
+                var attached = GateGeometry.Attached(gate.Edge, gate.Depth, slot, level.Cols, level.Rows);
+                if (GateGeometry.IsWallSide(attached, gate.Edge, level.Cols, level.Rows, holes)) slots.Add(slot);
             }
 
             return slots;
@@ -82,7 +89,7 @@ namespace ColorBlockJam.LevelEditor
         public static void ClampAll(LevelData level)
         {
             for (var i = 0; i < (level.Gates?.Length ?? 0); i++)
-                Move(level, i, level.Gates[i].Edge, level.Gates[i].Index);
+                Move(level, i, level.Gates[i].Edge, level.Gates[i].Index, level.Gates[i].Depth);
         }
     }
 }

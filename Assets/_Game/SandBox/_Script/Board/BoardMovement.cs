@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace ColorBlockJam.SandBox.Board
 {
-    // Collision and sliding of a block among the other (placed) blocks on the board. Every cell is
-    // a unit square. Exiting blocks are neither obstacles nor pickable.
+    // Collision and sliding of a block among the other (placed) blocks and the removed cells (holes) of the board.
+    // Every cell is a unit square. Exiting blocks are neither obstacles nor pickable.
     public sealed class BoardMovement
     {
         private const double Eps = 1e-6;
@@ -14,10 +14,13 @@ namespace ColorBlockJam.SandBox.Board
         private readonly int _cols;
         private readonly int _rows;
         private readonly double _assistRange;
+        private readonly IReadOnlyCollection<CellCoord> _holes;
 
-        public BoardMovement(IReadOnlyList<BlockState> blocks, int cols, int rows, double assistRange)
+        public BoardMovement(IReadOnlyList<BlockState> blocks, int cols, int rows, double assistRange,
+            IReadOnlyCollection<CellCoord> holes = null)
         {
             _blocks = blocks;
+            _holes = holes ?? Array.Empty<CellCoord>();
             _cols = cols;
             _rows = rows;
             _assistRange = assistRange;
@@ -155,6 +158,9 @@ namespace ColorBlockJam.SandBox.Board
                     Narrow(pos, cross, alongRow, other.Origin.Col + other.Cells[k].Col,
                         other.Origin.Row + other.Cells[k].Row, ref min, ref max);
             }
+
+            foreach (var hole in _holes)
+                Narrow(pos, cross, alongRow, hole.Col, hole.Row, ref min, ref max);
         }
 
         // A cell in the lane of the moving cell stops it from one side or the other.
@@ -184,6 +190,10 @@ namespace ColorBlockJam.SandBox.Board
                         SpansOverlap(row, other.Origin.Row + other.Cells[k].Row))
                         return true;
             }
+
+            foreach (var hole in _holes)
+                if (SpansOverlap(col, hole.Col) && SpansOverlap(row, hole.Row))
+                    return true;
 
             return false;
         }

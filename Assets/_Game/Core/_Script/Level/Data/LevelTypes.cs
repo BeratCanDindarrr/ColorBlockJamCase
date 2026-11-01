@@ -54,8 +54,9 @@ namespace ColorBlockJam.Core.Level
         public BlockColor Color;
     }
 
-    // A gate on one wall of the board: every cell from Index to Index + Length - 1 along that
-    // edge accepts a block of its Color.
+    // A gate in a wall: every cell from Index to Index + Length - 1 along the wall accepts a block of its Color.
+    // Depth 0 is the board's outer wall on Edge; a deeper gate sits that many cells further in, on the wall between
+    // board cells and removed cells (see GateGeometry).
     [Serializable]
     public class GateData
     {
@@ -63,5 +64,6 @@ namespace ColorBlockJam.Core.Level
         public int Index;
         public int Length;
         public BlockColor Color;
+        public int Depth;
     }
 }

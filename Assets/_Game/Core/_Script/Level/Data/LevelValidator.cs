@@ -22,11 +22,10 @@ namespace ColorBlockJam.Core.Level
     // Checks a level layout before it is saved: errors make it unplayable, warnings make it unwinnable or odd.
     public static class LevelValidator
     {
-        public static int EdgeLength(BoardEdge edge, int cols, int rows) =>
-            edge == BoardEdge.Top || edge == BoardEdge.Bottom ? cols : rows;
+        public static int EdgeLength(BoardEdge edge, int cols, int rows) => GateGeometry.LineLength(edge, cols, rows);
 
         public static List<LevelIssue> Validate(int cols, int rows, double timeLimitSec, BlockData[] blocks,
-            GateData[] gates)
+            GateData[] gates, CellCoord[] holes = null)
         {
             var issues = new List<LevelIssue>();
             if (cols <= 0 || rows <= 0) issues.Add(new LevelIssue($"Board size {cols}x{rows} must be positive", true));
@@ -34,10 +33,16 @@ namespace ColorBlockJam.Core.Level
 
             blocks ??= new BlockData[0];
             gates ??= new GateData[0];
+            var holeSet = new HashSet<CellCoord>(holes ?? new CellCoord[0]);
             if (blocks.Length == 0) issues.Add(new LevelIssue("The level has no blocks", true));
 
-            ValidateBlocks(cols, rows, blocks, issues);
-            ValidateGates(cols, rows, gates, issues);
+            foreach (var hole in holeSet)
+            {
+                if (!IsInside(hole, cols, rows)) issues.Add(new LevelIssue($"Removed cell {hole} is off the board", true));
+            }
+
+            ValidateBlocks(cols, rows, blocks, holeSet, issues);
+            ValidateGates(cols, rows, gates, holeSet, issues);
 
             for (var i = 0; i < blocks.Length; i++)
             {
@@ -48,7 +53,11 @@ namespace ColorBlockJam.Core.Level
             return issues;
         }
 
-        private static void ValidateBlocks(int cols, int rows, BlockData[] blocks, List<LevelIssue> issues)
+        private static bool IsInside(CellCoord cell, int cols, int rows) =>
+            cell.Col >= 0 && cell.Row >= 0 && cell.Col < cols && cell.Row < rows;
+
+        private static void ValidateBlocks(int cols, int rows, BlockData[] blocks, HashSet<CellCoord> holes,
+            List<LevelIssue> issues)
         {
             var ids = new HashSet<string>();
             var owner = new Dictionary<CellCoord, int>();
@@ -84,6 +93,12 @@ namespace ColorBlockJam.Core.Level
                         break;
                     }
 
+                    if (holes.Contains(cell))
+                    {
+                        issues.Add(new LevelIssue($"Block {name} stands on removed cell {cell}", true, i));
+                        break;
+                    }
+
                     if (owner.TryGetValue(cell, out var other) && other != i)
                     {
                         issues.Add(new LevelIssue($"Block {name} overlaps block {blocks[other].Id} at {cell}", true, i));
@@ -95,7 +110,8 @@ namespace ColorBlockJam.Core.Level
             }
         }
 
-        private static void ValidateGates(int cols, int rows, GateData[] gates, List<LevelIssue> issues)
+        private static void ValidateGates(int cols, int rows, GateData[] gates, HashSet<CellCoord> holes,
+            List<LevelIssue> issues)
         {
             for (var i = 0; i < gates.Length; i++)
             {
@@ -107,18 +123,29 @@ namespace ColorBlockJam.Core.Level
                 }
 
                 var length = EdgeLength(gate.Edge, cols, rows);
-                if (gate.Length < 1 || gate.Index < 0 || gate.Index + gate.Length > length)
+                var depthOk = gate.Depth >= 0 && gate.Depth < GateGeometry.MaxDepth(gate.Edge, cols, rows);
+                if (gate.Length < 1 || gate.Index < 0 || gate.Index + gate.Length > length || !depthOk)
                 {
                     issues.Add(new LevelIssue(
-                        $"Gate #{i} ({gate.Edge} {gate.Index}, length {gate.Length}) does not fit the {gate.Edge} wall",
+                        $"Gate #{i} ({gate.Edge} {gate.Index}, length {gate.Length}, depth {gate.Depth}) does not fit the board",
                         true, gateIndex: i));
                     continue;
+                }
+
+                // Every cell of the gate must stand on a wall: a board cell whose far side is off the board or removed.
+                for (var k = gate.Index; k < gate.Index + gate.Length; k++)
+                {
+                    var attached = GateGeometry.Attached(gate.Edge, gate.Depth, k, cols, rows);
+                    if (GateGeometry.IsWallSide(attached, gate.Edge, cols, rows, holes)) continue;
+                    var reason = holes.Contains(attached) ? $"stands on removed cell {attached}" : $"has board on both sides at {attached}";
+                    issues.Add(new LevelIssue($"Gate #{i} {reason}", true, gateIndex: i));
+                    break;
                 }
 
                 for (var j = 0; j < i; j++)
                 {
                     var other = gates[j];
-                    if (other == null || other.Edge != gate.Edge) continue;
+                    if (other == null || other.Edge != gate.Edge || other.Depth != gate.Depth) continue;
                     if (gate.Index < other.Index + other.Length && other.Index < gate.Index + gate.Length)
                         issues.Add(new LevelIssue($"Gate #{i} overlaps gate #{j} on the {gate.Edge} wall", true, gateIndex: i));
                 }

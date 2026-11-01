@@ -70,7 +70,8 @@ namespace ColorBlockJam.LevelEditor
             var errors = 0;
             foreach (var level in FindLevels())
             {
-                foreach (var issue in LevelValidator.Validate(level.Cols, level.Rows, level.TimeLimitSec, level.Blocks, level.Gates))
+                foreach (var issue in LevelValidator.Validate(level.Cols, level.Rows, level.TimeLimitSec, level.Blocks, level.Gates,
+                             level.Holes))
                 {
                     if (issue.IsError)
                     {

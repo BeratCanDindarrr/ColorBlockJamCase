@@ -6,17 +6,18 @@ using UnityEngine;
 
 namespace ColorBlockJam.LevelEditor
 {
-    // A gate in the selection, by the wall and the first wall cell it covers.
+    // A gate in the selection, by its wall line (edge and depth) and the first wall place it covers.
     [Serializable]
     internal struct GateKey : IEquatable<GateKey>
     {
         public BoardEdge Edge;
         public int Index;
+        public int Depth;
 
-        public static GateKey Of(GateData gate) => new GateKey { Edge = gate.Edge, Index = gate.Index };
-        public bool Equals(GateKey other) => Edge == other.Edge && Index == other.Index;
+        public static GateKey Of(GateData gate) => new GateKey { Edge = gate.Edge, Index = gate.Index, Depth = gate.Depth };
+        public bool Equals(GateKey other) => Edge == other.Edge && Index == other.Index && Depth == other.Depth;
         public override bool Equals(object obj) => obj is GateKey other && Equals(other);
-        public override int GetHashCode() => ((int)Edge * 397) ^ Index;
+        public override int GetHashCode() => (((int)Edge * 397) ^ Index) * 31 + Depth;
     }
 
     // What is picked. Blocks go by id, so deleting another block does not move the selection onto a different one;
@@ -143,7 +144,7 @@ namespace ColorBlockJam.LevelEditor
             {
                 var gate = working.Gates[i];
                 return Enumerable.Range(gate.Index, gate.Length)
-                    .Any(k => In(LevelEditorBoardGui.SlotCell(gate.Edge, k, working.Cols, working.Rows)));
+                    .Any(k => In(GateGeometry.Outside(gate.Edge, gate.Depth, k, working.Cols, working.Rows)));
             });
             AddToSelection(blocks.ToList(), gates.ToList());
         }

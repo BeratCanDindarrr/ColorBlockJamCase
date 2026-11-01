@@ -90,7 +90,7 @@ namespace ColorBlockJam.LevelEditor
         private EditingVisibility _visibility;
 
         public LevelEditorToolsOverlay() : base(SelectToolButton.Id, BlockToolButton.Id, GateToolButton.Id,
-            PanelButton.Id)
+            CellToolButton.Id, PanelButton.Id)
         {
         }
 
@@ -199,7 +199,18 @@ namespace ColorBlockJam.LevelEditor
         public const string Id = "ColorBlockJam/LevelEditor/Gate";
 
         public GateToolButton() : base(LevelEditorTool.Gate, "Grid.BoxTool",
-            "Gate (3)\nClick a wall slot around the board to add a gate in the brush colour, Shift deletes")
+            "Gate (3)\nClick a wall around the board or beside a removed cell to add a gate in the brush colour, Shift deletes")
+        {
+        }
+    }
+
+    [EditorToolbarElement(Id, typeof(SceneView))]
+    internal sealed class CellToolButton : ToolButton
+    {
+        public const string Id = "ColorBlockJam/LevelEditor/Cell";
+
+        public CellToolButton() : base(LevelEditorTool.Cell, "Grid.EraserTool",
+            "Cell (4)\nClick or drag to remove board cells or put them back, Shift puts back")
         {
         }
     }

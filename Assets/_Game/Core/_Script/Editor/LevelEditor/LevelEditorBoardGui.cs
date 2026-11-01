@@ -14,13 +14,17 @@ namespace ColorBlockJam.LevelEditor
         Wall
     }
 
-    // What the mouse is over: a board cell, or a slot on a wall just outside the board.
+    // What the mouse is over: a board cell, or a wall place (Edge, Index, Depth as in GateData) on a board cell's side
+    // that faces off the board or a removed cell. Cell is always the grid position under the mouse; InGrid is true for
+    // board cells and removed cells alike.
     internal struct BoardHit
     {
         public BoardHitKind Kind;
         public CellCoord Cell;
+        public bool InGrid;
         public BoardEdge Edge;
         public int Index;
+        public int Depth;
     }
 
     // Draws the level as a grid in the window, with a one-cell wall ring around it where the gates sit.
@@ -48,11 +52,18 @@ namespace ColorBlockJam.LevelEditor
             HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces)
         {
             EditorGUI.DrawRect(new Rect(_origin, new Vector2((_cols + 2) * _cell, (_rows + 2) * _cell)), LevelEditorStyle.Wall);
+            var holes = new HashSet<CellCoord>(level.Holes ?? new CellCoord[0]);
             for (var row = 0; row < _rows; row++)
             for (var col = 0; col < _cols; col++)
-                EditorGUI.DrawRect(Inset(CellRect(col, row)), LevelEditorStyle.Cell);
+            {
+                var removed = holes.Contains(new CellCoord(col, row));
+                EditorGUI.DrawRect(Inset(CellRect(col, row)), removed ? LevelEditorStyle.Background : LevelEditorStyle.Cell);
+            }
 
-            if (hover.Kind == BoardHitKind.Wall) EditorGUI.DrawRect(SlotRect(hover.Edge, hover.Index), LevelEditorStyle.WallSlotHover);
+            if (hover.Kind == BoardHitKind.Wall)
+                EditorGUI.DrawRect(StripRect(hover.Edge, hover.Index, hover.Depth), LevelEditorStyle.WallSlotHover);
+            else if (hover.InGrid)
+                EditorGUI.DrawRect(CellRect(hover.Cell.Col, hover.Cell.Row), LevelEditorStyle.WallSlotHover);
 
             var gates = level.Gates ?? new GateData[0];
             for (var i = 0; i < gates.Length; i++) DrawGate(gates[i], isGateSelected(i), errorGates.Contains(i));
@@ -91,53 +102,52 @@ namespace ColorBlockJam.LevelEditor
             return new CellCoord(Mathf.Clamp(col, -1, _cols), Mathf.Clamp(row, -1, _rows));
         }
 
-        // The grid position of a wall cell: one cell outside the board.
-        public static CellCoord SlotCell(BoardEdge edge, int index, int cols, int rows)
-        {
-            switch (edge)
-            {
-                case BoardEdge.Top: return new CellCoord(index, -1);
-                case BoardEdge.Bottom: return new CellCoord(index, rows);
-                case BoardEdge.Left: return new CellCoord(-1, index);
-                default: return new CellCoord(cols, index);
-            }
-        }
-
-        public BoardHit HitTest(Vector2 mouse)
+        public BoardHit HitTest(Vector2 mouse, ICollection<CellCoord> holes)
         {
             if (_cell <= 0f) return new BoardHit();
-            var col = Mathf.FloorToInt((mouse.x - _origin.x) / _cell) - 1;
-            var row = Mathf.FloorToInt((mouse.y - _origin.y) / _cell) - 1;
-            return HitAt(new CellCoord(col, row), _cols, _rows);
+            var x = (mouse.x - _origin.x) / _cell - 1f;
+            var y = (mouse.y - _origin.y) / _cell - 1f;
+            var point = new CellCoord(Mathf.FloorToInt(x), Mathf.FloorToInt(y));
+            return HitAt(point, new Vector2(x - point.Col, y - point.Row), _cols, _rows, holes);
         }
 
-        // What a grid position is: a board cell, a wall slot in the ring around the board (corners excluded), or nothing.
-        // Shared by the window and the SceneView, which map the mouse to grid positions their own way.
-        public static BoardHit HitAt(CellCoord point, int cols, int rows)
+        // What a grid position is. A board cell is a Cell; any other position next to board cells (the ring around the
+        // board, or a removed cell) is the wall place on the board cell beside it that `within` (0..1 inside the
+        // position, rows down) points to most. Shared by the window and the SceneView.
+        public static BoardHit HitAt(CellCoord point, Vector2 within, int cols, int rows, ICollection<CellCoord> holes)
         {
-            // Cell is the grid position for wall slots too (the wall ring), as the "+" places use.
-            var hit = new BoardHit { Cell = point };
-            var inCols = point.Col >= 0 && point.Col < cols;
-            var inRows = point.Row >= 0 && point.Row < rows;
-            if (inCols && inRows)
+            var hit = new BoardHit
+            {
+                Cell = point,
+                InGrid = point.Col >= 0 && point.Row >= 0 && point.Col < cols && point.Row < rows
+            };
+            if (GateGeometry.IsBoardCell(point, cols, rows, holes))
             {
                 hit.Kind = BoardHitKind.Cell;
+                return hit;
             }
-            else if (inCols && (point.Row == -1 || point.Row == rows))
+
+            var offset = within - new Vector2(0.5f, 0.5f);
+            var best = float.NegativeInfinity;
+            foreach (var edge in Edges)
             {
+                // The neighbour on that side of the position, and the wall on its side facing back to the position.
+                var toward = GateGeometry.Normal(edge);
+                var neighbour = point + toward;
+                if (!GateGeometry.IsBoardCell(neighbour, cols, rows, holes)) continue;
+
+                var score = offset.x * toward.Col + offset.y * toward.Row;
+                if (score <= best) continue;
+                best = score;
                 hit.Kind = BoardHitKind.Wall;
-                hit.Edge = point.Row == -1 ? BoardEdge.Top : BoardEdge.Bottom;
-                hit.Index = point.Col;
-            }
-            else if (inRows && (point.Col == -1 || point.Col == cols))
-            {
-                hit.Kind = BoardHitKind.Wall;
-                hit.Edge = point.Col == -1 ? BoardEdge.Left : BoardEdge.Right;
-                hit.Index = point.Row;
+                hit.Edge = GateGeometry.EdgeOfNormal(new CellCoord(-toward.Col, -toward.Row));
+                GateGeometry.PlaceOf(neighbour, hit.Edge, cols, rows, out hit.Index, out hit.Depth);
             }
 
             return hit;
         }
+
+        private static readonly BoardEdge[] Edges = { BoardEdge.Top, BoardEdge.Bottom, BoardEdge.Left, BoardEdge.Right };
 
         private void DrawBlock(BlockData block, bool selected, bool hasError)
         {
@@ -159,7 +169,7 @@ namespace ColorBlockJam.LevelEditor
         {
             for (var i = gate.Index; i < gate.Index + gate.Length; i++)
             {
-                var rect = SlotRect(gate.Edge, i);
+                var rect = StripRect(gate.Edge, i, gate.Depth);
                 if (selected || hasError) EditorGUI.DrawRect(rect, hasError ? LevelEditorStyle.Error : LevelEditorStyle.Selection);
                 EditorGUI.DrawRect(Inset(rect, selected || hasError ? 4f : Gap), LevelEditorStyle.Of(gate.Color));
             }
@@ -168,10 +178,20 @@ namespace ColorBlockJam.LevelEditor
         private Rect CellRect(int col, int row) =>
             new Rect(_origin.x + (col + 1) * _cell, _origin.y + (row + 1) * _cell, _cell, _cell);
 
-        private Rect SlotRect(BoardEdge edge, int index)
+        // The half of the cell past a wall place that lies against the wall, where its gate is drawn (so gates on two
+        // sides of one removed cell do not cover each other).
+        private Rect StripRect(BoardEdge edge, int index, int depth)
         {
-            var cell = SlotCell(edge, index, _cols, _rows);
-            return CellRect(cell.Col, cell.Row);
+            var cell = GateGeometry.Outside(edge, depth, index, _cols, _rows);
+            var rect = CellRect(cell.Col, cell.Row);
+            var half = rect.width / 2f;
+            switch (edge)
+            {
+                case BoardEdge.Top: return new Rect(rect.x, rect.y + half, rect.width, half);
+                case BoardEdge.Bottom: return new Rect(rect.x, rect.y, rect.width, half);
+                case BoardEdge.Left: return new Rect(rect.x + half, rect.y, half, rect.height);
+                default: return new Rect(rect.x, rect.y, half, rect.height);
+            }
         }
 
         private static Rect Inset(Rect rect, float by = Gap) =>

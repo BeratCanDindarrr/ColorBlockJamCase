@@ -12,7 +12,9 @@ namespace ColorBlockJam.LevelEditor
     {
         Select,
         Block,
-        Gate
+        Gate,
+        // Removes board cells and puts them back.
+        Cell
     }
 
     // Level editor: edits a working copy of a LevelData asset (one undo step per edit) and writes it back on Save.
@@ -65,6 +67,8 @@ namespace ColorBlockJam.LevelEditor
             StateChanged?.Invoke();
             SceneView.RepaintAll();
         }
+
+        private HashSet<CellCoord> Holes => new HashSet<CellCoord>(working.Holes ?? new CellCoord[0]);
 
         private bool IsDirty => working != null && JsonUtility.ToJson(working) != savedJson;
         private bool HasErrors => _issues.Exists(i => i.IsError);
@@ -158,6 +162,7 @@ namespace ColorBlockJam.LevelEditor
             working.hideFlags = HideFlags.DontSave;
             working.Blocks ??= new BlockData[0];
             working.Gates ??= new GateData[0];
+            working.Holes ??= new CellCoord[0];
             savedJson = JsonUtility.ToJson(working);
             selectedBlocks.Clear();
             selectedGates.Clear();
@@ -238,7 +243,8 @@ namespace ColorBlockJam.LevelEditor
                 return;
             }
 
-            _issues = LevelValidator.Validate(working.Cols, working.Rows, working.TimeLimitSec, working.Blocks, working.Gates);
+            _issues = LevelValidator.Validate(working.Cols, working.Rows, working.TimeLimitSec, working.Blocks, working.Gates,
+                working.Holes);
             foreach (var issue in _issues)
             {
                 if (!issue.IsError) continue;

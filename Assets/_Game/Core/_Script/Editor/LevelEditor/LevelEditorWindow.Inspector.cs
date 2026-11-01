@@ -73,8 +73,9 @@ namespace ColorBlockJam.LevelEditor
 
             var edge = (BoardEdge)EditorGUILayout.EnumPopup("Wall", gate.Edge);
             var slot = EditorGUILayout.DelayedIntField("Index", gate.Index);
-            if (edge != gate.Edge || slot != gate.Index)
-                Edit("Move Gate", l => LevelEditorGateOps.Move(l, index, edge, slot));
+            var depth = EditorGUILayout.DelayedIntField(new GUIContent("Depth", "Cells in from the outer edge; 0 is the outer wall"), gate.Depth);
+            if (edge != gate.Edge || slot != gate.Index || depth != gate.Depth)
+                Edit("Move Gate", l => LevelEditorGateOps.Move(l, index, edge, slot, depth));
 
             var length = EditorGUILayout.DelayedIntField("Length", gate.Length);
             if (length != gate.Length)
@@ -83,7 +84,7 @@ namespace ColorBlockJam.LevelEditor
                 {
                     var wall = LevelValidator.EdgeLength(l.Gates[index].Edge, l.Cols, l.Rows);
                     l.Gates[index].Length = Mathf.Clamp(length, 1, wall);
-                    LevelEditorGateOps.Move(l, index, l.Gates[index].Edge, l.Gates[index].Index);
+                    LevelEditorGateOps.Move(l, index, l.Gates[index].Edge, l.Gates[index].Index, l.Gates[index].Depth);
                     return true;
                 });
             }

@@ -21,13 +21,23 @@ namespace ColorBlockJam.LevelEditor
             {
                 var gate = working.Gates[PrimaryGate];
                 foreach (var slot in LevelEditorGateOps.GrowSlots(working, PrimaryGate))
-                    places.Add(LevelEditorBoardGui.SlotCell(gate.Edge, slot, working.Cols, working.Rows));
+                    places.Add(GateGeometry.Outside(gate.Edge, gate.Depth, slot, working.Cols, working.Rows));
             }
 
             return places;
         }
 
         private bool IsGrowPlace(CellCoord point) => GrowPlaces().Contains(point);
+
+        // A wall place right before or after the picked gate on its own wall line.
+        private bool IsGateGrowHit(BoardHit hit)
+        {
+            if (hit.Kind != BoardHitKind.Wall || tool != LevelEditorTool.Gate || PrimaryGate < 0 ||
+                selectedBlocks.Count + selectedGates.Count != 1) return false;
+            var gate = working.Gates[PrimaryGate];
+            return hit.Edge == gate.Edge && hit.Depth == gate.Depth &&
+                   LevelEditorGateOps.GrowSlots(working, PrimaryGate).Contains(hit.Index);
+        }
 
         private void GrowBlock(CellCoord cell)
         {

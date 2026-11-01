@@ -75,5 +75,27 @@ namespace ColorBlockJam.SandBox.Board.Tests
 
             Assert.That(movement.BlockAt(3.5, 0.5), Is.Null);
         }
+
+        [Test]
+        public void SlideBlock_StopsAtRemovedCell()
+        {
+            var moving = new BlockState(BoardTestLevels.Block("A", 0, 0, BlockColor.Red, BoardTestLevels.Cells(0, 0)));
+            var movement = new BoardMovement(new[] { moving }, BoardTestLevels.GridSize, BoardTestLevels.GridSize, 0.3,
+                new[] { new CellCoord(3, 0) });
+
+            var result = movement.SlideBlock(moving, new BoardPoint(0, 0), new BoardPoint(5, 0));
+
+            Assert.That(result.Col, Is.EqualTo(2).Within(Tolerance));
+        }
+
+        [Test]
+        public void Snap_OntoRemovedCell_ReturnsFallback()
+        {
+            var moving = new BlockState(BoardTestLevels.Block("A", 0, 0, BlockColor.Red, BoardTestLevels.Cells(0, 0)));
+            var movement = new BoardMovement(new[] { moving }, BoardTestLevels.GridSize, BoardTestLevels.GridSize, 0.3,
+                new[] { new CellCoord(1, 0) });
+
+            Assert.That(movement.Snap(moving, new BoardPoint(1, 0), new CellCoord(0, 0)), Is.EqualTo(new CellCoord(0, 0)));
+        }
     }
 }

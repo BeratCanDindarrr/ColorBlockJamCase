@@ -13,7 +13,8 @@ namespace ColorBlockJam.LevelEditor
 
         public static bool CanEditFromScene => _current != null && _current.working != null;
 
-        public static void ScenePress(CellCoord point, bool shift, bool command)
+        // `within` is where in the grid position the mouse is (0..1, rows down): it picks the wall side of a removed cell.
+        public static void ScenePress(CellCoord point, Vector2 within, bool shift, bool command)
         {
             if (!CanEditFromScene) return;
             var window = _current;
@@ -21,14 +22,14 @@ namespace ColorBlockJam.LevelEditor
             window._undoGroup = Undo.GetCurrentGroup();
             window._erasing = shift;
             window._adding = shift || command;
-            window.Press(window.SceneHit(point), point);
+            window.Press(window.SceneHit(point, within), point);
             window.Repaint();
         }
 
-        public static void SceneDrag(CellCoord point)
+        public static void SceneDrag(CellCoord point, Vector2 within)
         {
             if (!CanEditFromScene) return;
-            _current.Drag(_current.SceneHit(point), point);
+            _current.Drag(_current.SceneHit(point, within), point);
             _current.Repaint();
         }
 
@@ -55,7 +56,7 @@ namespace ColorBlockJam.LevelEditor
             {
                 var gate = level.Gates[i];
                 for (var k = gate.Index; k < gate.Index + gate.Length; k++)
-                    selected.Add(LevelEditorBoardGui.SlotCell(gate.Edge, k, level.Cols, level.Rows));
+                    selected.Add(GateGeometry.Outside(gate.Edge, gate.Depth, k, level.Cols, level.Rows));
             }
 
             growPlaces.AddRange(window.GrowPlaces());
@@ -68,6 +69,7 @@ namespace ColorBlockJam.LevelEditor
 
         public static bool SceneCommand(string name, bool execute) => CanEditFromScene && _current.HandleCommand(name, execute);
 
-        private BoardHit SceneHit(CellCoord point) => LevelEditorBoardGui.HitAt(point, working.Cols, working.Rows);
+        private BoardHit SceneHit(CellCoord point, Vector2 within) =>
+            LevelEditorBoardGui.HitAt(point, within, working.Cols, working.Rows, Holes);
     }
 }

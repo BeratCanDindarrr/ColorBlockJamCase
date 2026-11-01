@@ -13,6 +13,7 @@ namespace ColorBlockJam.LevelEditor
         private bool _draggingBlocks;
         private bool _draggingGate;
         private bool _boxing;
+        private bool _removingCells;
         private CellCoord _dragCell;
         private CellCoord _boxStart;
         private CellCoord _boxEnd;
@@ -26,7 +27,7 @@ namespace ColorBlockJam.LevelEditor
             switch (e.GetTypeForControl(id))
             {
                 case EventType.MouseMove:
-                    var hover = boardRect.Contains(e.mousePosition) ? _board.HitTest(e.mousePosition) : new BoardHit();
+                    var hover = boardRect.Contains(e.mousePosition) ? _board.HitTest(e.mousePosition, Holes) : new BoardHit();
                     if (hover.Kind != _hover.Kind || hover.Cell != _hover.Cell || hover.Edge != _hover.Edge || hover.Index != _hover.Index)
                     {
                         _hover = hover;
@@ -39,11 +40,11 @@ namespace ColorBlockJam.LevelEditor
                     _undoGroup = Undo.GetCurrentGroup();
                     _erasing = e.shift;
                     _adding = e.shift || e.control || e.command;
-                    Press(_board.HitTest(e.mousePosition), _board.PointAt(e.mousePosition));
+                    Press(_board.HitTest(e.mousePosition, Holes), _board.PointAt(e.mousePosition));
                     e.Use();
                     break;
                 case EventType.MouseDrag when GUIUtility.hotControl == id:
-                    Drag(_board.HitTest(e.mousePosition), _board.PointAt(e.mousePosition));
+                    Drag(_board.HitTest(e.mousePosition, Holes), _board.PointAt(e.mousePosition));
                     e.Use();
                     break;
                 case EventType.MouseUp when GUIUtility.hotControl == id:
@@ -66,8 +67,27 @@ namespace ColorBlockJam.LevelEditor
                     break;
                 case LevelEditorTool.Gate:
                     if (hit.Kind == BoardHitKind.Wall) PressGate(hit);
+                    else if (HasSelection) ClearSelection();
+                    break;
+                case LevelEditorTool.Cell:
+                    if (hit.InGrid) PressCell(hit.Cell);
                     break;
             }
+        }
+
+        // Cell tool: the first cell decides whether this press removes cells or puts them back (Shift always puts back);
+        // dragging keeps doing the same to every cell it passes.
+        private void PressCell(CellCoord cell)
+        {
+            var isRemoved = Holes.Contains(cell);
+            _removingCells = !_erasing && !isRemoved;
+            SetCellRemoved(cell);
+        }
+
+        private void SetCellRemoved(CellCoord cell)
+        {
+            var removing = _removingCells;
+            Edit(removing ? "Remove Cell" : "Restore Cell", l => LevelEditorBlockOps.SetRemoved(l, cell, removing));
         }
 
         private void Drag(BoardHit hit, CellCoord point)
@@ -78,10 +98,16 @@ namespace ColorBlockJam.LevelEditor
                 return;
             }
 
+            if (tool == LevelEditorTool.Cell)
+            {
+                if (hit.InGrid) SetCellRemoved(hit.Cell);
+                return;
+            }
+
             if (tool == LevelEditorTool.Gate)
             {
                 // Dragging along the wall keeps growing the picked gate.
-                if (hit.Kind == BoardHitKind.Wall && !_erasing && IsGrowPlace(hit.Cell)) GrowGate(hit);
+                if (!_erasing && IsGateGrowHit(hit)) GrowGate(hit);
                 return;
             }
 
@@ -101,7 +127,7 @@ namespace ColorBlockJam.LevelEditor
                 var gate = PrimaryGate;
                 if (gate < 0) return;
                 var before = GateKey.Of(working.Gates[gate]);
-                Edit("Move Gate", l => LevelEditorGateOps.Move(l, gate, hit.Edge, hit.Index));
+                Edit("Move Gate", l => LevelEditorGateOps.Move(l, gate, hit.Edge, hit.Index, hit.Depth));
                 FollowGate(before, gate);
             }
         }
@@ -124,7 +150,7 @@ namespace ColorBlockJam.LevelEditor
         private void PressSelect(BoardHit hit, CellCoord point)
         {
             var block = hit.Kind == BoardHitKind.Cell ? LevelEditorBlockOps.BlockAt(working, hit.Cell) : -1;
-            var gate = hit.Kind == BoardHitKind.Wall ? LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index) : -1;
+            var gate = hit.Kind == BoardHitKind.Wall ? LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index, hit.Depth) : -1;
 
             if (block >= 0)
             {
@@ -226,7 +252,7 @@ namespace ColorBlockJam.LevelEditor
         // free slot leaves the picked gate, or adds a new one when nothing is picked.
         private void PressGate(BoardHit hit)
         {
-            var gate = LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index);
+            var gate = LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index, hit.Depth);
             if (_erasing)
             {
                 if (gate < 0) return;
@@ -246,7 +272,7 @@ namespace ColorBlockJam.LevelEditor
             }
 
             // A "+" next to the picked gate makes it longer; any other free slot leaves it first.
-            if (IsGrowPlace(hit.Cell))
+            if (IsGateGrowHit(hit))
             {
                 GrowGate(hit);
                 return;
@@ -261,7 +287,7 @@ namespace ColorBlockJam.LevelEditor
             var added = -1;
             Edit("Add Gate", l =>
             {
-                added = LevelEditorGateOps.Add(l, hit.Edge, hit.Index, brush);
+                added = LevelEditorGateOps.Add(l, hit.Edge, hit.Index, hit.Depth, brush);
                 return true;
             });
             SelectOnly(-1, added);
@@ -284,6 +310,7 @@ namespace ColorBlockJam.LevelEditor
                 case KeyCode.Alpha1: SwitchTool(LevelEditorTool.Select); break;
                 case KeyCode.Alpha2: SwitchTool(LevelEditorTool.Block); break;
                 case KeyCode.Alpha3: SwitchTool(LevelEditorTool.Gate); break;
+                case KeyCode.Alpha4: SwitchTool(LevelEditorTool.Cell); break;
                 case KeyCode.Delete:
                 case KeyCode.Backspace: DeleteSelection(); break;
                 case KeyCode.R when !command: RotateSelection(); break;

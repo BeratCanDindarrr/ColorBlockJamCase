@@ -25,6 +25,8 @@ namespace ColorBlockJam.SandBox.Board
         public bool IsClockRunning { get; private set; }
         public IReadOnlyList<BlockState> Blocks => _blocks;
         public IReadOnlyList<GateState> Gates => _gates;
+        // Removed board cells.
+        public IReadOnlyCollection<CellCoord> Holes { get; }
         public BlockState DraggedBlock { get; private set; }
         public BoardPoint DragPosition { get; private set; }
 
@@ -48,7 +50,8 @@ namespace ColorBlockJam.SandBox.Board
             for (var i = 0; i < level.Gates.Count; i++)
                 _gates.Add(new GateState(level.Gates[i]));
 
-            _movement = new BoardMovement(_blocks, Cols, Rows, rules.AssistRange);
+            Holes = level.Holes;
+            _movement = new BoardMovement(_blocks, Cols, Rows, rules.AssistRange, Holes);
         }
 
         public BlockState BlockAt(BoardPoint point) => _movement.BlockAt(point.Col, point.Row);
