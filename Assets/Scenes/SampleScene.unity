@@ -167,6 +167,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCameraView: {fileID: 963194229}
+--- !u!1 &155932424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 155932426}
+  - component: {fileID: 155932425}
+  m_Layer: 0
+  m_Name: MockMessenger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &155932425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155932424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e2fd343496840da9a9bc4fad31298d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currencyType: 0
+  currencyAmount: 100
+  rewardCoins: 20
+  rewardTimeSeconds: 1800
+  rewardBooster1: 1
+  limitlessSeconds: 1800
+  level: 1
+--- !u!4 &155932426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155932424}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &440029333
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,6 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5177af90409f7474ba531c909be511da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mockMessageController: {fileID: 155932425}
 --- !u!1 &510802998
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,3 +743,4 @@ SceneRoots:
   - {fileID: 1967957348}
   - {fileID: 510803001}
   - {fileID: 986117428}
+  - {fileID: 155932426}

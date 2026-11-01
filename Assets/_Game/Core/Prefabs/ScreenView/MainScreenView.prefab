@@ -545,6 +545,8 @@ MonoBehaviour:
   lifeButton: {fileID: 3622719905384730449}
   coinText: {fileID: 5848606405223962513}
   lifeText: {fileID: 4854224531873162305}
+  coinImageTransform: {fileID: 433449410505336791}
+  lifeImageTransform: {fileID: 2706788537598532571}
 --- !u!1 &2465535433876936001
 GameObject:
   m_ObjectHideFlags: 0

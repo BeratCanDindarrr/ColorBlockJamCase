@@ -7,12 +7,17 @@ using UnityEngine;
 namespace ColorBlockJam.LevelEditor
 {
     // Layout: header bar, then tools | board | inspector, then the problem list.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
         private const float SideWidth = 200f;
         private const float InspectorWidth = 260f;
         private const float StatusHeight = 120f;
         private const float SwatchSize = 26f;
+        // The SceneView level bar.
+        internal const float BarWidth = 620f;
+        private const float BarLabelWidth = 62f;
+        private const float BarFieldWidth = 105f;
+        private const int BarSwatchesPerRow = 20;
 
         private static readonly string[] ToolNames = { "1 Select", "2 Block", "3 Gate", "4 Cell" };
 
@@ -21,9 +26,9 @@ namespace ColorBlockJam.LevelEditor
         private bool _showRaw;
         private UnityEditor.Editor _rawEditor;
 
-        private void OnGUI()
+        internal void DrawWindow()
         {
-            if (working == null)
+            if (EnsureWorking() == null)
             {
                 DrawNoLevel();
                 return;
@@ -85,6 +90,72 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndHorizontal();
         }
 
+        // The SceneView level bar, three short rows: which level and save / play; its size, time and problems; the palette.
+        internal void DrawLevelBar()
+        {
+            if (EnsureWorking() == null) return;
+            var levels = LevelEditorAssets.FindLevels();
+            var current = levels.IndexOf(source);
+
+            EditorGUILayout.BeginHorizontal();
+            using (new EditorGUI.DisabledScope(current <= 0))
+            {
+                if (GUILayout.Button("‹", EditorStyles.miniButtonLeft, GUILayout.Width(22f))) TryOpen(levels[current - 1]);
+            }
+
+            var picked = EditorGUILayout.Popup(current, levels.Select(l => l.name).ToArray(), GUILayout.Width(130f));
+            if (picked != current && picked >= 0) TryOpen(levels[picked]);
+
+            using (new EditorGUI.DisabledScope(current < 0 || current >= levels.Count - 1))
+            {
+                if (GUILayout.Button("›", EditorStyles.miniButtonRight, GUILayout.Width(22f))) TryOpen(levels[current + 1]);
+            }
+
+            var playIndex = LevelEditorAssets.PlayIndexOf(source);
+            var state = playIndex >= 0 ? $"Level {playIndex + 1}" : "Not in LevelSettings";
+            GUILayout.Label(IsDirty ? state + "   ● unsaved" : state, EditorStyles.miniBoldLabel);
+            GUILayout.FlexibleSpace();
+
+            using (new EditorGUI.DisabledScope(!IsDirty))
+            {
+                if (GUILayout.Button("Save", EditorStyles.miniButtonLeft, GUILayout.Width(50f))) Save();
+                if (GUILayout.Button("Revert", EditorStyles.miniButtonMid, GUILayout.Width(55f))) Revert();
+            }
+
+            if (GUILayout.Button("New", EditorStyles.miniButtonMid, GUILayout.Width(45f))) CreateLevel();
+            if (GUILayout.Button("▶ Play", EditorStyles.miniButtonRight, GUILayout.Width(55f))) PlayLevel();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            var labelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = BarLabelWidth;
+            DrawLevelFields(GUILayout.Width(BarFieldWidth));
+            EditorGUIUtility.labelWidth = labelWidth;
+            GUILayout.Space(8f);
+            DrawProblemsLine();
+            EditorGUILayout.EndHorizontal();
+
+            DrawSwatches(BarSwatchesPerRow, BarWidth);
+        }
+
+        // One line: the first error (or warning) and the counts; the tooltip lists them all.
+        private void DrawProblemsLine()
+        {
+            var errors = _issues.Count(i => i.IsError);
+            var warnings = _issues.Count - errors;
+            if (errors + warnings == 0)
+            {
+                GUILayout.Label("No problems", EditorStyles.miniLabel);
+                return;
+            }
+
+            var first = errors > 0 ? _issues.First(i => i.IsError) : _issues[0];
+            var icon = EditorGUIUtility.IconContent(errors > 0 ? "console.erroricon.sml" : "console.warnicon.sml").image;
+            var all = string.Join("\n", _issues.Select(i => i.Message));
+            GUILayout.Label(new GUIContent($"{errors} error(s), {warnings} warning(s): {first.Message}", icon, all),
+                EditorStyles.miniLabel, GUILayout.MinWidth(0f));
+        }
+
         private void DrawToolPanel()
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(SideWidth));
@@ -108,24 +179,75 @@ namespace ColorBlockJam.LevelEditor
         }
 
         // Picks the brush colour; with a block or gate selected it also recolours it.
-        private void DrawSwatches()
+        // The favourite colours (all of them after "…", or when none is starred; a double click stars one), then "+" adds
+        // a colour, the pencil opens the colour list and "…" shows the rest.
+        private void DrawSwatches(int perRow = 6, float width = SideWidth)
         {
-            var colors = (BlockColor[])Enum.GetValues(typeof(BlockColor));
-            const int perRow = 6;
-            for (var i = 0; i < colors.Length; i += perRow)
+            var all = (BlockColor[])Enum.GetValues(typeof(BlockColor));
+            var favorites = all.Where(LevelEditorColors.IsFavorite).ToArray();
+            var hasMore = favorites.Length > 0 && favorites.Length < all.Length;
+            var colors = hasMore && !_showAllColors ? favorites : all;
+            // After the colours: eyedropper, "+", pencil, and "…" when some colours are hidden.
+            var slots = colors.Length + (hasMore ? 4 : 3);
+            for (var i = 0; i < slots; i += perRow)
             {
-                var row = GUILayoutUtility.GetRect(SideWidth, SwatchSize + 4f);
-                for (var j = 0; j < perRow && i + j < colors.Length; j++)
+                var row = GUILayoutUtility.GetRect(width, SwatchSize + 4f);
+                for (var j = 0; j < perRow && i + j < slots; j++)
                 {
-                    var color = colors[i + j];
                     var rect = new Rect(row.x + j * (SwatchSize + 4f), row.y, SwatchSize, SwatchSize);
-                    if (color == brush) EditorGUI.DrawRect(rect, LevelEditorStyle.Selection);
-                    EditorGUI.DrawRect(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), LevelEditorStyle.Of(color));
-                    if (GUI.Button(rect, new GUIContent("", color.ToString()), GUIStyle.none)) PickColor(color);
+                    var slot = i + j - colors.Length - 1;
+                    if (slot == -1)
+                    {
+                        if (_pickingColor) EditorGUI.DrawRect(rect, LevelEditorStyle.Selection);
+                        var eyedropper = new GUIContent(EditorGUIUtility.IconContent("d_eyeDropper.Large").image,
+                            "Eyedropper: click a block or gate to copy its colour (Esc cancels)");
+                        if (GUI.Button(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), eyedropper))
+                            ToggleEyedropper();
+                    }
+                    else if (slot == 0)
+                    {
+                        if (GUI.Button(rect, new GUIContent("+", "Add a colour"))) PopupWindow.Show(rect, new AddColorPopup());
+                    }
+                    else if (slot == 1)
+                    {
+                        if (GUI.Button(rect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image,
+                                "Edit colours and favourites"))) LevelEditorColorsWindow.Open();
+                    }
+                    else if (slot == 2)
+                    {
+                        if (GUI.Button(rect, new GUIContent(_showAllColors ? "▴" : "…",
+                                _showAllColors ? "Show only favourites" : "Show all colours")))
+                            _showAllColors = !_showAllColors;
+                    }
+                    else
+                    {
+                        DrawSwatch(rect, colors[i + j]);
+                    }
                 }
             }
 
             GUILayout.Label(brush.ToString(), EditorStyles.miniLabel);
+        }
+
+        // A click picks the colour, a double click stars or unstars it as a favourite.
+        private void DrawSwatch(Rect rect, BlockColor color)
+        {
+            var favorite = LevelEditorColors.IsFavorite(color);
+            if (color == brush) EditorGUI.DrawRect(rect, LevelEditorStyle.Selection);
+            EditorGUI.DrawRect(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), LevelEditorStyle.Of(color));
+            if (favorite) GUI.Label(new Rect(rect.xMax - 13f, rect.y, 13f, 13f), "★", EditorStyles.miniBoldLabel);
+
+            var e = Event.current;
+            if (e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 2 && rect.Contains(e.mousePosition))
+            {
+                LevelEditorColors.SetFavorite(color, !favorite);
+                e.Use();
+                RaiseStateChanged();
+                return;
+            }
+
+            var tip = $"{color}\nDouble-click: {(favorite ? "remove from" : "add to")} favourites";
+            if (GUI.Button(rect, new GUIContent("", tip), GUIStyle.none)) PickColor(color);
         }
 
         private void PickColor(BlockColor color)
@@ -145,10 +267,10 @@ namespace ColorBlockJam.LevelEditor
             });
         }
 
-        private void DrawLevelFields()
+        private void DrawLevelFields(params GUILayoutOption[] options)
         {
-            var cols = EditorGUILayout.DelayedIntField("Cols", working.Cols);
-            var rows = EditorGUILayout.DelayedIntField("Rows", working.Rows);
+            var cols = EditorGUILayout.DelayedIntField("Cols", working.Cols, options);
+            var rows = EditorGUILayout.DelayedIntField("Rows", working.Rows, options);
             if (cols != working.Cols || rows != working.Rows)
             {
                 Edit("Resize Board", l =>
@@ -161,7 +283,7 @@ namespace ColorBlockJam.LevelEditor
                 });
             }
 
-            var time = EditorGUILayout.DelayedFloatField("Time (sec)", working.TimeLimitSec);
+            var time = EditorGUILayout.DelayedFloatField("Time (sec)", working.TimeLimitSec, options);
             if (!Mathf.Approximately(time, working.TimeLimitSec))
             {
                 Edit("Set Time Limit", l =>
@@ -180,6 +302,7 @@ namespace ColorBlockJam.LevelEditor
             {
                 _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, GrowPlaces());
                 if (_boxing) _board.DrawBox(BoxMin, BoxMax);
+                if (_ghost.Count > 0) _board.DrawGhost(_ghost, _ghostFits);
             }
             HandleBoardInput(rect);
         }

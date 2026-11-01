@@ -84,6 +84,13 @@ namespace ColorBlockJam.LevelEditor
             EditorGUI.DrawRect(new Rect(inner.center.x - bar / 2f, inner.center.y - arm / 2f, bar, arm), Color.white);
         }
 
+        // Where a dragged shape would go: green when it fits, red when it does not.
+        public void DrawGhost(List<CellCoord> cells, bool fits)
+        {
+            var color = fits ? new Color(0.2f, 0.8f, 0.3f, 0.6f) : new Color(1f, 0.25f, 0.25f, 0.6f);
+            foreach (var cell in cells) EditorGUI.DrawRect(Inset(CellRect(cell.Col, cell.Row)), color);
+        }
+
         // Outline of a selection box from cell min to cell max (wall cells included).
         public void DrawBox(CellCoord min, CellCoord max)
         {

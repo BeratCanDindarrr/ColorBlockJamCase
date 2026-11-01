@@ -14,6 +14,7 @@ namespace ColorBlockJam.Core.Controller
         public GamePlayScreenView GamePlayScreenView;
 
         private ScreenType _screenType = ScreenType.None;
+        public ScreenType ScreenStatus => _screenType;
         
         private ScreenViewSettings _screenViewSettings;
         private IObjectResolver _objectResolver;

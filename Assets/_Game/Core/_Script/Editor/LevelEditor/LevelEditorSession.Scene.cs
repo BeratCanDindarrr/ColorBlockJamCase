@@ -7,36 +7,34 @@ namespace ColorBlockJam.LevelEditor
 {
     // Editing from the SceneView. The scene preview (SandBox editor code) maps the mouse to grid positions — board
     // cells, plus the wall ring at -1 and Cols/Rows — and drives the same tools as the window's board.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
-        private static LevelEditorWindow _current;
-
-        public static bool CanEditFromScene => _current != null && _current.working != null;
+        public static bool CanEditFromScene => instance.EnsureWorking() != null;
 
         // `within` is where in the grid position the mouse is (0..1, rows down): it picks the wall side of a removed cell.
         public static void ScenePress(CellCoord point, Vector2 within, bool shift, bool command)
         {
             if (!CanEditFromScene) return;
-            var window = _current;
+            var session = instance;
             Undo.IncrementCurrentGroup();
-            window._undoGroup = Undo.GetCurrentGroup();
-            window._erasing = shift;
-            window._adding = shift || command;
-            window.Press(window.SceneHit(point, within), point);
-            window.Repaint();
+            session._undoGroup = Undo.GetCurrentGroup();
+            session._erasing = shift;
+            session._adding = shift || command;
+            session.Press(session.SceneHit(point, within), point);
+            Repaint();
         }
 
         public static void SceneDrag(CellCoord point, Vector2 within)
         {
             if (!CanEditFromScene) return;
-            _current.Drag(_current.SceneHit(point, within), point);
-            _current.Repaint();
+            instance.Drag(instance.SceneHit(point, within), point);
+            Repaint();
         }
 
         public static void SceneRelease()
         {
             if (!CanEditFromScene) return;
-            _current.Release();
+            instance.Release();
         }
 
         // What the scene overlay draws: every grid position of the selected blocks and gates, the "+" places where the
@@ -49,7 +47,7 @@ namespace ColorBlockJam.LevelEditor
             boxMin = boxMax = default;
             if (!CanEditFromScene) return false;
 
-            var window = _current;
+            var window = instance;
             var level = window.working;
             foreach (var i in window.SelectedBlockIndices()) selected.AddRange(LevelValidator.AbsoluteCells(level.Blocks[i]));
             foreach (var i in window.SelectedGateIndices())
@@ -65,9 +63,9 @@ namespace ColorBlockJam.LevelEditor
             return window._boxing;
         }
 
-        public static bool SceneShortcut(Event e) => CanEditFromScene && _current.HandleShortcut(e);
+        public static bool SceneShortcut(Event e) => CanEditFromScene && instance.HandleShortcut(e);
 
-        public static bool SceneCommand(string name, bool execute) => CanEditFromScene && _current.HandleCommand(name, execute);
+        public static bool SceneCommand(string name, bool execute) => CanEditFromScene && instance.HandleCommand(name, execute);
 
         private BoardHit SceneHit(CellCoord point, Vector2 within) =>
             LevelEditorBoardGui.HitAt(point, within, working.Cols, working.Rows, Holes);

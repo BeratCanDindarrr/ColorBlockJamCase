@@ -13,6 +13,13 @@ namespace ColorBlockJam.Views
         [SerializeField] private MainScreenMenuButtonView[] menuButtons;
         [SerializeField] private int startPage = 1;
 
+        // Where reward icons fly to (set by the home page that holds them) and the canvas they fly on.
+        public MainScreenHeaderView Header { get; private set; }
+        public Transform PlayButtonTransform { get; private set; }
+        public Transform CoinImageTransform => Header != null ? Header.CoinImageTransform : null;
+        public Transform LifeImageTransform => Header != null ? Header.LifeImageTransform : null;
+        public Transform FlyLayer => Header != null ? Header.GetComponentInParent<Canvas>().rootCanvas.transform : null;
+
         public void Init()
         {
             if (menuButtons.Length != pages.Length)
@@ -28,6 +35,13 @@ namespace ColorBlockJam.Views
             pageSnapper.Init(pages.Length, startPage);
             pageSnapper.PageChanged += OnPageChanged;
             SelectPage(pageSnapper.CurrentPage);
+            
+        }
+
+        public void SetCurrencyTargets(MainScreenHeaderView header, Transform playButtonTransform)
+        {
+            Header = header;
+            PlayButtonTransform = playButtonTransform;
         }
 
         public void SnapToPage(int page) => pageSnapper.SnapTo(page);

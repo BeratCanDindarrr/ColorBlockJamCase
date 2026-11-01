@@ -21,6 +21,9 @@ namespace ColorBlockJam.SandBox.Editor
         private static readonly int ControlHint = "LevelEditorSceneInput".GetHashCode();
         private static readonly List<CellCoord> Marks = new List<CellCoord>();
         private static readonly List<CellCoord> GrowPlaces = new List<CellCoord>();
+        private static readonly List<CellCoord> Ghost = new List<CellCoord>();
+        private static readonly Color GhostFits = new Color(0.2f, 0.8f, 0.3f, 0.55f);
+        private static readonly Color GhostBlocked = new Color(1f, 0.25f, 0.25f, 0.55f);
         private static readonly Color GrowFill = new Color(0.20f, 0.72f, 0.30f, 0.85f);
         private static readonly Vector3[] Quad = new Vector3[4];
         private static CellCoord? _hover;
@@ -33,16 +36,20 @@ namespace ColorBlockJam.SandBox.Editor
         private static void OnSceneGui(SceneView sceneView)
         {
             var board = LevelEditorScenePreview.Board;
-            if (board == null || board.Layout == null || !LevelEditorWindow.CanEditFromScene) return;
+            if (board == null || board.Layout == null || !LevelEditorSession.CanEditFromScene) return;
 
             var e = Event.current;
             if (HandleKeys(e)) return;
+            // The problem card's buttons get presses on it; only presses, so a drag ending there still finishes.
+            if (e.type == EventType.MouseDown && LevelEditorSession.IsOverProblemToast(e.mousePosition)) return;
 
             var id = GUIUtility.GetControlID(ControlHint, FocusType.Passive);
             // Clicks on the board edit the level instead of picking scene objects.
             if (e.type == EventType.Layout) HandleUtility.AddDefaultControl(id);
 
             var point = PointUnderMouse(board, e.mousePosition, out var within);
+            if (HandleShapeDrag(e, point)) return;
+
             switch (e.GetTypeForControl(id))
             {
                 case EventType.MouseMove:
@@ -52,19 +59,23 @@ namespace ColorBlockJam.SandBox.Editor
                         sceneView.Repaint();
                     }
                     break;
+                case EventType.MouseDown when e.button == 0 && !e.alt && !point.HasValue:
+                    // Off the board: leave what was picked (and its "+" places).
+                    LevelEditorSession.SceneClickOutside();
+                    break;
                 case EventType.MouseDown when e.button == 0 && !e.alt && point.HasValue:
                     GUIUtility.hotControl = id;
-                    LevelEditorWindow.ScenePress(point.Value, within, e.shift, e.control || e.command);
+                    LevelEditorSession.ScenePress(point.Value, within, e.shift, e.control || e.command);
                     e.Use();
                     break;
                 case EventType.MouseDrag when GUIUtility.hotControl == id:
-                    if (point.HasValue) LevelEditorWindow.SceneDrag(point.Value, within);
+                    if (point.HasValue) LevelEditorSession.SceneDrag(point.Value, within);
                     _hover = point;
                     e.Use();
                     break;
                 case EventType.MouseUp when GUIUtility.hotControl == id:
                     GUIUtility.hotControl = 0;
-                    LevelEditorWindow.SceneRelease();
+                    LevelEditorSession.SceneRelease();
                     e.Use();
                     break;
                 case EventType.Repaint:
@@ -73,16 +84,38 @@ namespace ColorBlockJam.SandBox.Editor
             }
         }
 
+        // A shape dragged in from the Shapes panel: its ghost follows the mouse, a drop adds it as a block.
+        private static bool HandleShapeDrag(Event e, CellCoord? point)
+        {
+            switch (e.type)
+            {
+                case EventType.DragUpdated:
+                case EventType.DragPerform:
+                    if (DragAndDrop.GetGenericData(LevelEditorSession.ShapeDragKey) == null) return false;
+                    var drop = e.type == EventType.DragPerform;
+                    var fits = LevelEditorSession.SceneDragShape(point, drop);
+                    DragAndDrop.visualMode = fits ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+                    if (drop) DragAndDrop.AcceptDrag();
+                    e.Use();
+                    return true;
+                case EventType.DragExited:
+                    LevelEditorSession.SceneEndShapeDrag();
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
         // The editor's keys and Edit menu commands (duplicate, copy, paste, delete) work in the SceneView too.
         private static bool HandleKeys(Event e)
         {
             switch (e.type)
             {
-                case EventType.KeyDown when LevelEditorWindow.SceneShortcut(e):
+                case EventType.KeyDown when LevelEditorSession.SceneShortcut(e):
                     e.Use();
                     return true;
-                case EventType.ValidateCommand when LevelEditorWindow.SceneCommand(e.commandName, false):
-                case EventType.ExecuteCommand when LevelEditorWindow.SceneCommand(e.commandName, true):
+                case EventType.ValidateCommand when LevelEditorSession.SceneCommand(e.commandName, false):
+                case EventType.ExecuteCommand when LevelEditorSession.SceneCommand(e.commandName, true):
                     e.Use();
                     return true;
                 default:
@@ -111,9 +144,14 @@ namespace ColorBlockJam.SandBox.Editor
 
         private static void DrawMarks(BoardViewController board)
         {
-            var boxing = LevelEditorWindow.GetSceneMarks(Marks, GrowPlaces, out var boxMin, out var boxMax);
+            var boxing = LevelEditorSession.GetSceneMarks(Marks, GrowPlaces, out var boxMin, out var boxMax);
             foreach (var cell in Marks) DrawRect(board, cell, cell, SelectionFill, Color.white);
             foreach (var place in GrowPlaces) DrawPlus(board, place);
+            if (LevelEditorSession.GetShapeGhost(Ghost, out var fits))
+            {
+                var fill = fits ? GhostFits : GhostBlocked;
+                foreach (var cell in Ghost) DrawRect(board, cell, cell, fill, fill);
+            }
             if (boxing) DrawRect(board, boxMin, boxMax, BoxFill, Color.white);
             if (_hover.HasValue) DrawRect(board, _hover.Value, _hover.Value, HoverFill, new Color(1f, 1f, 1f, 0.5f));
         }

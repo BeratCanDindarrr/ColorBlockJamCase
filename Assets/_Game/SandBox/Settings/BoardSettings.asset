@@ -22,7 +22,6 @@ MonoBehaviour:
   MaxTilt: 12
   TiltSharpness: 12
   AssistRange: 0.3
-  MaxFrameDelta: 0.1
   ClockWaitsForFirstMove: 1
   PushThreshold: 0.35
   ExitSeconds: 0.5

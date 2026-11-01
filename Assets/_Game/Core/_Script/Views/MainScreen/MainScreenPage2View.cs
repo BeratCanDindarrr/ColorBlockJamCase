@@ -57,6 +57,7 @@ namespace ColorBlockJam.Views
                 _currencyUpdateSubscriber.Subscribe(_ => RefreshHeader()),
                 _lifeModelSyncSubscriber.Subscribe(_ => RefreshHeader()));
             RefreshHeader();
+            _screenController.MainScreenView.SetCurrencyTargets(header, playButton.transform);
         }
 
         public override void Dispose()

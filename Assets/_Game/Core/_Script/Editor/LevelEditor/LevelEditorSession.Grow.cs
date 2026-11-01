@@ -5,7 +5,7 @@ namespace ColorBlockJam.LevelEditor
 {
     // "+" places: with the Block or Gate tool, a picked block or gate shows the free places next to it; clicking one
     // grows that block or gate instead of adding a new one. Clicking elsewhere or switching tool leaves it.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
         // Grid positions of the "+" places (wall ring at -1 / Cols / Rows for gates); empty when nothing grows.
         internal List<CellCoord> GrowPlaces()

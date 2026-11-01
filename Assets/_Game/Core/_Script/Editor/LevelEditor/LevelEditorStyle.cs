@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.LevelEditor
 {
-    // Editor drawing colours. Block colours mirror BoardSettings' defaults; BoardSettings lives in SandBox, which
-    // Core code cannot see.
+    // Editor drawing colours.
     internal static class LevelEditorStyle
     {
         public static readonly Color Background = new Color(0.17f, 0.17f, 0.19f);
@@ -16,20 +15,7 @@ namespace ColorBlockJam.LevelEditor
         // "+" places where the picked block or gate can grow.
         public static readonly Color Grow = new Color(0.20f, 0.72f, 0.30f, 0.9f);
 
-        public static Color Of(BlockColor color)
-        {
-            switch (color)
-            {
-                case BlockColor.Red: return new Color(0.90f, 0.22f, 0.21f);
-                case BlockColor.Blue: return new Color(0.20f, 0.45f, 0.90f);
-                case BlockColor.Green: return new Color(0.30f, 0.75f, 0.30f);
-                case BlockColor.Yellow: return new Color(0.98f, 0.82f, 0.20f);
-                case BlockColor.Purple: return new Color(0.58f, 0.32f, 0.80f);
-                case BlockColor.Orange: return new Color(0.98f, 0.55f, 0.15f);
-                case BlockColor.Pink: return new Color(0.96f, 0.45f, 0.70f);
-                case BlockColor.Cyan: return new Color(0.25f, 0.82f, 0.88f);
-                default: return Color.magenta;
-            }
-        }
+        // The game's colour for a block colour (BoardSettings), so the editor and the game agree.
+        public static Color Of(BlockColor color) => LevelEditorColors.Of(color);
     }
 }

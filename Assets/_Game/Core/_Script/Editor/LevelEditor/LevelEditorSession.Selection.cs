@@ -22,7 +22,7 @@ namespace ColorBlockJam.LevelEditor
 
     // What is picked. Blocks go by id, so deleting another block does not move the selection onto a different one;
     // the last picked block or gate is the one the single-item inspector shows.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
         [SerializeField] private List<string> selectedBlocks = new List<string>();
         [SerializeField] private List<GateKey> selectedGates = new List<GateKey>();

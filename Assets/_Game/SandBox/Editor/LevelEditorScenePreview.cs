@@ -31,16 +31,27 @@ namespace ColorBlockJam.SandBox.Editor
 
         static LevelEditorScenePreview()
         {
-            LevelEditorWindow.WorkingLevelChanged += Rebuild;
-            EditorSceneManager.activeSceneChangedInEditMode += (_, __) => Rebuild(LevelEditorWindow.CurrentWorking);
+            LevelEditorSession.WorkingLevelChanged += Rebuild;
+            EditorSceneManager.activeSceneChangedInEditMode += (_, to) =>
+            {
+                if (to.path == EditorScenePath) Rebuild(LevelEditorSession.CurrentWorking);
+                else Clear();
+            };
             EditorApplication.playModeStateChanged += change =>
             {
                 if (change == PlayModeStateChange.ExitingEditMode) Clear();
-                if (change == PlayModeStateChange.EnteredEditMode) Rebuild(LevelEditorWindow.CurrentWorking);
+                if (change == PlayModeStateChange.EnteredEditMode) Rebuild(LevelEditorSession.CurrentWorking);
             };
             // References die with the domain; a preview left behind would be found only by name.
             AssemblyReloadEvents.beforeAssemblyReload += Clear;
-            EditorApplication.delayCall += () => Rebuild(LevelEditorWindow.CurrentWorking);
+            EditorApplication.delayCall += () => Rebuild(LevelEditorSession.CurrentWorking);
+        }
+
+        private static bool FrameOnce(LevelData level)
+        {
+            if (_alignedFor == level || !FrameSceneView()) return _alignedFor == level;
+            _alignedFor = level;
+            return true;
         }
 
         [MenuItem("Tools/Level Editor/Frame Scene Preview")]
@@ -81,8 +92,9 @@ namespace ColorBlockJam.SandBox.Editor
                 return;
             }
 
-            // Framed once per opened level, so orbiting the view is kept while editing.
-            if (_alignedFor != level && FrameSceneView()) _alignedFor = level;
+            // Framed once per opened level, so orbiting the view is kept while editing; tried again on the next editor
+            // tick when the Scene view is not up yet (just after a script reload or a layout change).
+            if (_alignedFor != level && !FrameOnce(level)) EditorApplication.delayCall += () => FrameOnce(level);
 
             SceneView.RepaintAll();
         }

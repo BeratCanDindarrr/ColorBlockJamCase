@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ColorBlockJam.LevelEditor
 {
     // Right panel: fields of one selected block or gate, shared actions for several, and the raw asset data.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
         private void DrawInspector()
         {
@@ -31,14 +31,10 @@ namespace ColorBlockJam.LevelEditor
             else EditorGUILayout.HelpBox("Nothing selected.\nSelect tool: click a block or gate, or drag a box.", MessageType.None);
         }
 
-        // The SceneView properties overlay: the colour palette (brush, and recolours what is selected) and the
-        // selected block or gate.
+        // The SceneView properties overlay: the selected block or gate.
         internal void DrawScenePanel()
         {
-            if (working == null) return;
-            GUILayout.Label("Colour", EditorStyles.boldLabel);
-            DrawSwatches();
-            GUILayout.Space(6f);
+            if (EnsureWorking() == null) return;
             DrawSelectionInspector();
         }
 

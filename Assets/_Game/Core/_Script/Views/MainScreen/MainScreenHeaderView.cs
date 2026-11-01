@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,10 @@ namespace ColorBlockJam.Views
         [SerializeField] private Button lifeButton;
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private TextMeshProUGUI lifeText;
-
+        [SerializeField] private Transform coinImageTransform;
+        [SerializeField] private Transform lifeImageTransform;
+        public Transform CoinImageTransform => coinImageTransform;
+        public Transform LifeImageTransform => lifeImageTransform;
         public event Action ProfileClicked;
         public event Action SettingsClicked;
         public event Action CoinClicked;
@@ -36,9 +40,27 @@ namespace ColorBlockJam.Views
             if (lifeButton != null) lifeButton.onClick.RemoveListener(OnLifeClicked);
         }
 
-        public void SetCoin(long amount) => coinText.SetText(amount.ToString());
+        public void SetCoin(long amount)
+        {
+            coinText.DOKill();
+            coinText.SetText(amount.ToString());
+        }
 
-        // Text, so limitless life can show "∞".
+        // Counts the coin label from `from` to `to`, as reward coins land.
+        public void CountCoin(long from, long to, float duration)
+        {
+            coinText.DOKill();
+            var shown = from;
+            DOTween.To(() => shown, value =>
+                {
+                    shown = value;
+                    coinText.SetText(shown.ToString());
+                }, to, duration)
+                .SetEase(Ease.OutQuad)
+                .SetTarget(coinText)
+                .SetLink(gameObject);
+        }
+
         public void SetLife(string life) => lifeText.SetText(life);
 
         private void OnProfileClicked() => ProfileClicked?.Invoke();

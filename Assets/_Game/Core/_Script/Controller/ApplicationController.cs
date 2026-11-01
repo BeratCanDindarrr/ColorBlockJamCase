@@ -155,17 +155,21 @@ namespace ColorBlockJam.Core.Controller
         {
             if (!_sceneLoaderController.IsGamePlaySceneLoaded()) return;
 
-            _currencyController.AddCurrency(new CurrencyData(CurrencyType.Coin, _levelSettings.LevelReward), false);
+            var rewards = new[] { new CurrencyData(CurrencyType.Coin, _levelSettings.LevelReward) };
+            foreach (var reward in rewards) _currencyController.AddCurrency(reward, false);
             _playerController.LevelSuccess();
             _lifeController.GiveLife();
             _lifeController.SyncModel();
             _storageService.SaveStorage();
 
-            // TODO: LevelWinPopup, LevelCompleteRewardPopup and the coin fly animation (not in this project yet).
+            // TODO: LevelWinPopup and LevelCompleteRewardPopup (not in this project yet).
 
             var backToMenuTask = new CallBackGameTask();
             backToMenuTask.Init(() => _sceneLoaderController.CloseGamePlayScene().Forget());
             _taskService.AddTask(backToMenuTask);
+            var rewardFlyTask = new CurrencyUpdateAnimationGameTask();
+            rewardFlyTask.Init(rewards);
+            _taskService.AddTask(rewardFlyTask);
             _taskService.AddTask(new UnlockInputGameTask());
         }
 

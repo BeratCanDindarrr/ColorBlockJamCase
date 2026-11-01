@@ -26,11 +26,15 @@ namespace ColorBlockJam.LevelEditor
         }
 
         // Starts a new one-cell block on a free cell. Returns its index.
-        public static int AddBlock(LevelData level, CellCoord cell, BlockColor color)
+        public static int AddBlock(LevelData level, CellCoord cell, BlockColor color) =>
+            AddBlock(level, new List<CellCoord> { cell }, color);
+
+        // Adds a block over the given board cells (a shape dropped from the library). Returns its index.
+        public static int AddBlock(LevelData level, List<CellCoord> cells, BlockColor color)
         {
             var blocks = (level.Blocks ?? new BlockData[0]).ToList();
             var block = new BlockData { Id = NextId(blocks), Color = color };
-            SetCells(block, new List<CellCoord> { cell });
+            SetCells(block, cells);
             blocks.Add(block);
             level.Blocks = blocks.ToArray();
             return blocks.Count - 1;

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ColorBlockJam.LevelEditor
 {
     // Board mouse input per tool, and keyboard shortcuts. One mouse press to release is one undo step.
-    public sealed partial class LevelEditorWindow
+    public sealed partial class LevelEditorSession
     {
         private bool _erasing;
         private bool _adding;
@@ -47,6 +47,20 @@ namespace ColorBlockJam.LevelEditor
                     Drag(_board.HitTest(e.mousePosition, Holes), _board.PointAt(e.mousePosition));
                     e.Use();
                     break;
+                case EventType.DragUpdated when boardRect.Contains(e.mousePosition) && DraggedShape() >= 0:
+                case EventType.DragPerform when boardRect.Contains(e.mousePosition) && DraggedShape() >= 0:
+                {
+                    var hit = _board.HitTest(e.mousePosition, Holes);
+                    var drop = e.type == EventType.DragPerform;
+                    var fits = DragShape(DraggedShape(), hit.InGrid ? hit.Cell : (CellCoord?)null, drop);
+                    DragAndDrop.visualMode = fits ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+                    if (drop) DragAndDrop.AcceptDrag();
+                    e.Use();
+                    break;
+                }
+                case EventType.DragExited:
+                    ClearShapeGhost();
+                    break;
                 case EventType.MouseUp when GUIUtility.hotControl == id:
                     GUIUtility.hotControl = 0;
                     Release();
@@ -57,6 +71,7 @@ namespace ColorBlockJam.LevelEditor
 
         private void Press(BoardHit hit, CellCoord point)
         {
+            if (PressEyedropper(hit)) return;
             switch (tool)
             {
                 case LevelEditorTool.Select:
@@ -64,6 +79,7 @@ namespace ColorBlockJam.LevelEditor
                     break;
                 case LevelEditorTool.Block:
                     if (hit.Kind == BoardHitKind.Cell) PaintCell(hit.Cell);
+                    else if (HasSelection) ClearSelection();
                     break;
                 case LevelEditorTool.Gate:
                     if (hit.Kind == BoardHitKind.Wall) PressGate(hit);
@@ -92,6 +108,7 @@ namespace ColorBlockJam.LevelEditor
 
         private void Drag(BoardHit hit, CellCoord point)
         {
+            if (_eyedropperPress) return;
             if (tool == LevelEditorTool.Block)
             {
                 if (hit.Kind == BoardHitKind.Cell) DragPaint(hit.Cell);
@@ -135,6 +152,7 @@ namespace ColorBlockJam.LevelEditor
         private void Release()
         {
             if (_boxing) SelectInBox(BoxMin, BoxMax);
+            _eyedropperPress = false;
             _boxing = false;
             _draggingBlocks = false;
             _draggingGate = false;
@@ -318,6 +336,7 @@ namespace ColorBlockJam.LevelEditor
                 case KeyCode.C when command: CopySelection(); break;
                 case KeyCode.V when command: PasteBlocks(LevelEditorClipboard.Paste(), "Paste"); break;
                 case KeyCode.S when command: Save(); break;
+                case KeyCode.Escape when _pickingColor: CancelEyedropper(); break;
                 case KeyCode.Escape: ClearSelection(); break;
                 default: return false;
             }
