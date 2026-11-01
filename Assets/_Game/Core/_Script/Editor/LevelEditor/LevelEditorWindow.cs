@@ -30,6 +30,11 @@ namespace ColorBlockJam.LevelEditor
         private readonly HashSet<int> _errorBlocks = new HashSet<int>();
         private readonly HashSet<int> _errorGates = new HashSet<int>();
 
+        // The level being edited, after every change; null once the window closes. Scene previews (SandBox editor
+        // code, which this assembly cannot see) listen to it.
+        public static event Action<LevelData> WorkingLevelChanged;
+        public static LevelData CurrentWorking { get; private set; }
+
         private bool IsDirty => working != null && JsonUtility.ToJson(working) != savedJson;
         private bool HasErrors => _issues.Exists(i => i.IsError);
 
@@ -54,6 +59,7 @@ namespace ColorBlockJam.LevelEditor
             }
 
             RefreshIssues();
+            NotifyWorkingChanged();
         }
 
         private void OnDisable()
@@ -68,6 +74,8 @@ namespace ColorBlockJam.LevelEditor
             if (IsDirty && EditorUtility.DisplayDialog("Level Editor", $"Save the changes to {source.name}?", "Save", "Discard"))
                 Save();
             if (working != null) DestroyImmediate(working);
+            CurrentWorking = null;
+            WorkingLevelChanged?.Invoke(null);
         }
 
         // One undoable step on the working copy; change returns whether it changed anything.
@@ -78,7 +86,14 @@ namespace ColorBlockJam.LevelEditor
 
             EditorUtility.SetDirty(working);
             RefreshIssues();
+            NotifyWorkingChanged();
             Repaint();
+        }
+
+        private void NotifyWorkingChanged()
+        {
+            CurrentWorking = working;
+            WorkingLevelChanged?.Invoke(working);
         }
 
         private bool TryOpen(LevelData level)
@@ -113,6 +128,7 @@ namespace ColorBlockJam.LevelEditor
             selectedGates.Clear();
             DestroyRawEditor();
             RefreshIssues();
+            NotifyWorkingChanged();
         }
 
         private bool Save()
@@ -172,6 +188,7 @@ namespace ColorBlockJam.LevelEditor
             if (working == null) return;
             PruneSelection();
             RefreshIssues();
+            NotifyWorkingChanged();
             Repaint();
         }
 

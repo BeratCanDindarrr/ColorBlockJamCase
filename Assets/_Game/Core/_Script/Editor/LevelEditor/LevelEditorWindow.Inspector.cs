@@ -112,6 +112,7 @@ namespace ColorBlockJam.LevelEditor
 
             PruneSelection();
             RefreshIssues();
+            NotifyWorkingChanged();
         }
 
         private void DestroyRawEditor()

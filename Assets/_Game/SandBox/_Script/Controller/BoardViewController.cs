@@ -63,7 +63,7 @@ namespace ColorBlockJam.SandBox
                 _blocks.Add(block, view);
             }
 
-            _cameraView.Frame(transform.position, Layout.OuterHalfExtents, _boardSettings.CameraMargin);
+            _cameraView.Frame(transform.position, Layout.OuterHalfExtents, _boardSettings.CameraMargin, Layout.CellSize);
         }
 
         public BlockView GetView(BlockState block) => _blocks.TryGetValue(block, out var view) ? view : null;
