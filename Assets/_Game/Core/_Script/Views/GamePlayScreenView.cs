@@ -1,4 +1,5 @@
 using System;
+using ColorBlockJam.Core.Controller;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
 using MessagePipe;
@@ -9,38 +10,42 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // HUD shown on top of the gameplay scene.
+    // HUD shown on top of the gameplay scene. Button clicks are wired in the prefab (OnSettingsClicked / OnRetryClicked).
     public class GamePlayScreenView : BaseView
     {
         private const string WonText = "You Win!";
         private const string LostText = "Time's Up!";
+        private const string LevelFormat = "Level\n<size=130%>{0}</size>";
 
-        [SerializeField] private Button settingsButton;
+        [SerializeField] private Button retryButton;
+        [SerializeField] private TextMeshProUGUI levelText;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private TextMeshProUGUI resultText;
 
         private IPopupService _popupService;
+        private PlayerController _playerController;
         private ISubscriber<LevelTimeChangedSignal> _timeChangedSubscriber;
         private ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
         private ISubscriber<TimePurchasedSignal> _timePurchasedSubscriber;
         private IDisposable _subscriptions;
 
         [Inject]
-        public void Construct(IPopupService popupService,
+        public void Construct(IPopupService popupService, PlayerController playerController,
             ISubscriber<LevelTimeChangedSignal> timeChangedSubscriber,
             ISubscriber<LevelEndedSignal> levelEndedSubscriber,
             ISubscriber<TimePurchasedSignal> timePurchasedSubscriber)
         {
             _timePurchasedSubscriber = timePurchasedSubscriber;
             _popupService = popupService;
+            _playerController = playerController;
             _timeChangedSubscriber = timeChangedSubscriber;
             _levelEndedSubscriber = levelEndedSubscriber;
         }
 
+        // Retry stays locked until the level's clock runs (every new board publishes its clock state).
         public void Init()
         {
-            settingsButton.onClick.AddListener(OnSettingsClicked);
-
+            retryButton.interactable = false;
             var bag = DisposableBag.CreateBuilder();
             _timeChangedSubscriber.Subscribe(OnTimeChanged).AddTo(bag);
             _levelEndedSubscriber.Subscribe(OnLevelEnded).AddTo(bag);
@@ -51,7 +56,6 @@ namespace ColorBlockJam.Views
 
         public override void Dispose()
         {
-            if (settingsButton != null) settingsButton.onClick.RemoveListener(OnSettingsClicked);
             _subscriptions?.Dispose();
             _subscriptions = null;
         }
@@ -65,6 +69,7 @@ namespace ColorBlockJam.Views
         public void Show()
         {
             resultText.gameObject.SetActive(false);
+            levelText.text = string.Format(LevelFormat, _playerController.GetVisualLevel());
             gameObject.SetActive(true);
         }
 
@@ -72,6 +77,7 @@ namespace ColorBlockJam.Views
         {
             var seconds = Mathf.Max(0, signal.SecondsLeft);
             timerText.text = $"{seconds / 60}:{seconds % 60:00}";
+            retryButton.interactable = signal.IsClockRunning;
         }
 
         private void OnLevelEnded(LevelEndedSignal signal)
@@ -81,9 +87,15 @@ namespace ColorBlockJam.Views
         }
 
         // Leaving the level goes through the settings popup (Quit), like knit_Out.
-        private void OnSettingsClicked()
+        public void OnSettingsClicked()
         {
             _popupService.AddPopup(new InGameSettingsPopupParameters());
+        }
+
+        // Try Again restarts the level; closing it keeps playing.
+        public void OnRetryClicked()
+        {
+            _popupService.AddPopup(new LevelFailedPopupParameters());
         }
     }
 }

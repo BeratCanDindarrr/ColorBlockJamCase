@@ -37,10 +37,13 @@ namespace ColorBlockJam.Signals
     public readonly struct LevelTimeChangedSignal
     {
         public readonly int SecondsLeft;
+        // False until the first move when the clock waits for it.
+        public readonly bool IsClockRunning;
 
-        public LevelTimeChangedSignal(int secondsLeft)
+        public LevelTimeChangedSignal(int secondsLeft, bool isClockRunning)
         {
             SecondsLeft = secondsLeft;
+            IsClockRunning = isClockRunning;
         }
     }
 

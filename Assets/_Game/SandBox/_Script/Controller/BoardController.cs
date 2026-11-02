@@ -20,17 +20,20 @@ namespace ColorBlockJam.SandBox
         private readonly IPublisher<LevelEndedSignal> _levelEndedPublisher;
         private readonly ITimerSubscriber _timerSubscriber;
         private readonly ISubscriber<TimePurchasedSignal> _timePurchasedSubscriber;
+        private readonly IPopupService _popupService;
 
         private IDisposable _timePurchasedSubscription;
 
         private int _publishedSeconds;
+        private bool _publishedClockRunning;
 
         public BoardSimulation Simulation { get; private set; }
 
         public BoardController(BoardSettings boardSettings, BoardViewController boardViewController, IPublisher<LevelTimeChangedSignal> timeChangedPublisher,
             IPublisher<LevelEndedSignal> levelEndedPublisher, ITimerSubscriber timerSubscriber,
-            ISubscriber<TimePurchasedSignal> timePurchasedSubscriber)
+            ISubscriber<TimePurchasedSignal> timePurchasedSubscriber, IPopupService popupService)
         {
+            _popupService = popupService;
             _timePurchasedSubscriber = timePurchasedSubscriber;
             _timerSubscriber = timerSubscriber;
             _timeChangedPublisher = timeChangedPublisher;
@@ -57,10 +60,10 @@ namespace ColorBlockJam.SandBox
 
         public void UpdateTime(float intervalTime)
         {
-            if (Simulation == null) return;
+            // The clock stops while a popup (settings, retry, ...) is open.
+            if (Simulation == null || _popupService.HasOpenPopup) return;
 
             Simulation.AdvanceClock(intervalTime);
-            if (SecondsLeft() != _publishedSeconds) PublishTime();
             Flush();
         }
 
@@ -68,6 +71,9 @@ namespace ColorBlockJam.SandBox
         public void Flush()
         {
             if (Simulation == null) return;
+
+            // The first drag starts a waiting clock; publish so the HUD knows right away.
+            if (SecondsLeft() != _publishedSeconds || Simulation.IsClockRunning != _publishedClockRunning) PublishTime();
 
             var events = Simulation.TakeEvents();
             _boardViewController.Apply(events);
@@ -88,7 +94,8 @@ namespace ColorBlockJam.SandBox
         private void PublishTime()
         {
             _publishedSeconds = SecondsLeft();
-            _timeChangedPublisher.Publish(new LevelTimeChangedSignal(_publishedSeconds));
+            _publishedClockRunning = Simulation.IsClockRunning;
+            _timeChangedPublisher.Publish(new LevelTimeChangedSignal(_publishedSeconds, _publishedClockRunning));
         }
 
         // "Play On" bought more time; a level lost on time resumes.

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba1f77cdaaf447099ecf3fbf84c4f36, type: 3}
   m_Name: Level_1
   m_EditorClassIdentifier: 
-  Cols: 6
-  Rows: 6
-  TimeLimitSec: 120
+  Cols: 10
+  Rows: 10
+  TimeLimitSec: 10
   Blocks:
   - Id: A
     Col: 1
@@ -25,19 +25,6 @@ MonoBehaviour:
     - Col: 1
       Row: 0
     Color: 0
-  - Id: B
-    Col: 3
-    Row: 3
-    Cells:
-    - Col: 0
-      Row: 0
-    - Col: 1
-      Row: 0
-    - Col: 0
-      Row: 1
-    - Col: 1
-      Row: 1
-    Color: 1
   - Id: C
     Col: 0
     Row: 5
@@ -45,16 +32,45 @@ MonoBehaviour:
     - Col: 0
       Row: 0
     Color: 2
+  - Id: B
+    Col: 3
+    Row: 0
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    - Col: 1
+      Row: 1
+    - Col: 1
+      Row: 0
+    Color: 1
+  - Id: D
+    Col: 5
+    Row: 5
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 7
   Gates:
   - Edge: 3
     Index: 2
     Length: 1
     Color: 0
-  - Edge: 1
-    Index: 3
-    Length: 2
-    Color: 1
+    Depth: 0
   - Edge: 2
-    Index: 5
+    Index: 4
     Length: 1
     Color: 2
+    Depth: 0
+  - Edge: 1
+    Index: 4
+    Length: 2
+    Color: 1
+    Depth: 0
+  - Edge: 3
+    Index: 5
+    Length: 1
+    Color: 7
+    Depth: 0
+  Holes: []

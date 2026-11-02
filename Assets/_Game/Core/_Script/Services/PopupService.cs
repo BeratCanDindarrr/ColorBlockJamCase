@@ -24,6 +24,10 @@ namespace ColorBlockJam.Core.Service
         #endregion
 
         private Dictionary<string, GameObject> _popupPrefabs = new Dictionary<string, GameObject>();
+        private int _openPopupCount;
+
+        public bool HasOpenPopup => _openPopupCount > 0;
+
         public void Init()
         {
             foreach (var prefab in _popupSettings.PopupPrefabs)
@@ -35,7 +39,7 @@ namespace ColorBlockJam.Core.Service
         public void AddPopup(BasePopupParameters param)
         {
             var popupTask = new PopupGameTask();
-            popupTask.Init(param,GetPopup(param));
+            popupTask.Init(param,GetPopup(param), isOpen => _openPopupCount += isOpen ? 1 : -1);
             _taskService.AddTask(popupTask);
         }
 

@@ -1,11 +1,12 @@
 using ColorBlockJam.Core.Controller;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // Shown on the main menu after giving up a level: try it again (costs a life) or close.
+    // Shown after giving up a level, or from the HUD Retry button: try it again (costs a life) or close (keeps playing).
     public class LevelFailedPopup : BasePopup<LevelFailedPopupParameters>
     {
         [SerializeField] private Button tryAgainButton;
@@ -33,7 +34,7 @@ namespace ColorBlockJam.Views
 
         private void TryAgainButtonClicked()
         {
-            _applicationController.PlayLevel();
+            _applicationController.RetryLevel().Forget();
             ClosePopup();
         }
     }

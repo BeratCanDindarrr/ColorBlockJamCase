@@ -22,10 +22,12 @@ namespace ColorBlockJam.GameTask
 
         private BasePopupParameters _popupParameters;
         private GameObject _popupPrefab;
-        public void Init(BasePopupParameters parameters,GameObject prefab)
+        private Action<bool> _onOpenChanged;
+        public void Init(BasePopupParameters parameters,GameObject prefab, Action<bool> onOpenChanged = null)
         {
             _popupParameters = parameters;
             _popupPrefab = prefab;
+            _onOpenChanged = onOpenChanged;
         }
         
         public async UniTask RunTask(CancellationToken cancellationToken)
@@ -45,8 +47,16 @@ namespace ColorBlockJam.GameTask
                     UnityEngine.Object.Destroy(popup);
                     return;
                 }
-                popupComponent.Init(_popupParameters);
-                await popupComponent.RunPopup(cancellationToken);
+                _onOpenChanged?.Invoke(true);
+                try
+                {
+                    popupComponent.Init(_popupParameters);
+                    await popupComponent.RunPopup(cancellationToken);
+                }
+                finally
+                {
+                    _onOpenChanged?.Invoke(false);
+                }
                 
             }
             catch (OperationCanceledException e)

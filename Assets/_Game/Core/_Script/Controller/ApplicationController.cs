@@ -176,12 +176,24 @@ namespace ColorBlockJam.Core.Controller
         // Gave up after running out of time; the life spent on starting the level is not returned.
         public void LoseLevel()
         {
+            LeaveLevel().Forget();
+            // TODO: post-level flow (FlowController.LevelUpFlowStart in knit_Out; not in this project yet).
+        }
+
+        // Try Again: gives up the running level (if any) and starts it again, spending a life.
+        public async UniTaskVoid RetryLevel()
+        {
+            await LeaveLevel();
+            PlayLevel();
+        }
+
+        private async UniTask LeaveLevel()
+        {
             if (!_sceneLoaderController.IsGamePlaySceneLoaded()) return;
 
             _lifeController.SyncModel();
             _storageService.SaveStorage();
-            _sceneLoaderController.CloseGamePlayScene().Forget();
-            // TODO: post-level flow (FlowController.LevelUpFlowStart in knit_Out; not in this project yet).
+            await _sceneLoaderController.CloseGamePlayScene();
         }
 
         public void OpenOutOfMovesPopup()
