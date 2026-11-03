@@ -12,6 +12,7 @@ namespace ColorBlockJam.Const
             public const string MenuSettingsPopup = "MenuSettingsPopup";
             public const string InGameSettingsPopup = "InGameSettingsPopup";
             public const string CollectPopup = "CollectPopup";
+            public const string LevelCompletePopup = "LevelCompletePopup";
         }
 
         public struct SceneName
