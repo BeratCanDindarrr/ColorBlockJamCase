@@ -27,7 +27,7 @@ namespace ColorBlockJam.SandBox.Board
                 foreach (var step in Steps)
                 {
                     var next = origin + step;
-                    if (!AlongAxis(block.Axis, step) || cameFrom.ContainsKey(next) ||
+                    if (!GateFit.AlongAxis(block.Axis, step) || cameFrom.ContainsKey(next) ||
                         !_movement.IsPlacementFree(block, BoardPoint.From(next)))
                         continue;
 
@@ -43,21 +43,10 @@ namespace ColorBlockJam.SandBox.Board
         {
             foreach (var gate in _gates)
             {
-                if (AlongAxis(block.Axis, GateFit.Normal(gate.Edge)) && GateFit.Fits(block, origin, gate, Cols, Rows))
-                    return gate;
+                if (GateFit.CanPushInto(block, origin, gate, Cols, Rows)) return gate;
             }
 
             return null;
-        }
-
-        private static bool AlongAxis(BlockAxis axis, CellCoord step)
-        {
-            switch (axis)
-            {
-                case BlockAxis.Horizontal: return step.Row == 0;
-                case BlockAxis.Vertical: return step.Col == 0;
-                default: return true;
-            }
         }
 
         private static List<CellCoord> Walk(Dictionary<CellCoord, CellCoord> cameFrom, CellCoord end, CellCoord into)

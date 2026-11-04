@@ -80,13 +80,28 @@ namespace ColorBlockJam.Core.Level.Tests
         }
 
         [Test]
-        public void BlockWithoutGateOfItsColour_IsWarning()
+        public void BlockWithoutGateOfItsColour_IsError()
         {
             var issues = LevelValidator.Validate(4, 4, 60,
                 new[] { Block("A", 0, 0, BlockColor.Blue, (0, 0)) },
                 new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) });
 
-            Assert.That(issues.Single().IsError, Is.False);
+            Assert.That(issues.Single().IsError, Is.True);
+        }
+
+        // An L three tall and two wide needs a top/bottom gate of 2 or a left/right gate of 3 to leave.
+        [TestCase(BoardEdge.Top, 1, true)]
+        [TestCase(BoardEdge.Top, 2, false)]
+        [TestCase(BoardEdge.Left, 2, true)]
+        [TestCase(BoardEdge.Left, 3, false)]
+        public void GateShorterThanBlockAlongItsWall_IsError(BoardEdge edge, int length, bool blocked)
+        {
+            var issues = LevelValidator.Validate(4, 4, 60,
+                new[] { Block("A", 0, 0, BlockColor.Red, (0, 0), (0, 1), (0, 2), (1, 2)) },
+                new[] { Gate(edge, 0, length, BlockColor.Red) });
+
+            Assert.That(issues.Any(i => i.IsError && i.Message.Contains("long enough")), Is.EqualTo(blocked));
+            Assert.That(issues.Count, Is.EqualTo(blocked ? 1 : 0));
         }
 
         [Test]
@@ -156,14 +171,14 @@ namespace ColorBlockJam.Core.Level.Tests
         }
 
         [Test]
-        public void AxisBlockWithoutGateOnItsAxis_IsWarning()
+        public void AxisBlockWithoutGateOnItsAxis_IsError()
         {
             var block = Block("A", 0, 0, BlockColor.Red, (0, 0));
             block.Axis = BlockAxis.Vertical;
             var issues = LevelValidator.Validate(4, 4, 60, new[] { block },
                 new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) });
 
-            Assert.That(issues.Single().IsError, Is.False);
+            Assert.That(issues.Single().IsError, Is.True);
             Assert.That(issues.Single().Message, Does.Contain("Vertical"));
         }
     }

@@ -72,6 +72,8 @@ namespace ColorBlockJam.LevelEditor
 
         private void Press(BoardHit hit, CellCoord point)
         {
+            // A press on the board goes back to editing the level from a solution being watched.
+            StopPlayback();
             if (PressEyedropper(hit)) return;
             switch (tool)
             {

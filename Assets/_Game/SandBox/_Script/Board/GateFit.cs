@@ -49,6 +49,21 @@ namespace ColorBlockJam.SandBox.Board
             return true;
         }
 
+        // Whether a one-cell step is allowed for a block locked to `axis`.
+        public static bool AlongAxis(BlockAxis axis, CellCoord step)
+        {
+            switch (axis)
+            {
+                case BlockAxis.Horizontal: return step.Row == 0;
+                case BlockAxis.Vertical: return step.Col == 0;
+                default: return true;
+            }
+        }
+
+        // Standing at `origin`, the block fits the gate and can be pushed into it along its axis (RouteToGate, LevelSolver).
+        public static bool CanPushInto(BlockState block, CellCoord origin, GateState gate, int cols, int rows) =>
+            AlongAxis(block.Axis, Normal(gate.Edge)) && Fits(block, origin, gate, cols, rows);
+
         // How far a move from "from" to "target" pushes into the given wall; positive is into the wall,
         // negative is away from it.
         public static double Push(BoardPoint from, BoardPoint target, BoardEdge edge)

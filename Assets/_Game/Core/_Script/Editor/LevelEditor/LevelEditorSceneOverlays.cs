@@ -54,6 +54,18 @@ namespace ColorBlockJam.LevelEditor
             var sceneView = SceneView.lastActiveSceneView;
             return sceneView != null && sceneView.TryGetOverlay(id, out var overlay) && overlay.displayed;
         }
+
+        private const float CloseSize = 16f;
+        private static readonly GUIContent CloseContent =
+            new GUIContent("×", "Close (open it again from the level bar's Panels)");
+
+        // A × at the top-right of a panel's content that closes it; Unity gives overlays no room in their own title.
+        public static void DrawCloseButton(string id)
+        {
+            var row = GUILayoutUtility.GetRect(0f, CloseSize, GUILayout.ExpandWidth(true));
+            if (GUI.Button(new Rect(row.xMax - CloseSize, row.y, CloseSize, CloseSize), CloseContent, EditorStyles.miniButton))
+                SetShown(id, false);
+        }
     }
 
     // Shows itself when editing starts (unless `opensItself` is false: then only the user opens it) and hides when it
@@ -186,7 +198,11 @@ namespace ColorBlockJam.LevelEditor
 
         public override VisualElement CreatePanelContent()
         {
-            _content = new IMGUIContainer(() => LevelEditorSession.Current?.DrawScenePanel(SwatchesPerRow, Width));
+            _content = new IMGUIContainer(() =>
+            {
+                LevelEditorSceneOverlays.DrawCloseButton(LevelEditorSceneOverlays.PanelId);
+                LevelEditorSession.Current?.DrawScenePanel(SwatchesPerRow, Width);
+            });
             _content.style.width = Width;
             return _content;
         }
@@ -235,6 +251,7 @@ namespace ColorBlockJam.LevelEditor
 
         private static void Draw()
         {
+            LevelEditorSceneOverlays.DrawCloseButton(LevelEditorSceneOverlays.ShapesId);
             var session = LevelEditorSession.Current;
             var library = LevelEditorShapeLibrary.Get();
             GUILayout.Label("Drag a shape onto the board", EditorStyles.miniBoldLabel);

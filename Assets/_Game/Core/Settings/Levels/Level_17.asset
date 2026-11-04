@@ -1,0 +1,309 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba1f77cdaaf447099ecf3fbf84c4f36, type: 3}
+  m_Name: Level_17
+  m_EditorClassIdentifier: 
+  Cols: 6
+  Rows: 8
+  TimeLimitSec: 140
+  Blocks:
+  - Id: A
+    Col: 0
+    Row: 0
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 1
+    Ice: 0
+    Axis: 0
+  - Id: B
+    Col: 3
+    Row: 0
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 0
+    Ice: 0
+    Axis: 0
+  - Id: C
+    Col: 0
+    Row: 1
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 1
+    Ice: 17
+    Axis: 0
+  - Id: D
+    Col: 3
+    Row: 1
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 0
+    Ice: 16
+    Axis: 0
+  - Id: E
+    Col: 0
+    Row: 2
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 1
+    Ice: 16
+    Axis: 0
+  - Id: F
+    Col: 3
+    Row: 2
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 2
+      Row: 0
+    Color: 1
+    Ice: 16
+    Axis: 0
+  - Id: G
+    Col: 0
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: H
+    Col: 1
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    Color: 2
+    Ice: 0
+    Axis: 0
+  - Id: I
+    Col: 2
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    - Col: 0
+      Row: 1
+    - Col: 1
+      Row: 1
+    Color: 1
+    Ice: 0
+    Axis: 0
+  - Id: J
+    Col: 4
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    Color: 0
+    Ice: 0
+    Axis: 0
+  - Id: K
+    Col: 5
+    Row: 3
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    Color: 4
+    Ice: 0
+    Axis: 0
+  - Id: L
+    Col: 0
+    Row: 5
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    Color: 2
+    Ice: 5
+    Axis: 0
+  - Id: M
+    Col: 2
+    Row: 5
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    Color: 1
+    Ice: 5
+    Axis: 0
+  - Id: N
+    Col: 4
+    Row: 5
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    Color: 4
+    Ice: 5
+    Axis: 0
+  - Id: O
+    Col: 0
+    Row: 6
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 0
+      Row: 1
+    Color: 2
+    Ice: 0
+    Axis: 0
+  - Id: P
+    Col: 1
+    Row: 6
+    Cells:
+    - Col: 0
+      Row: 0
+    - Col: 1
+      Row: 0
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: Q
+    Col: 3
+    Row: 6
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 2
+    Ice: 0
+    Axis: 0
+  - Id: R
+    Col: 4
+    Row: 6
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 2
+    Ice: 0
+    Axis: 0
+  - Id: S
+    Col: 5
+    Row: 6
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: T
+    Col: 1
+    Row: 7
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: U
+    Col: 2
+    Row: 7
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 2
+    Ice: 0
+    Axis: 0
+  - Id: V
+    Col: 3
+    Row: 7
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: W
+    Col: 4
+    Row: 7
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 3
+    Ice: 0
+    Axis: 0
+  - Id: X
+    Col: 5
+    Row: 7
+    Cells:
+    - Col: 0
+      Row: 0
+    Color: 2
+    Ice: 0
+    Axis: 0
+  Gates:
+  - Edge: 0
+    Index: 3
+    Length: 3
+    Color: 1
+    Depth: 0
+  - Edge: 2
+    Index: 6
+    Length: 2
+    Color: 2
+    Depth: 0
+  - Edge: 3
+    Index: 3
+    Length: 2
+    Color: 0
+    Depth: 0
+  - Edge: 3
+    Index: 6
+    Length: 2
+    Color: 3
+    Depth: 0
+  - Edge: 1
+    Index: 1
+    Length: 2
+    Color: 4
+    Depth: 0
+  Holes: []

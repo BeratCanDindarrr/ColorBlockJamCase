@@ -54,6 +54,8 @@ namespace ColorBlockJam.LevelEditor
         // Opens another level for editing (asks about unsaved changes first).
         internal void OpenLevel(LevelData level) => TryOpen(level);
 
+        internal bool HasUnsavedEdits => IsDirty;
+
         internal LevelEditorTool CurrentTool
         {
             get => tool;
@@ -103,6 +105,13 @@ namespace ColorBlockJam.LevelEditor
 
         internal LevelData EnsureWorking()
         {
+            // The level being edited was deleted: drop its copy (nothing could save it) and open the first level instead.
+            if (working != null && source == null)
+            {
+                DestroyImmediate(working);
+                working = null;
+            }
+
             if (working != null) return working;
 
             var levels = LevelEditorAssets.FindLevels();
@@ -135,6 +144,7 @@ namespace ColorBlockJam.LevelEditor
         // One undoable step on the working copy; change returns whether it changed anything.
         private void Edit(string undoName, Func<LevelData, bool> change)
         {
+            StopPlayback();
             Undo.RecordObject(working, undoName);
             if (!change(working)) return;
 
@@ -177,6 +187,7 @@ namespace ColorBlockJam.LevelEditor
 
         private void LoadWorkingCopy(LevelData level)
         {
+            _playback = null;
             if (working != null) DestroyImmediate(working);
             working = Instantiate(level);
             working.name = level.name;

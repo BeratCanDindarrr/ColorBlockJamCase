@@ -25,6 +25,16 @@ namespace ColorBlockJam.SandBox.Editor
         private static readonly Color GhostBlocked = new Color(1f, 0.25f, 0.25f, 0.55f);
         private static readonly Color GrowFill = new Color(0.20f, 0.72f, 0.30f, 0.85f);
         private static readonly Vector3[] Quad = new Vector3[4];
+        // The next drag of a solution being watched: the block to play (green outline), the path its origin walks (green
+        // line) and where it goes (green, blue when it leaves from there).
+        private static readonly List<CellCoord> PlayFrom = new List<CellCoord>();
+        private static readonly List<CellCoord> PlayTo = new List<CellCoord>();
+        private static readonly List<CellCoord> PlayPath = new List<CellCoord>();
+        private static readonly Color PlayBlockFill = new Color(0.25f, 0.9f, 0.35f, 0.15f);
+        private static readonly Color PlayBlockLine = new Color(0.25f, 0.95f, 0.35f, 1f);
+        private static readonly Color PlayMoveFill = new Color(0.25f, 0.85f, 0.35f, 0.35f);
+        private static readonly Color PlayExitFill = new Color(0.25f, 0.6f, 1f, 0.45f);
+        private const float PlayPathWidth = 5f;
         private static CellCoord? _hover;
         private static bool _lastShift;
 
@@ -160,6 +170,14 @@ namespace ColorBlockJam.SandBox.Editor
 
         private static void DrawMarks(BoardViewController board)
         {
+            if (LevelEditorSession.GetPlaybackMarks(PlayFrom, PlayTo, PlayPath, out var exits))
+            {
+                var fill = exits ? PlayExitFill : PlayMoveFill;
+                foreach (var cell in PlayTo) DrawRect(board, cell, cell, fill, fill);
+                foreach (var cell in PlayFrom) DrawRect(board, cell, cell, PlayBlockFill, PlayBlockLine);
+                DrawPath(board, PlayPath);
+            }
+
             var boxing = LevelEditorSession.GetSceneMarks(Marks, GrowPlaces, out var boxMin, out var boxMax);
             foreach (var cell in Marks) DrawRect(board, cell, cell, SelectionFill, Color.white);
             foreach (var place in GrowPlaces) DrawPlus(board, place);
@@ -172,6 +190,16 @@ namespace ColorBlockJam.SandBox.Editor
             if (!_hover.HasValue) return;
             var hoverFill = LevelEditorSession.HoverColor(Event.current.shift);
             DrawRect(board, _hover.Value, _hover.Value, hoverFill, new Color(hoverFill.r, hoverFill.g, hoverFill.b, 0.9f));
+        }
+
+        // A line through the centres of the cells walked, so the way a block goes can be followed.
+        private static void DrawPath(BoardViewController board, List<CellCoord> path)
+        {
+            if (path.Count < 2) return;
+            var points = new Vector3[path.Count];
+            for (var i = 0; i < path.Count; i++)
+                points[i] = (CornerWorld(board, path[i].Col, path[i].Row) + CornerWorld(board, path[i].Col + 1, path[i].Row + 1)) * 0.5f;
+            using (new Handles.DrawingScope(PlayBlockLine)) Handles.DrawAAPolyLine(PlayPathWidth, points);
         }
 
         // A green "+" where the picked block or gate can grow.

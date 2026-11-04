@@ -12,92 +12,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba1f77cdaaf447099ecf3fbf84c4f36, type: 3}
   m_Name: Level_1
   m_EditorClassIdentifier: 
-  Cols: 10
-  Rows: 10
-  TimeLimitSec: 10
+  Cols: 4
+  Rows: 5
+  TimeLimitSec: 300
   Blocks:
   - Id: A
-    Col: 1
-    Row: 2
+    Col: 2
+    Row: 1
     Cells:
     - Col: 0
       Row: 0
     - Col: 1
       Row: 0
-    Color: 0
-    Ice: 0
-    Axis: 1
-  - Id: C
-    Col: 0
-    Row: 5
-    Cells:
     - Col: 0
-      Row: 0
-    Color: 2
+      Row: 1
+    - Col: 1
+      Row: 1
+    Color: 1
     Ice: 0
     Axis: 0
   - Id: B
-    Col: 3
-    Row: 0
+    Col: 0
+    Row: 2
     Cells:
     - Col: 0
       Row: 0
+    - Col: 1
+      Row: 0
     - Col: 0
       Row: 1
     - Col: 1
       Row: 1
-    - Col: 1
-      Row: 0
-    Color: 1
+    Color: 4
     Ice: 0
     Axis: 0
-  - Id: D
-    Col: 5
-    Row: 5
-    Cells:
-    - Col: 0
-      Row: 0
-    Color: 7
-    Ice: 1
-    Axis: 0
   Gates:
-  - Edge: 2
-    Index: 4
-    Length: 1
-    Color: 2
-    Depth: 0
-  - Edge: 1
-    Index: 4
-    Length: 2
+  - Edge: 0
+    Index: 1
+    Length: 3
     Color: 1
     Depth: 0
-  - Edge: 3
-    Index: 5
-    Length: 1
-    Color: 7
+  - Edge: 1
+    Index: 0
+    Length: 3
+    Color: 4
     Depth: 0
-  Holes:
-  - Col: 7
-    Row: 1
-  - Col: 7
-    Row: 4
-  - Col: 7
-    Row: 2
-  - Col: 8
-    Row: 2
-  - Col: 8
-    Row: 4
-  - Col: 8
-    Row: 1
-  - Col: 6
-    Row: 1
-  - Col: 6
-    Row: 2
-  - Col: 6
-    Row: 4
-  - Col: 6
-    Row: 5
-  - Col: 7
-    Row: 5
-  - Col: 8
-    Row: 5
+  Holes: []

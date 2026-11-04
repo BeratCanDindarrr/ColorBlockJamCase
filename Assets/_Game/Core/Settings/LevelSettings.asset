@@ -13,55 +13,34 @@ MonoBehaviour:
   m_Name: LevelSettings
   m_EditorClassIdentifier: 
   Levels:
-  - {fileID: 11400000, guid: 082b60539ba6d4e9ca697163a220ab0a, type: 2}
-  - {fileID: 11400000, guid: a3ade287fddd24708be954a1f340645b, type: 2}
-  - {fileID: 11400000, guid: c9353d1c29f814edb82c156da76bbc76, type: 2}
-  - {fileID: 11400000, guid: 826166c16c5eb42f282cf0ebe9b9556e, type: 2}
-  - {fileID: 11400000, guid: 33cd4fbf4443f4407b9e3adfc0a93aff, type: 2}
-  - {fileID: 11400000, guid: 9e42650e161f34585bf2388ba5436f7f, type: 2}
-  - {fileID: 11400000, guid: 856d6242006c544e2971b6e46b0370cc, type: 2}
-  - {fileID: 11400000, guid: 1a4c075a61d094df68f0f6acff333590, type: 2}
-  - {fileID: 11400000, guid: e730914937d9e4f7c91bc2e0376877a0, type: 2}
-  - {fileID: 11400000, guid: 755ecd00f9d65478396b92dc5315fdce, type: 2}
-  - {fileID: 11400000, guid: 14f95463ddfc24150a8f37a60247033f, type: 2}
-  - {fileID: 11400000, guid: 0dc1bdfdb0e3d4390bf9bd5072a51f85, type: 2}
-  - {fileID: 11400000, guid: 2a5b5d553b80f45d5add68e0f0760885, type: 2}
-  - {fileID: 11400000, guid: 61077753fdd5b42f9933148a42a7b757, type: 2}
-  - {fileID: 11400000, guid: cf83116e2e833419b86f4f1f4686d96a, type: 2}
-  - {fileID: 11400000, guid: 9a2d21294da0c4c8c8509ddc102ca8fb, type: 2}
-  - {fileID: 11400000, guid: 45305ec716f224a00a8b540c796786f8, type: 2}
-  - {fileID: 11400000, guid: e9e2cfba2dbba472c9d11d3d210d89ba, type: 2}
-  - {fileID: 11400000, guid: f20c49e0f4e48489e861ef91e2aea1db, type: 2}
-  - {fileID: 11400000, guid: dc3ac615b158d443bb28267b743811c1, type: 2}
-  - {fileID: 11400000, guid: 8adc865c2603447a69e6e0741bb0703f, type: 2}
-  - {fileID: 11400000, guid: a2811c0448b2441fcae25c74da92c4b1, type: 2}
-  - {fileID: 11400000, guid: a219b618bcd804121ba66e48c4d4de44, type: 2}
-  - {fileID: 11400000, guid: 996b8f36812bb46a885d0470ab6f7c12, type: 2}
-  - {fileID: 11400000, guid: b6df37f005cb2477c8667a2f3375cb81, type: 2}
-  - {fileID: 11400000, guid: d19b106c8f36d4c4ba09658deef49399, type: 2}
-  - {fileID: 11400000, guid: e96e7660c82da44bd9257b46b7e820af, type: 2}
-  - {fileID: 11400000, guid: ccfa6030696904deb8596a5d3be5d284, type: 2}
-  - {fileID: 11400000, guid: 634ee3e676089412ba30ff45290e7551, type: 2}
-  - {fileID: 11400000, guid: 14e8122cd80324e18a48a92bf4cea9e7, type: 2}
-  - {fileID: 11400000, guid: 92eaef16da9f74cdb9b54f514f7836aa, type: 2}
-  - {fileID: 11400000, guid: 5d69a4596ecab471f85e20a7b10d0b00, type: 2}
-  - {fileID: 11400000, guid: 16540237632394cee8952d82c488d887, type: 2}
-  - {fileID: 11400000, guid: a00c032a22cee4e6884c8f096dcb2698, type: 2}
-  - {fileID: 11400000, guid: b123046a4353a42de8b3f9c0c41cea0d, type: 2}
-  - {fileID: 11400000, guid: d9bde2398ea0e4ed591c6e08406d80ef, type: 2}
-  - {fileID: 11400000, guid: 38ab194b59dd64aab9b5f6289fad508c, type: 2}
-  - {fileID: 11400000, guid: a286283be0cf9455c929acef0883da1f, type: 2}
-  - {fileID: 11400000, guid: df6451c1869f44e969d2c58fbda60ddc, type: 2}
-  - {fileID: 11400000, guid: dff787ed4819e4f9d8816fb776abf374, type: 2}
-  - {fileID: 11400000, guid: ae584b6e8226a47bf954bbe65aad2639, type: 2}
-  - {fileID: 11400000, guid: 94a654f02d2724cc7925fe86e7c82699, type: 2}
-  - {fileID: 11400000, guid: f3911aa25c8164e8781eed1fcf399452, type: 2}
-  - {fileID: 11400000, guid: 2889e31ff09f14aec91647c512fd5528, type: 2}
-  - {fileID: 11400000, guid: 5d1d805626fd1460d8aa8eb4a386df4e, type: 2}
-  - {fileID: 11400000, guid: af8029d3a354449e88e4245089aa79ca, type: 2}
-  - {fileID: 11400000, guid: 09291ceb9a01847608ee935c09b910d0, type: 2}
+  - {fileID: 11400000, guid: ddd73fac5084b44218acfabb90575f3a, type: 2}
+  - {fileID: 11400000, guid: eed8693d81475422ea84b2eed864f269, type: 2}
+  - {fileID: 11400000, guid: f15150240018b40cb9765d7863f0a592, type: 2}
+  - {fileID: 11400000, guid: 07dab99b8a96449d18f5eeaec23fa3fe, type: 2}
+  - {fileID: 11400000, guid: 6142bd27e037044e1afecd0d6bb8dc34, type: 2}
+  - {fileID: 11400000, guid: de26776519808484489860612fb45826, type: 2}
+  - {fileID: 11400000, guid: cd1b4bd419830405bad8183ddb5165cd, type: 2}
+  - {fileID: 11400000, guid: c49f45dbd6431492d9bb7ecd09a70300, type: 2}
+  - {fileID: 11400000, guid: 9645b79f482f342b094cd32cb56c25aa, type: 2}
+  - {fileID: 11400000, guid: 85ac8a868ea2a4a3aa462f9965b6ac0e, type: 2}
+  - {fileID: 11400000, guid: ede4a8ec0df95465db0b5616bb3c9d27, type: 2}
+  - {fileID: 11400000, guid: d3b7c8f4f0d1f4ac2b2bcc5573d7b429, type: 2}
+  - {fileID: 11400000, guid: 80d3462acdd68436c8e392cec890cc87, type: 2}
+  - {fileID: 11400000, guid: a1ae58fe0857749a09f5343659d7a835, type: 2}
+  - {fileID: 11400000, guid: 0404698be9fad4bed971c16d6facd7e9, type: 2}
+  - {fileID: 11400000, guid: da85e40a39fec4bccacb60ff5ca1d734, type: 2}
+  - {fileID: 11400000, guid: fe1268779ead340e8831b2d24d31d575, type: 2}
+  - {fileID: 11400000, guid: 085d29b4e20b44c58b890307d0ec30c2, type: 2}
+  - {fileID: 11400000, guid: d7cf12aefaffc459a971028c7c6976f2, type: 2}
+  - {fileID: 11400000, guid: 20dd00fb072ab442584e7dabeb20787f, type: 2}
   EndlessLoopCount: 5
   LevelReward: 20
   WinLevelDelaySeconds: 1.5
   PlayOnCoinCost: 900
   PlayOnSeconds: 30
+  LevelButtonShrinkScale: 0.8
+  LevelButtonShrinkDuration: 0.15
+  LevelButtonGrowDuration: 0.6
+  LevelButtonShakeAngle: 8
+  LevelButtonShineAlpha: 0.6
+  LevelButtonShineDuration: 0.4

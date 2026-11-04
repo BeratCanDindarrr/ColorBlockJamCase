@@ -22,7 +22,7 @@ namespace ColorBlockJam.LevelEditor
         private const float ArrowWidth = 22f;
         private const float Gap = 4f;
         private const string TabKey = "ColorBlockJam.LevelEditor.LevelOrderTab";
-        private static readonly string[] Tabs = { "Levels", "Boosters" };
+        private static readonly string[] Tabs = { "Levels", "Boosters", "Test" };
         private static readonly GUIContent PreviewContent =
             new GUIContent(EditorGUIUtility.IconContent("d_scenevis_visible_hover").image, "Preview: open this level in the editor");
 
@@ -32,6 +32,7 @@ namespace ColorBlockJam.LevelEditor
         private ReorderableList _list;
         private Vector2 _scroll;
         private readonly LevelEditorBoosterTab _boosterTab = new LevelEditorBoosterTab();
+        private readonly LevelEditorTestTab _testTab = new LevelEditorTestTab();
         private int _moveFrom = -1;
         private int _moveTo = -1;
 
@@ -47,15 +48,18 @@ namespace ColorBlockJam.LevelEditor
 
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
 
-        // Two tabs: the level order, and the boosters' unlock levels, pictures and texts. The open tab is kept per user.
+        // Three tabs: the level order; the boosters' unlock levels, pictures and texts; whether each level can be finished
+        // (LevelEditorTestTab). The open tab is kept per user.
         private void Draw()
         {
+            LevelEditorSceneOverlays.DrawCloseButton(LevelEditorSceneOverlays.LevelOrderId);
             var tab = EditorPrefs.GetInt(TabKey, 0);
             var picked = GUILayout.Toolbar(tab, Tabs);
             if (picked != tab) EditorPrefs.SetInt(TabKey, picked);
             GUILayout.Space(4f);
 
             if (picked == 1) _boosterTab.Draw(MaxHeight);
+            else if (picked == 2) _testTab.Draw(MaxHeight);
             else DrawLevels();
         }
 

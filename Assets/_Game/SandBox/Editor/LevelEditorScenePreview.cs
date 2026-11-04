@@ -33,6 +33,8 @@ namespace ColorBlockJam.SandBox.Editor
         // The board the preview built, for SceneView editing; null when no preview is shown.
         public static BoardViewController Board { get; private set; }
         public static BoardSettings Settings { get; private set; }
+        // The simulation the preview board was built from (its blocks are the keys of the board's views).
+        public static BoardSimulation Simulation { get; private set; }
 
         static LevelEditorScenePreview()
         {
@@ -58,7 +60,8 @@ namespace ColorBlockJam.SandBox.Editor
         // Lines the Scene view up once per opened level, trying again on later editor ticks while there is no Scene view.
         private static void FrameWhenReady(LevelData level, int triesLeft)
         {
-            if (level == null || IsAlignedFor(level)) return;
+            // A solution being watched shows a copy of the level; the view stays where it is.
+            if (level == null || IsAlignedFor(level) || LevelEditorSession.IsPlaybackLevel(level)) return;
             if (FrameSceneView())
             {
                 SessionState.SetInt(AlignedForKey, level.GetInstanceID());
@@ -143,7 +146,8 @@ namespace ColorBlockJam.SandBox.Editor
                 new EditorInstantiatePool<GateView>(settings.GatePrefab, parent),
                 new EditorInstantiatePool<BlockView>(settings.BlockPrefab, parent, view => view.Construct(piecePool, settings)));
 
-            board.Build(new BoardSimulation(LevelDefinitionFactory.Create(level), settings.ToRules()));
+            Simulation = new BoardSimulation(LevelDefinitionFactory.Create(level), settings.ToRules());
+            board.Build(Simulation);
             Board = board;
 
             foreach (var child in _root.GetComponentsInChildren<Transform>(true))
@@ -155,6 +159,7 @@ namespace ColorBlockJam.SandBox.Editor
             if (_root != null) Object.DestroyImmediate(_root);
             _root = null;
             Board = null;
+            Simulation = null;
 
             var scene = SceneManager.GetActiveScene();
             if (!scene.IsValid() || !scene.isLoaded) return;

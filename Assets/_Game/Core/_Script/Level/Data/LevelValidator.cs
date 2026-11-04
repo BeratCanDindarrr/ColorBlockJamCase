@@ -49,10 +49,13 @@ namespace ColorBlockJam.Core.Level
                 var block = blocks[i];
                 if (block == null) continue;
 
+                // A block with no gate it can leave through makes the level impossible to finish: an error, so Save is blocked.
                 if (!HasGateOfColor(gates, block.Color, BlockAxis.Free))
-                    issues.Add(new LevelIssue($"Block {block.Id} ({block.Color}) has no gate of its colour", false, i));
+                    issues.Add(new LevelIssue($"Block {block.Id} ({block.Color}) has no gate of its colour", true, i));
                 else if (!HasGateOfColor(gates, block.Color, block.Axis))
-                    issues.Add(new LevelIssue($"Block {block.Id} moves only {block.Axis} but has no {block.Color} gate that way", false, i));
+                    issues.Add(new LevelIssue($"Block {block.Id} moves only {block.Axis} but has no {block.Color} gate that way", true, i));
+                else if (!HasGateItFits(gates, block))
+                    issues.Add(new LevelIssue(TooNarrowMessage(block), true, i));
 
                 // Every other block leaving first is the most exits that can happen before it thaws.
                 if (block.Ice < 0) issues.Add(new LevelIssue($"Block {block.Id} has negative ice", true, i));
@@ -207,6 +210,41 @@ namespace ColorBlockJam.Core.Level
             }
 
             return false;
+        }
+
+        // A block leaves through a gate only with every cell inside the gate's span along its wall (GateFit.Fits), so the
+        // gate must be at least as long as the block is wide (top/bottom walls) or tall (left/right walls).
+        private static bool HasGateItFits(GateData[] gates, BlockData block)
+        {
+            foreach (var gate in gates)
+            {
+                if (gate == null || gate.Color != block.Color || !RunsInto(block.Axis, gate.Edge)) continue;
+                if (gate.Length >= SpanAlong(block, gate.Edge)) return true;
+            }
+
+            return false;
+        }
+
+        private static string TooNarrowMessage(BlockData block) =>
+            $"Block {block.Id} ({block.Color}) is {SpanAlong(block, BoardEdge.Top)} wide and {SpanAlong(block, BoardEdge.Left)} tall: " +
+            $"no {block.Color} gate is long enough (top/bottom need {SpanAlong(block, BoardEdge.Top)}, left/right need {SpanAlong(block, BoardEdge.Left)})";
+
+        // How many cells the block covers along the given wall: its width on the top and bottom walls, its height on the sides.
+        private static int SpanAlong(BlockData block, BoardEdge edge)
+        {
+            var cells = block.Cells;
+            if (cells == null || cells.Length == 0) return 0;
+            var horizontal = edge == BoardEdge.Top || edge == BoardEdge.Bottom;
+            var min = int.MaxValue;
+            var max = int.MinValue;
+            foreach (var cell in cells)
+            {
+                var along = horizontal ? cell.Col : cell.Row;
+                if (along < min) min = along;
+                if (along > max) max = along;
+            }
+
+            return max - min + 1;
         }
 
         private static bool RunsInto(BlockAxis axis, BoardEdge edge)
