@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace ColorBlockJam.Core.Settings
 {
-    // Gameplay camera framing. Manual: hand-tuned entries per board size (knit_Out's LevelCameraSettings), looking
+    // Gameplay camera framing. Manual: hand-tuned entries per board size, looking
     // straight down, CameraPos being the offset from the board centre. Otherwise the camera leans back by TiltDegrees
-    // (the reference game's look) and is fitted to the fills below.
+    // and is fitted to the fills below.
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(LevelCameraSettings), fileName = nameof(LevelCameraSettings))]
     public class LevelCameraSettings : ScriptableObject
     {
@@ -43,7 +43,7 @@ namespace ColorBlockJam.Core.Settings
         public int ColumnCount;
         public Vector3 CameraPos;
         public float CameraFieldOfView = 60f;
-        // Screens of other shapes than the reference (9:16): blends from CameraPos to the entry's values.
+        // Screens of other shapes than 9:16: blends from CameraPos to the entry's values.
         public CameraRadioAspectSettings[] CameraRadioAspectSettings;
 
         public CameraRadioAspectSettings GetAspectSettings(float aspect)

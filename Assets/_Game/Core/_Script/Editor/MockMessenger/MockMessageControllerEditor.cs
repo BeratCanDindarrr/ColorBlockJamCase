@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.MockMessenger
 {
-    // The mock messenger's buttons (knit_Out used Odin's [Button]/[FoldoutGroup]); each section shows its inputs, the
+    // The mock messenger's buttons (plain IMGUI, no Odin); each section shows its inputs, the
     // current values and the actions. Buttons work in Play Mode; a failing action logs instead of breaking the Inspector.
     [CustomEditor(typeof(MockMessageController))]
     public sealed class MockMessageControllerEditor : UnityEditor.Editor

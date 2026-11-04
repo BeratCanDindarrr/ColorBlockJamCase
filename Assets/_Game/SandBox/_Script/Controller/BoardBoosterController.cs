@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    // Runs the in-game boosters the HUD asks for (yarm_stack's BoardBoosterController). Every request is answered with
+    // Runs the in-game boosters the HUD asks for. Every request is answered with
     // a BoosterEndedSignal, so the HUD buttons unlock whatever happened; Used tells the HUD to spend one. A booster
     // that needs a target waits in a BoardSelection until BoardDragController hands it a tap.
     public class BoardBoosterController : IDisposable

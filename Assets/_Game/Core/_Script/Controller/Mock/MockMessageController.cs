@@ -13,7 +13,7 @@ using VContainer;
 
 namespace ColorBlockJam.Core.Controller.Mock
 {
-    // knit_Out's MockMessageController: a scene object whose Inspector (MockMessageControllerEditor) has buttons that
+    // MockMessageController: a scene object whose Inspector (MockMessageControllerEditor) has buttons that
     // drive the running game's controllers, popups and tasks, for checking flows by hand in Play Mode. The fields are
     // the buttons' inputs. Optional: ControllerLifeTimeScope injects it when the scene has one.
     public class MockMessageController : BaseView
@@ -89,7 +89,7 @@ namespace ColorBlockJam.Core.Controller.Mock
             new CurrencyData(CurrencyType.Booster1, rewardBooster1)
         }.Where(r => r.currencyValue > 0).ToArray();
 
-        // knit_Out's PlayWinState: the rewards are added, then fly onto the main screen.
+        // The rewards are added, then fly onto the main screen.
         public void AddRewardsAndFly()
         {
             var rewards = Rewards();

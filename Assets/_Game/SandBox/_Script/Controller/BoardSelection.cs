@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    // A booster waiting for a target (yarm_stack's BoardShapeSelection): the board darkens and only the blocks that
+    // A booster waiting for a target: the board darkens and only the blocks that
     // can be picked stay bright. They move to the SelectableItem layer, which the selected-item camera draws over the
     // dim quad that hangs in front of the gameplay camera.
     public sealed class BoardSelection

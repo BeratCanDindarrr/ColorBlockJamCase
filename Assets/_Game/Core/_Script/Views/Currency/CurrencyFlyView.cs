@@ -11,7 +11,7 @@ using VContainer;
 
 namespace ColorBlockJam.Views.Currency
 {
-    // The fly animation shared by the currency icons (knit_Out's CoinCurrencyAnimationView): scale in where the
+    // The fly animation shared by the currency icons: scale in where the
     // reward was given, wait, then a curved flight onto the target. Pooled; the label is optional.
     public abstract class CurrencyFlyView : BaseView, ICurrencyUpdate, IPoolable
     {

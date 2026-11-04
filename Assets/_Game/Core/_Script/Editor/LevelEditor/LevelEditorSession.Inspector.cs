@@ -80,7 +80,7 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndHorizontal();
         }
 
-        // Plain Unity inspector of the working copy (knit_Out drew this with Odin's PropertyTree).
+        // Plain Unity inspector of the working copy (no Odin).
         private void DrawRawData()
         {
             if (_rawEditor == null || _rawEditor.target != working) _rawEditor = UnityEditor.Editor.CreateEditor(working);

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    // How the in-game boosters look on the board (yarm_stack's BoosterAnimationSettings). Registered through
+    // How the in-game boosters look on the board. Registered through
     // GlobalSettings like BoardSettings.
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(BoosterAnimationSettings), fileName = nameof(BoosterAnimationSettings))]
     public class BoosterAnimationSettings : ScriptableObject

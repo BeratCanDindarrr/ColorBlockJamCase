@@ -11,7 +11,7 @@ namespace ColorBlockJam.Views
     // The admin panel's tabs and what each button does (the Mock Messenger's actions, for the device).
     public partial class AdminPanelPopup
     {
-        // Developer amounts, as in knit_Out's admin panel and the Mock Messenger's defaults.
+        // Developer amounts, as the Mock Messenger's defaults.
         private const long CoinAmount = 1000;
         private const long BoosterAmount = 1;
         private const long RewardCoins = 20;

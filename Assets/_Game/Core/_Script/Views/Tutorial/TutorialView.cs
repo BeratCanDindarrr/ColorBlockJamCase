@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ColorBlockJam.Views
 {
-    // yarm_stack's TutorialView: a hand tapping a point or dragging along a path over and over, and a dim frame around
+    // Tutorial overlay: a hand tapping a point or dragging along a path over and over, and a dim frame around
     // a button. The frame has the button in its hole, so the button is tapped where it is while the frame takes every
     // other tap. Lives full screen at the top of the HUD; the hand takes no taps.
     public class TutorialView : BaseView

@@ -16,7 +16,7 @@ using VContainer;
 
 namespace ColorBlockJam.GameTask
 {
-    // Rewards already added to the player fly onto the main screen, from the screen centre or given screen points (knit_Out's MainViewCoinAnimationTask): coins to the
+    // Rewards already added to the player fly onto the main screen, from the screen centre or given screen points: coins to the
     // header coin (its label counting up as they land), limitless life time to the life icon, boosters to Play.
     public class CurrencyUpdateAnimationGameTask : IGameTask
     {

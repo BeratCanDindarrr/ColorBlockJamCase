@@ -8,7 +8,7 @@ namespace ColorBlockJam.Core.Settings
     {
         public string ApplicationName;
 
-        // Applied once at startup by ApplicationController (as in knit_Out).
+        // Applied once at startup by ApplicationController.
         public int TargetFrameRate = 60;
         public bool NeverSleep = true;
         public bool MultiTouch = false;

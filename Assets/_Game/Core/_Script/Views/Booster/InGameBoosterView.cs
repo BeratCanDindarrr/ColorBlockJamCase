@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace ColorBlockJam.Views
 {
-    // One HUD booster button (yarm_stack's InGameBoosterView): the owned count, or the coin price when none is left,
+    // One HUD booster button: the owned count, or the coin price when none is left,
     // or a lock with the unlock level. Clicked (wired in the prefab's onClick): with one owned it asks the board to start
     // the booster (the board spends it only when used); with none it buys one for coins.
     public class InGameBoosterView : BaseView

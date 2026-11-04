@@ -188,7 +188,7 @@ namespace ColorBlockJam.Core.Controller
         public void LoseLevel()
         {
             LeaveLevel().Forget();
-            // TODO: post-level flow (FlowController.LevelUpFlowStart in knit_Out; not in this project yet).
+            // TODO: post-level flow (level-up flow after a loss; not built yet).
         }
 
         // Try Again: gives up the running level (if any) and starts it again, spending a life.

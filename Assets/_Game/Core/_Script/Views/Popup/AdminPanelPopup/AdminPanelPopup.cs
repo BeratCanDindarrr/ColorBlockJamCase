@@ -11,7 +11,7 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // knit_Out's AdminPanelPopup (dimmed background, frameless container, red close button, green and red buttons) with
+    // Admin panel (dimmed background, frameless container, red close button, green and red buttons) with
     // the tabs listed down the left side and the picked tab's buttons on the right: the level (go to / win / lose),
     // Level Complete and Level Fail flows, and the Mock Messenger's groups. Each tab's buttons are made from the
     // templates when the popup opens (see Tabs in AdminPanelPopup.Actions.cs); the level field and its Go button sit at

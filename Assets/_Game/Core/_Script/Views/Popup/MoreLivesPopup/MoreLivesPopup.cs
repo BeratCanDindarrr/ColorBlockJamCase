@@ -93,6 +93,6 @@ namespace ColorBlockJam.Views
             ClosePopup();
         }
 
-        // TODO: knit_Out also gives one life for a rewarded ad (AdService is not in this project yet).
+        // TODO: one life for a rewarded ad (no AdService yet).
     }
 }

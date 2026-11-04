@@ -11,7 +11,7 @@ using VContainer.Unity;
 
 namespace ColorBlockJam.Core.Controller
 {
-    // Teaches a booster once, on its unlock level (yarm_stack's BoosterTutorialController). Its promote popup comes
+    // Teaches a booster once, on its unlock level. Its promote popup comes
     // first; then the screen dims around the booster's button and a hand taps it, the only thing that takes a tap.
     // A booster that needs a target then has the board offer one block (SandBox, told by BoosterTutorialSignal) and the
     // hand taps that. Using the booster finishes the tutorial; anything else stops it until the level is played again.

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace ColorBlockJam.Views
 {
-    // yarm_stack's BoosterPromotePopup: the new booster's picture and what it does; closing it starts its tutorial.
+    // The new booster's picture and what it does; closing it starts its tutorial.
     public class BoosterPromotePopup : BasePopup<BoosterPromotePopupParameters>
     {
         [SerializeField] private Image iconImage;

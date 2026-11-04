@@ -37,7 +37,7 @@ namespace ColorBlockJam.Core.Controller
             LoadingScreenView.Hide();
             MainScreenView.Hide();
             GamePlayScreenView.Hide();
-            // Development builds and the editor only, like knit_Out's DevelopmentBuild check.
+            // Development builds and the editor only.
             if (_screenViewSettings.showAdminPanel && Debug.isDebugBuild && _screenViewSettings.adminPanelButtonView != null)
                 _objectResolver.Instantiate(_screenViewSettings.adminPanelButtonView);
         }

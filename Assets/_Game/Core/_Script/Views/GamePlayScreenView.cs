@@ -159,7 +159,7 @@ namespace ColorBlockJam.Views
             resultText.gameObject.SetActive(true);
         }
 
-        // Leaving the level goes through the settings popup (Quit), like knit_Out.
+        // Leaving the level goes through the settings popup (Quit).
         public void OnSettingsClicked()
         {
             _popupService.AddPopup(new InGameSettingsPopupParameters());

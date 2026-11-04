@@ -3,7 +3,7 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // knit_Out's AdminPanelButtonView: a small button over every screen (its own canvas) that opens the admin panel.
+    // AdminPanelButtonView: a small button over every screen (its own canvas) that opens the admin panel.
     // Made by ScreenController when ScreenViewSettings.showAdminPanel is on; its click is wired in the prefab.
     public class AdminPanelButtonView : BaseView
     {

@@ -6,7 +6,7 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // Vibrates when its button is clicked (knit_Out's HapticComponent; it sits on every UI button). The button's onClick
+    // Vibrates when its button is clicked (it sits on every UI button). The button's onClick
     // in the prefab calls PlayHaptic.
     [RequireComponent(typeof(Button))]
     public class HapticComponent : BaseView

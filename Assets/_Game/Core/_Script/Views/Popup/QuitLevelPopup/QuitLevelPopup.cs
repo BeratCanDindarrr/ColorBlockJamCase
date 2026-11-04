@@ -34,7 +34,7 @@ namespace ColorBlockJam.Views
             closeButton.onClick.RemoveListener(CloseButtonClicked);
         }
 
-        // TODO: knit_Out first shows what the player loses (streak items) before the final quit.
+        // TODO: show what the player loses (streak items) before the final quit.
         private void QuitButtonClicked()
         {
             _applicationController.LoseLevel();

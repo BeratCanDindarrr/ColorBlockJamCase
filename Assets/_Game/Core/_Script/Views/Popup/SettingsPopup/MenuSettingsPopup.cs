@@ -6,7 +6,7 @@ using VContainer;
 namespace ColorBlockJam.Views
 {
     // Main menu settings: music, sound and haptic switches.
-    // TODO: knit_Out also has Support (mail), Terms and Privacy links here.
+    // TODO: Support (mail), Terms and Privacy links here.
     public class MenuSettingsPopup : BasePopup<MenuSettingsPopupParameters>
     {
         [SerializeField] private SettingsToggleButtonView musicToggle;

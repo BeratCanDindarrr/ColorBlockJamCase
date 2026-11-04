@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ColorBlockJam.Core.Service
 {
     // Game code depends on IAudioService only; Audio Manager Pro's SFXManager (scene object in SampleScene, kept across
-    // scenes) stays behind this class. Sounds are looked up by SfxName in SfxListData, as in knit_Out's AudioService.
+    // scenes) stays behind this class. Sounds are looked up by SfxName in SfxListData.
     public class AudioService : IAudioService
     {
         private readonly Dictionary<SfxName, SfxListData.SfxItem> _items = new Dictionary<SfxName, SfxListData.SfxItem>();

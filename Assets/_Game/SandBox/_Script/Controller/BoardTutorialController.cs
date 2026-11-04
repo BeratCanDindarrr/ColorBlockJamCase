@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    // The board side of the first-level tutorial (yarm_stack's BoardTutorialController): the block with the shortest
+    // The board side of the first-level tutorial: the block with the shortest
     // way out is the only one that can be picked, and its way (cell by cell, round the other blocks, into its gate) goes
     // to the HUD as screen points for the hand. The hand hides while the block is held and shows the way again from
     // where it was dropped; the tutorial is done once the block leaves through its gate.

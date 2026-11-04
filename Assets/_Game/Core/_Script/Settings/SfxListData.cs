@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.Core.Settings
 {
-    // Which Audio Manager Pro SFXObject plays for each SfxName (knit_Out's SfxListData, objects only).
+    // Which Audio Manager Pro SFXObject plays for each SfxName (objects only).
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(SfxListData), fileName = nameof(SfxListData))]
     public class SfxListData : ScriptableObject
     {

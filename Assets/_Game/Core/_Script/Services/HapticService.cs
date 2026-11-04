@@ -5,7 +5,7 @@ using Solo.MOST_IN_ONE;
 
 namespace ColorBlockJam.Core.Service
 {
-    // Vibrates through MOST_HapticFeedback when the saved haptic switch is on (knit_Out's HapticController, as a
+    // Vibrates through MOST_HapticFeedback when the saved haptic switch is on (as a
     // service so SandBox can use it too). MOST does nothing in the editor; it vibrates on iOS / Android devices.
     public class HapticService : IHapticService
     {

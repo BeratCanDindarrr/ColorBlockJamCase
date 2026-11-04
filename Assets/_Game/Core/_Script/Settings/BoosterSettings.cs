@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.Core.Settings
 {
-    // Coin price and unlock level of each in-game booster (yarm_stack's BoosterSettings).
+    // Coin price and unlock level of each in-game booster.
     [CreateAssetMenu(menuName = MenuConst.Settings + nameof(BoosterSettings), fileName = nameof(BoosterSettings))]
     public class BoosterSettings : ScriptableObject
     {
@@ -26,7 +26,7 @@ namespace ColorBlockJam.Core.Settings
         // How long the Timer booster (Booster1) stops the level clock.
         public float TimerFreezeSeconds = 15f;
 
-        // The tutorial hand and the dim around the booster button (yarm_stack's TutorialSettings).
+        // The tutorial hand and the dim around the booster button.
         [Header("Tutorial")]
         [Tooltip("A player without the booster is given one when its tutorial starts.")]
         public bool GrantBoosterIfNone = true;
