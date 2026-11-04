@@ -95,6 +95,14 @@ namespace ColorBlockJam.SandBox.Board
         private static bool FindNextExit(Board board, int budget, ref int explored, out List<SolveStep> path,
             out bool exhausted)
         {
+            // No block that can be picked up has an open gate it could ever use: no arrangement helps, skip the search.
+            if (!board.AnyGateUsable())
+            {
+                path = null;
+                exhausted = true;
+                return false;
+            }
+
             var start = board.Origins();
             var parents = new Dictionary<string, (string Parent, SolveStep Step)> { [Key(start)] = (null, default) };
             var queue = new Queue<CellCoord[]>();
@@ -294,6 +302,40 @@ namespace ColorBlockJam.SandBox.Board
                 }
 
                 return places;
+            }
+
+            // Some block that can be picked up has an open gate of its colour, on its axis and long enough for it.
+            public bool AnyGateUsable()
+            {
+                foreach (var i in Movable())
+                {
+                    var block = _blocks[i];
+                    for (var k = 0; k < _gates.Count; k++)
+                    {
+                        var gate = _gates[k];
+                        if (_gateIce[k] > _exits || gate.Color != block.Color) continue;
+                        if (!GateFit.AlongAxis(block.Axis, GateFit.Normal(gate.Edge))) continue;
+                        if (gate.Length >= SpanAlong(block, gate.Edge)) return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // How many cells the block covers along a wall: its width on the top and bottom, its height on the sides.
+            private static int SpanAlong(BlockState block, BoardEdge edge)
+            {
+                var horizontal = edge == BoardEdge.Top || edge == BoardEdge.Bottom;
+                var min = int.MaxValue;
+                var max = int.MinValue;
+                foreach (var cell in block.Cells)
+                {
+                    var along = horizontal ? cell.Col : cell.Row;
+                    min = Math.Min(min, along);
+                    max = Math.Max(max, along);
+                }
+
+                return max - min + 1;
             }
 
             // The open gate the block can be pushed into along its axis from `origin` (GateFit.CanPushInto), or null. A gate

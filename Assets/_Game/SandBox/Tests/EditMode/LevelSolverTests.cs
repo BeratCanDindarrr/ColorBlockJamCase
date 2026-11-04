@@ -89,6 +89,18 @@ namespace ColorBlockJam.SandBox.Board.Tests
         }
 
         [Test]
+        public void NoUsableGate_IsUnsolvableWithoutSearching()
+        {
+            // A's gate is iced and B has none: nothing can ever leave, however the blocks are moved.
+            var iced = Gate(BoardEdge.Left, 0, 1, BlockColor.Red);
+            iced.Ice = 1;
+            var result = Solve(4, 4, new[] { Block("A", 0, 0, BlockColor.Red), Block("B", 3, 3, BlockColor.Blue) }, iced);
+
+            Assert.That(result.Verdict, Is.EqualTo(SolveVerdict.Unsolvable));
+            Assert.That(result.StatesExplored, Is.Zero);
+        }
+
+        [Test]
         public void HorizontalBlockWithOnlyATopGate_IsUnsolvable()
         {
             var block = Block("A", 0, 0, BlockColor.Red);
