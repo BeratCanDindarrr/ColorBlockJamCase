@@ -13,7 +13,6 @@ namespace ColorBlockJam.Views
     // HUD shown on top of the gameplay scene. Button clicks are wired in the prefab (OnSettingsClicked / OnRetryClicked).
     public class GamePlayScreenView : BaseView
     {
-        private const string WonText = "You Win!";
         private const string LostText = "Time's Up!";
         private const string LevelFormat = "Level\n<size=130%>{0}</size>";
 
@@ -80,9 +79,12 @@ namespace ColorBlockJam.Views
             retryButton.interactable = signal.IsClockRunning;
         }
 
+        // A win goes straight on to the LevelComplete popup (ApplicationController); only a loss is shown here.
         private void OnLevelEnded(LevelEndedSignal signal)
         {
-            resultText.text = signal.Won ? WonText : LostText;
+            if (signal.Won) return;
+
+            resultText.text = LostText;
             resultText.gameObject.SetActive(true);
         }
 

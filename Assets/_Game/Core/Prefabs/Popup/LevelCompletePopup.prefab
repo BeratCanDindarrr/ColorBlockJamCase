@@ -123,9 +123,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2451738501473155568}
-        m_TargetAssemblyTypeName: ColorBlockJam.Views.BasePopup`1[[ColorBlockJam.Views.LevelCompletePopupParameters,
-          ColorBlockJam.Core
-        m_MethodName: ClosePopup
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.LevelCompletePopup, ColorBlockJam.Core
+        m_MethodName: Continue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -814,6 +813,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinsText: {fileID: 5425002713605100853}
+  coinImage: {fileID: 55450139683765134}
+  continueButton: {fileID: 7280149165580539760}
+  canvas: {fileID: 7280503014890275956}
 --- !u!1 &7046322655059182996
 GameObject:
   m_ObjectHideFlags: 0
@@ -1009,7 +1011,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.47058824}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.8627451}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

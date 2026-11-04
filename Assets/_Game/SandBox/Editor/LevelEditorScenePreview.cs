@@ -22,8 +22,13 @@ namespace ColorBlockJam.SandBox.Editor
         private const float CameraFieldOfView = 60f;
         private static readonly Vector3 LightEuler = new Vector3(50f, 330f, 0f);
 
+        // The level the Scene view was last lined up with the preview camera for. Kept across script reloads (so a
+        // compile does not undo orbiting the view) but cleared on entering the editor scene and with every Unity start.
+        private const string AlignedForKey = "ColorBlockJam.LevelEditor.PreviewAlignedFor";
+        // Editor ticks to wait for a Scene view after Unity starts or the layout changes.
+        private const int FrameRetries = 30;
+
         private static GameObject _root;
-        private static LevelData _alignedFor;
 
         // The board the preview built, for SceneView editing; null when no preview is shown.
         public static BoardViewController Board { get; private set; }
@@ -34,6 +39,7 @@ namespace ColorBlockJam.SandBox.Editor
             LevelEditorSession.WorkingLevelChanged += Rebuild;
             EditorSceneManager.activeSceneChangedInEditMode += (_, to) =>
             {
+                SessionState.EraseInt(AlignedForKey);
                 if (to.path == EditorScenePath) Rebuild(LevelEditorSession.CurrentWorking);
                 else Clear();
             };
@@ -47,17 +53,26 @@ namespace ColorBlockJam.SandBox.Editor
             EditorApplication.delayCall += () => Rebuild(LevelEditorSession.CurrentWorking);
         }
 
-        private static bool FrameOnce(LevelData level)
+        private static bool IsAlignedFor(LevelData level) => SessionState.GetInt(AlignedForKey, 0) == level.GetInstanceID();
+
+        // Lines the Scene view up once per opened level, trying again on later editor ticks while there is no Scene view.
+        private static void FrameWhenReady(LevelData level, int triesLeft)
         {
-            if (_alignedFor == level || !FrameSceneView()) return _alignedFor == level;
-            _alignedFor = level;
-            return true;
+            if (level == null || IsAlignedFor(level)) return;
+            if (FrameSceneView())
+            {
+                SessionState.SetInt(AlignedForKey, level.GetInstanceID());
+                return;
+            }
+
+            if (triesLeft > 0) EditorApplication.delayCall += () => FrameWhenReady(level, triesLeft - 1);
         }
 
         [MenuItem("Tools/Level Editor/Frame Scene Preview")]
         private static void FrameSceneViewMenu() => FrameSceneView();
 
-        // Looks at the board through the game camera's eyes. False when there is no scene view or preview yet.
+        // Looks at the board from exactly where the game camera stands, with its field of view. False when there is no
+        // Scene view or preview yet.
         private static bool FrameSceneView()
         {
             var camera = _root != null ? _root.GetComponentInChildren<Camera>() : null;
@@ -65,6 +80,8 @@ namespace ColorBlockJam.SandBox.Editor
             if (camera == null || sceneView == null) return false;
 
             sceneView.in2DMode = false;
+            sceneView.orthographic = false;
+            sceneView.cameraSettings.fieldOfView = camera.fieldOfView;
             sceneView.AlignViewToObject(camera.transform);
             sceneView.Repaint();
             return true;
@@ -92,9 +109,9 @@ namespace ColorBlockJam.SandBox.Editor
                 return;
             }
 
-            // Framed once per opened level, so orbiting the view is kept while editing; tried again on the next editor
-            // tick when the Scene view is not up yet (just after a script reload or a layout change).
-            if (_alignedFor != level && !FrameOnce(level)) EditorApplication.delayCall += () => FrameOnce(level);
+            // Framed once per opened level and on every entry to the editor scene, so orbiting the view is kept while
+            // editing.
+            FrameWhenReady(level, FrameRetries);
 
             SceneView.RepaintAll();
         }

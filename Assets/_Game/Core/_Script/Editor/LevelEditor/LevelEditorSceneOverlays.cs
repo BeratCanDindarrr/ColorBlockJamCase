@@ -20,6 +20,7 @@ namespace ColorBlockJam.LevelEditor
         public const string ShapesId = "colorblockjam-level-editor-shapes";
         public const string LevelBarId = "colorblockjam-level-editor-level-bar";
         public const string ModeId = "colorblockjam-level-editor-mode";
+        public const string LevelOrderId = "colorblockjam-level-editor-level-order";
 
         public static bool InEditorScene => SceneManager.GetActiveScene().path == LevelEditorSceneHook.EditorScenePath;
 
@@ -55,22 +56,25 @@ namespace ColorBlockJam.LevelEditor
         }
     }
 
-    // Shows itself when editing starts and hides when it stops, following LevelEditorSession.StateChanged.
+    // Shows itself when editing starts (unless `opensItself` is false: then only the user opens it) and hides when it
+    // stops, following LevelEditorSession.StateChanged.
     internal sealed class EditingVisibility
     {
         private readonly Overlay _overlay;
         private readonly Action _onState;
         private readonly Func<bool> _shouldShow;
+        private readonly bool _opensItself;
         private bool _wasEditing;
         private bool _synced;
 
-        public EditingVisibility(Overlay overlay, Action onState = null, Func<bool> shouldShow = null)
+        public EditingVisibility(Overlay overlay, Action onState = null, Func<bool> shouldShow = null, bool opensItself = true)
         {
             _overlay = overlay;
             _onState = onState;
             _shouldShow = shouldShow ?? (() => LevelEditorSceneOverlays.IsEditing);
+            _opensItself = opensItself;
             _wasEditing = _shouldShow();
-            _overlay.displayed = _wasEditing;
+            _overlay.displayed = _wasEditing && _opensItself;
             LevelEditorSession.StateChanged += Sync;
             EditorApplication.hierarchyChanged += Sync;
             EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
@@ -88,7 +92,7 @@ namespace ColorBlockJam.LevelEditor
                 // once to the editing state, whatever was restored.
                 _synced = true;
                 _wasEditing = _shouldShow();
-                _overlay.displayed = _wasEditing;
+                _overlay.displayed = _wasEditing && _opensItself;
             }
 
             Sync();
@@ -118,7 +122,7 @@ namespace ColorBlockJam.LevelEditor
             if (isEditing != _wasEditing)
             {
                 _wasEditing = isEditing;
-                _overlay.displayed = isEditing;
+                if (!isEditing || _opensItself) _overlay.displayed = isEditing;
             }
 
             _onState?.Invoke();

@@ -162,14 +162,12 @@ namespace ColorBlockJam.Core.Controller
             _lifeController.SyncModel();
             _storageService.SaveStorage();
 
-            // TODO: LevelWinPopup and LevelCompleteRewardPopup (not in this project yet).
-
+            // The LevelComplete popup opens over the won board and holds the queue; its Continue goes on: back to the menu,
+            // then the rewards fly in (the popup queues the fly from its coin picture).
+            _popupService.AddPopup(new LevelCompletePopupParameters { Rewards = rewards });
             var backToMenuTask = new CallBackGameTask();
             backToMenuTask.Init(() => _sceneLoaderController.CloseGamePlayScene().Forget());
             _taskService.AddTask(backToMenuTask);
-            var rewardFlyTask = new CurrencyUpdateAnimationGameTask();
-            rewardFlyTask.Init(rewards);
-            _taskService.AddTask(rewardFlyTask);
             _taskService.AddTask(new UnlockInputGameTask());
         }
 

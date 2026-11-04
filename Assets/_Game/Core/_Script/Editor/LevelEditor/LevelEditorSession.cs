@@ -48,6 +48,12 @@ namespace ColorBlockJam.LevelEditor
 
         internal BlockColor Brush => brush;
 
+        // The level asset being edited (not the working copy).
+        internal LevelData Source => source;
+
+        // Opens another level for editing (asks about unsaved changes first).
+        internal void OpenLevel(LevelData level) => TryOpen(level);
+
         internal LevelEditorTool CurrentTool
         {
             get => tool;
