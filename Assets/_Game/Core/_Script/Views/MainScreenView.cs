@@ -16,6 +16,7 @@ namespace ColorBlockJam.Views
         // Where reward icons fly to (set by the home page that holds them) and the canvas they fly on.
         public MainScreenHeaderView Header { get; private set; }
         public Transform PlayButtonTransform { get; private set; }
+        public LevelButtonView LevelButton { get; private set; }
         public Transform CoinImageTransform => Header != null ? Header.CoinImageTransform : null;
         public Transform LifeImageTransform => Header != null ? Header.LifeImageTransform : null;
         public Transform FlyLayer => Header != null ? Header.GetComponentInParent<Canvas>().rootCanvas.transform : null;
@@ -43,6 +44,8 @@ namespace ColorBlockJam.Views
             Header = header;
             PlayButtonTransform = playButtonTransform;
         }
+
+        public void SetLevelButton(LevelButtonView levelButton) => LevelButton = levelButton;
 
         public void SnapToPage(int page) => pageSnapper.SnapTo(page);
 

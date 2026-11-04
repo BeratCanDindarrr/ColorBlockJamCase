@@ -4,7 +4,6 @@ using ColorBlockJam.Enums;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
 using MessagePipe;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -15,10 +14,9 @@ namespace ColorBlockJam.Views
     {
         // Page 0 of the main screen is the shop.
         private const int ShopPage = 0;
-        private const string PlayLabelFormat = "Level {0}";
 
         [SerializeField] private Button playButton;
-        [SerializeField] private TextMeshProUGUI playLabel;
+        [SerializeField] private LevelButtonView levelButton;
         [SerializeField] private MainScreenHeaderView header;
 
         private ApplicationController _applicationController;
@@ -29,7 +27,6 @@ namespace ColorBlockJam.Views
         private PlayerController _playerController;
         private ISubscriber<CurrencyUpdateSignal> _currencyUpdateSubscriber;
         private ISubscriber<LifeModelSync> _lifeModelSyncSubscriber;
-        private ISubscriber<LevelSuccessSignal> _levelSuccessSubscriber;
         private ISubscriber<LevelUpSignal> _levelUpSubscriber;
         private IDisposable _subscriptions;
 
@@ -42,7 +39,6 @@ namespace ColorBlockJam.Views
             , PlayerController playerController
             , ISubscriber<CurrencyUpdateSignal> currencyUpdateSubscriber
             , ISubscriber<LifeModelSync> lifeModelSyncSubscriber
-            , ISubscriber<LevelSuccessSignal> levelSuccessSubscriber
             , ISubscriber<LevelUpSignal> levelUpSubscriber)
         {
             _applicationController = applicationController;
@@ -53,7 +49,6 @@ namespace ColorBlockJam.Views
             _playerController = playerController;
             _currencyUpdateSubscriber = currencyUpdateSubscriber;
             _lifeModelSyncSubscriber = lifeModelSyncSubscriber;
-            _levelSuccessSubscriber = levelSuccessSubscriber;
             _levelUpSubscriber = levelUpSubscriber;
         }
 
@@ -68,11 +63,12 @@ namespace ColorBlockJam.Views
             _subscriptions = DisposableBag.Create(
                 _currencyUpdateSubscriber.Subscribe(_ => RefreshHeader()),
                 _lifeModelSyncSubscriber.Subscribe(_ => RefreshHeader()),
-                _levelSuccessSubscriber.Subscribe(_ => RefreshPlayLabel()),
-                _levelUpSubscriber.Subscribe(_ => RefreshPlayLabel()));
+                // A set level shows at once; a won level waits for LevelButtonUpdateGameTask's animation.
+                _levelUpSubscriber.Subscribe(_ => levelButton.SetLevel(_playerController.GetVisualLevel())));
             RefreshHeader();
-            RefreshPlayLabel();
+            levelButton.SetLevel(_playerController.GetVisualLevel());
             _screenController.MainScreenView.SetCurrencyTargets(header, playButton.transform);
+            _screenController.MainScreenView.SetLevelButton(levelButton);
         }
 
         public override void Dispose()
@@ -93,12 +89,6 @@ namespace ColorBlockJam.Views
         {
             header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin));
             header.SetLife(_lifeController.GetLifeTime().Item1);
-        }
-
-        // The Play button names the level it starts.
-        private void RefreshPlayLabel()
-        {
-            playLabel.SetText(PlayLabelFormat, _playerController.GetVisualLevel());
         }
 
         private void OnCoinClicked()
