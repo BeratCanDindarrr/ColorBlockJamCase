@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ namespace ColorBlockJam.LevelEditor
     internal static class LevelEditorColors
     {
         private const string EnumFile = "Assets/_Game/Core/_Script/Level/Data/LevelTypes.cs";
+        private const string GameFolder = "Assets/_Game";
         private const string SettingsType = "BoardSettings";
         private const string ColorsField = "Colors";
         private static readonly Regex Identifier = new Regex("^[A-Z][A-Za-z0-9]*$");
@@ -113,20 +115,21 @@ namespace ColorBlockJam.LevelEditor
             AssetDatabase.SaveAssetIfDirty(settings);
         }
 
-        // Null when `color` can be renamed: code (tests, BoardSettings defaults) that names it would stop compiling.
-        public static string CheckRenamable(BlockColor color)
+        // Scripts under Assets/_Game that name `color` in code (tests, BoardSettings defaults); a rename updates them too.
+        public static List<string> UsersOf(BlockColor color)
         {
-            var reference = new Regex($@"\bBlockColor\.{color}\b");
-            var user = AssetDatabase.FindAssets("t:Script", new[] { "Assets/_Game" })
+            var reference = Reference(color);
+            return AssetDatabase.FindAssets("t:Script", new[] { GameFolder })
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .FirstOrDefault(path => path.EndsWith(".cs") && reference.IsMatch(File.ReadAllText(path)));
-            return user == null ? null : $"Used by {Path.GetFileName(user)}; only its colour can change.";
+                .Where(path => path.EndsWith(".cs") && path != EnumFile && reference.IsMatch(File.ReadAllText(path)))
+                .ToList();
         }
 
-        // Renames the BlockColor member; levels keep it, as they store the number. Unity recompiles afterwards.
+        // Renames the BlockColor member and every `BlockColor.<old>` in the scripts that use it; levels keep the colour,
+        // as they store its number. The caller refreshes the AssetDatabase once after all renames (Unity recompiles).
         public static bool Rename(BlockColor color, string name)
         {
-            if (CheckName(name) != null || CheckRenamable(color) != null) return false;
+            if (CheckName(name) != null) return false;
 
             var text = File.ReadAllText(EnumFile);
             var member = new Regex($@"\b{color}(\s*=\s*{(int)color}\b)");
@@ -136,10 +139,14 @@ namespace ColorBlockJam.LevelEditor
                 return false;
             }
 
+            var users = UsersOf(color);
             File.WriteAllText(EnumFile, member.Replace(text, name + "$1", 1));
-            AssetDatabase.ImportAsset(EnumFile);
+            foreach (var path in users)
+                File.WriteAllText(path, Reference(color).Replace(File.ReadAllText(path), "BlockColor." + name));
             return true;
         }
+
+        private static Regex Reference(BlockColor color) => new Regex($@"\bBlockColor\.{color}\b");
 
         private static bool AddEnumMember(string name, int value)
         {

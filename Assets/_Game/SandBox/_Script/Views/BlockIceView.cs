@@ -6,7 +6,7 @@ namespace ColorBlockJam.SandBox
 {
     // The ice count on a frozen block: how many more blocks must leave before it can be picked up. The label lies flat
     // on the block, facing the board camera that looks straight down.
-    public class BlockIceView : MonoBehaviour
+    public class BlockIceView : ColorBlockJam.Views.BaseView
     {
         [SerializeField] private TextMeshPro label;
 

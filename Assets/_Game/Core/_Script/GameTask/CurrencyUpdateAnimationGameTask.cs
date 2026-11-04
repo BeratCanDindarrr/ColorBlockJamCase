@@ -153,7 +153,8 @@ namespace ColorBlockJam.GameTask
                 case CurrencyType.Time: return screen.LifeImageTransform;
                 case CurrencyType.Booster1:
                 case CurrencyType.Booster2:
-                case CurrencyType.Booster3: return screen.PlayButtonTransform;
+                case CurrencyType.Booster3:
+                case CurrencyType.Booster4: return screen.PlayButtonTransform;
                 default: return null;
             }
         }

@@ -10,7 +10,7 @@ namespace ColorBlockJam.Views
 {
     // The main screen's Play button, labelled with the level it starts. After a win it shrinks, takes the new number,
     // springs back with a jolt and a shine.
-    public class LevelButtonView : MonoBehaviour
+    public class LevelButtonView : BaseView
     {
         private const string LabelFormat = "Level {0}";
 

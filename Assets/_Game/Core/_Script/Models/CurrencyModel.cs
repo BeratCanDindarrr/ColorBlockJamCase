@@ -9,6 +9,7 @@ namespace ColorBlockJam.Core.Model
         public long booster1;
         public long booster2;
         public long booster3;
+        public long booster4;
         public long removeAdCount;
     }
 }

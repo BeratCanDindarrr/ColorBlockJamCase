@@ -6,7 +6,7 @@ namespace ColorBlockJam.SandBox.Board
 {
     // Rules of the board: the player drags blocks; one pushed into a same-colour gate it fits slides out
     // and is removed. Clear every block before the clock runs out. State is owned here and exposed read-only.
-    public sealed class BoardSimulation
+    public sealed partial class BoardSimulation
     {
         private readonly BoardRules _rules;
         // Shared with _movement, so removed blocks stop being obstacles there too.
@@ -16,6 +16,8 @@ namespace ColorBlockJam.SandBox.Board
         private readonly List<BoardEvent> _events = new List<BoardEvent>();
         // Events raised since the last TakeEvents.
         private readonly List<BoardEvent> _pendingEvents = new List<BoardEvent>();
+        // Numbers the blocks a Rocket split off, so their ids stay unique.
+        private int _splitCount;
 
         public int Cols { get; }
         public int Rows { get; }
@@ -23,6 +25,9 @@ namespace ColorBlockJam.SandBox.Board
         public double TimeLeft { get; private set; }
         // False while the clock still waits for the player's first move.
         public bool IsClockRunning { get; private set; }
+        // Seconds the clock still stands still for (Timer booster); counted down before TimeLeft.
+        public double FrozenTimeLeft { get; private set; }
+        public bool IsClockFrozen => FrozenTimeLeft > 0;
         public IReadOnlyList<BlockState> Blocks => _blocks;
         public IReadOnlyList<GateState> Gates => _gates;
         // Removed board cells.
@@ -120,9 +125,23 @@ namespace ColorBlockJam.SandBox.Board
             if (Status != BoardStatus.Playing || !IsClockRunning)
                 return;
 
-            TimeLeft = Math.Max(0, TimeLeft - Sanitize(seconds));
+            var passed = Sanitize(seconds);
+            var frozen = Math.Min(FrozenTimeLeft, passed);
+            FrozenTimeLeft -= frozen;
+            TimeLeft = Math.Max(0, TimeLeft - (passed - frozen));
             if (TimeLeft <= 0)
                 EndLevel(BoardStatus.Lost);
+        }
+
+        // Stops the running clock for the given seconds (Timer booster). Refused before the first move, once the level is
+        // over, or while it is already frozen.
+        public bool FreezeClock(double seconds)
+        {
+            if (Status != BoardStatus.Playing || !IsClockRunning || IsClockFrozen || Sanitize(seconds) <= 0)
+                return false;
+
+            FrozenTimeLeft = seconds;
+            return true;
         }
 
         // Puts more time on the clock ("Play On"); a level lost on time resumes where it stopped.
@@ -165,12 +184,101 @@ namespace ColorBlockJam.SandBox.Board
                 return;
 
             block.MoveTo(drop);
-            block.IsExiting = true;
             block.ExitGate = best;
             ClearDrag();
-            // The rules are done with it at once; the slide through the gate is the view's animation.
+            LeaveBoard(block, new BoardEvent(BoardEventType.BlockExitStarted, block, best));
+        }
+
+        // Hammer / Vacuum: the block leaves as if through a gate (cracks ice, may win). Not for an iced or held block.
+        public bool RemoveBlock(BlockState block)
+        {
+            if (Status != BoardStatus.Playing || block == null || block.IsExiting || block.Ice > 0 ||
+                block == DraggedBlock || !_blocks.Contains(block))
+                return false;
+
+            LeaveBoard(block, new BoardEvent(BoardEventType.BlockDestroyed, block));
+            return true;
+        }
+
+        // Rocket: breaks the block's piece on the given board cell. A one-cell block leaves like a gate exit; otherwise the
+        // block keeps its other cells, and groups of them that no longer touch become separate blocks of its colour.
+        // Not for an iced or held block, nor a cell the block does not cover.
+        public bool BreakCell(BlockState block, CellCoord cell)
+        {
+            if (Status != BoardStatus.Playing || block == null || block.IsExiting || block.Ice > 0 ||
+                block == DraggedBlock || !_blocks.Contains(block))
+                return false;
+
+            var offset = new CellCoord(cell.Col - block.Origin.Col, cell.Row - block.Origin.Row);
+            var rest = new List<CellCoord>(block.Cells);
+            if (!rest.Remove(offset))
+                return false;
+
+            if (rest.Count == 0)
+            {
+                LeaveBoard(block, new BoardEvent(BoardEventType.BlockDestroyed, block));
+                return true;
+            }
+
+            var parts = SplitConnected(rest);
+            block.Reshape(parts[0]);
+            _pendingEvents.Add(new BoardEvent(BoardEventType.BlockBroken, block, cell: cell));
+            for (var i = 1; i < parts.Count; i++)
+            {
+                var piece = new BlockState(new BlockData
+                {
+                    Id = $"{block.Id}~{++_splitCount}", Col = block.Origin.Col, Row = block.Origin.Row,
+                    Cells = parts[i].ToArray(), Color = block.Color, Axis = block.Axis
+                });
+                _blocks.Add(piece);
+                _pendingEvents.Add(new BoardEvent(BoardEventType.BlockAdded, piece));
+            }
+
+            return true;
+        }
+
+        // Groups of cells joined side to side.
+        private static List<List<CellCoord>> SplitConnected(List<CellCoord> cells)
+        {
+            var left = new HashSet<CellCoord>(cells);
+            var parts = new List<List<CellCoord>>();
+            var stack = new Stack<CellCoord>();
+            foreach (var start in cells)
+            {
+                if (!left.Remove(start)) continue;
+
+                var part = new List<CellCoord>();
+                stack.Push(start);
+                while (stack.Count > 0)
+                {
+                    var cell = stack.Pop();
+                    part.Add(cell);
+                    foreach (var next in Neighbours(cell))
+                    {
+                        if (left.Remove(next)) stack.Push(next);
+                    }
+                }
+
+                parts.Add(part);
+            }
+
+            return parts;
+        }
+
+        private static IEnumerable<CellCoord> Neighbours(CellCoord cell)
+        {
+            yield return new CellCoord(cell.Col + 1, cell.Row);
+            yield return new CellCoord(cell.Col - 1, cell.Row);
+            yield return new CellCoord(cell.Col, cell.Row + 1);
+            yield return new CellCoord(cell.Col, cell.Row - 1);
+        }
+
+        // The rules are done with a leaving block at once; how it goes is the view's animation.
+        private void LeaveBoard(BlockState block, BoardEvent leaveEvent)
+        {
+            block.IsExiting = true;
             _blocks.Remove(block);
-            _pendingEvents.Add(new BoardEvent(BoardEventType.BlockExitStarted, block, best));
+            _pendingEvents.Add(leaveEvent);
             CrackIce();
             if (_blocks.Count == 0)
                 EndLevel(BoardStatus.Won);

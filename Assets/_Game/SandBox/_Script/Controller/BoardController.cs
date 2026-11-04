@@ -26,6 +26,7 @@ namespace ColorBlockJam.SandBox
 
         private int _publishedSeconds;
         private bool _publishedClockRunning;
+        private bool _publishedClockFrozen;
 
         public BoardSimulation Simulation { get; private set; }
 
@@ -73,7 +74,8 @@ namespace ColorBlockJam.SandBox
             if (Simulation == null) return;
 
             // The first drag starts a waiting clock; publish so the HUD knows right away.
-            if (SecondsLeft() != _publishedSeconds || Simulation.IsClockRunning != _publishedClockRunning) PublishTime();
+            if (SecondsLeft() != _publishedSeconds || Simulation.IsClockRunning != _publishedClockRunning ||
+                Simulation.IsClockFrozen != _publishedClockFrozen) PublishTime();
 
             var events = Simulation.TakeEvents();
             _boardViewController.Apply(events);
@@ -95,7 +97,9 @@ namespace ColorBlockJam.SandBox
         {
             _publishedSeconds = SecondsLeft();
             _publishedClockRunning = Simulation.IsClockRunning;
-            _timeChangedPublisher.Publish(new LevelTimeChangedSignal(_publishedSeconds, _publishedClockRunning));
+            _publishedClockFrozen = Simulation.IsClockFrozen;
+            _timeChangedPublisher.Publish(new LevelTimeChangedSignal(_publishedSeconds, _publishedClockRunning,
+                _publishedClockFrozen));
         }
 
         // "Play On" bought more time; a level lost on time resumes.

@@ -23,6 +23,8 @@ namespace ColorBlockJam
             builder.Register<LifeController>(Lifetime.Singleton);
             builder.Register<CurrencyController>(Lifetime.Singleton);
             builder.Register<SettingsController>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<BoosterTutorialController>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<DragTutorialController>(Lifetime.Singleton);
             builder.RegisterEntryPoint<InputController>(Lifetime.Singleton).AsSelf();
         }
     }

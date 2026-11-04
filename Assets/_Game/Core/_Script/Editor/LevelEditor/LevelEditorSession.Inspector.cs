@@ -23,7 +23,8 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndVertical();
         }
 
-        // What can be done to the selection: ice and axis of blocks, then rotate / mirror / duplicate / delete.
+        // What can be done to the selection: obstacles of blocks (LevelEditorSession.Obstacles.cs), then rotate / mirror /
+        // duplicate / delete.
         private void DrawSelectionInspector()
         {
             PruneSelection();
@@ -31,7 +32,7 @@ namespace ColorBlockJam.LevelEditor
             var blocks = SelectedBlockIndices();
             if (blocks.Count > 0)
             {
-                DrawBlockRules(blocks);
+                DrawObstacles(blocks);
                 DrawBlockActions();
             }
             else if (selectedGates.Count > 0)
@@ -62,25 +63,6 @@ namespace ColorBlockJam.LevelEditor
             if (key == _inspectedSelection) return;
             _inspectedSelection = key;
             GUIUtility.keyboardControl = 0;
-        }
-
-        // Ice and move axis of the given blocks; a field shows "—" while they differ and sets all of them when changed.
-        private void DrawBlockRules(List<int> blocks)
-        {
-            var first = working.Blocks[blocks[0]];
-
-            EditorGUI.showMixedValue = blocks.Any(i => working.Blocks[i].Ice != first.Ice);
-            EditorGUI.BeginChangeCheck();
-            var ice = Mathf.Max(0, EditorGUILayout.IntField(
-                new GUIContent("Ice", "Frozen until this many blocks have left through gates; 0 = no ice"), first.Ice));
-            if (EditorGUI.EndChangeCheck()) Edit("Set Ice", l => blocks.Aggregate(false, (any, i) => Set(ref l.Blocks[i].Ice, ice) | any));
-
-            EditorGUI.showMixedValue = blocks.Any(i => working.Blocks[i].Axis != first.Axis);
-            EditorGUI.BeginChangeCheck();
-            var axis = (BlockAxis)EditorGUILayout.EnumPopup(
-                new GUIContent("Axis", "Free moves anywhere; Horizontal only along a row, Vertical only along a column"), first.Axis);
-            if (EditorGUI.EndChangeCheck()) Edit("Set Axis", l => blocks.Aggregate(false, (any, i) => Set(ref l.Blocks[i].Axis, axis) | any));
-            EditorGUI.showMixedValue = false;
         }
 
         private void DrawBlockActions()

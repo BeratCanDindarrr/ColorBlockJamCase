@@ -6,31 +6,19 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // Vibrates when its button is clicked (knit_Out's HapticComponent; it sits on every UI button). The button's own
-    // onClick wiring stays as it is.
+    // Vibrates when its button is clicked (knit_Out's HapticComponent; it sits on every UI button). The button's onClick
+    // in the prefab calls PlayHaptic.
     [RequireComponent(typeof(Button))]
-    public class HapticComponent : MonoBehaviour
+    public class HapticComponent : BaseView
     {
         [SerializeField] private MOST_HapticFeedback.HapticTypes hapticType = MOST_HapticFeedback.HapticTypes.Selection;
 
         private IHapticService _hapticService;
-        private Button _button;
 
         [Inject]
         public void Construct(IHapticService hapticService)
         {
             _hapticService = hapticService;
-        }
-
-        private void Awake()
-        {
-            _button = GetComponent<Button>();
-            _button.onClick.AddListener(PlayHaptic);
-        }
-
-        private void OnDestroy()
-        {
-            if (_button != null) _button.onClick.RemoveListener(PlayHaptic);
         }
 
         public void PlayHaptic()

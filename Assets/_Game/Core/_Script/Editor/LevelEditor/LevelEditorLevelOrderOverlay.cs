@@ -9,7 +9,8 @@ namespace ColorBlockJam.LevelEditor
 {
     // The order the game plays the levels in (LevelSettings.Levels), as in its inspector: drag a row by its handle, use
     // ▲ ▼, or the ⇥ button to type the position to send it to. Every change is saved to the asset at once.
-    // Opened from the level bar's Panels switches; closed by default.
+    // A second tab edits the boosters (LevelEditorBoosterTab). Opened from the level bar's Panels switches; closed by
+    // default.
     [Overlay(typeof(SceneView), LevelEditorSceneOverlays.LevelOrderId, "Level Order", defaultDisplay = false,
         defaultDockZone = DockZone.Floating)]
     internal sealed class LevelEditorLevelOrderOverlay : Overlay
@@ -20,6 +21,8 @@ namespace ColorBlockJam.LevelEditor
         private const float PositionWidth = 34f;
         private const float ArrowWidth = 22f;
         private const float Gap = 4f;
+        private const string TabKey = "ColorBlockJam.LevelEditor.LevelOrderTab";
+        private static readonly string[] Tabs = { "Levels", "Boosters" };
         private static readonly GUIContent PreviewContent =
             new GUIContent(EditorGUIUtility.IconContent("d_scenevis_visible_hover").image, "Preview: open this level in the editor");
 
@@ -28,6 +31,7 @@ namespace ColorBlockJam.LevelEditor
         private SerializedObject _serialized;
         private ReorderableList _list;
         private Vector2 _scroll;
+        private readonly LevelEditorBoosterTab _boosterTab = new LevelEditorBoosterTab();
         private int _moveFrom = -1;
         private int _moveTo = -1;
 
@@ -43,7 +47,19 @@ namespace ColorBlockJam.LevelEditor
 
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
 
+        // Two tabs: the level order, and the boosters' unlock levels, pictures and texts. The open tab is kept per user.
         private void Draw()
+        {
+            var tab = EditorPrefs.GetInt(TabKey, 0);
+            var picked = GUILayout.Toolbar(tab, Tabs);
+            if (picked != tab) EditorPrefs.SetInt(TabKey, picked);
+            GUILayout.Space(4f);
+
+            if (picked == 1) _boosterTab.Draw(MaxHeight);
+            else DrawLevels();
+        }
+
+        private void DrawLevels()
         {
             var settings = LevelEditorAssets.FindLevelSettings();
             if (settings == null)

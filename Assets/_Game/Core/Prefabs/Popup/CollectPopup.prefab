@@ -660,7 +660,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8658186860746970490}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 322704097488726257}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &322704097488726257
 MonoBehaviour:
   m_ObjectHideFlags: 0

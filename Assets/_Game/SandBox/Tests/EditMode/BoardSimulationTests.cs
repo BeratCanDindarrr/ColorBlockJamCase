@@ -289,5 +289,173 @@ namespace ColorBlockJam.SandBox.Board.Tests
             Assert.That(block.IsExiting, Is.True);
             Assert.That(block.ExitGate.Edge, Is.EqualTo(BoardEdge.Top));
         }
+
+        [Test]
+        public void FreezeClock_BeforeClockRuns_Refused()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
+
+            Assert.That(sim.FreezeClock(30), Is.False);
+            Assert.That(sim.IsClockFrozen, Is.False);
+        }
+
+        [Test]
+        public void FreezeClock_StopsTime_ThenClockRunsOn()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules(clockWaitsForFirstMove: false));
+
+            Assert.That(sim.FreezeClock(30), Is.True);
+            sim.AdvanceClock(20);
+            Assert.That(sim.TimeLeft, Is.EqualTo(60));
+            Assert.That(sim.IsClockFrozen, Is.True);
+
+            // 10 s of freeze are left: the other 5 come off the clock.
+            sim.AdvanceClock(15);
+            Assert.That(sim.IsClockFrozen, Is.False);
+            Assert.That(sim.TimeLeft, Is.EqualTo(55));
+        }
+
+        [Test]
+        public void FreezeClock_WhileFrozen_Refused()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules(clockWaitsForFirstMove: false));
+            sim.FreezeClock(30);
+
+            Assert.That(sim.FreezeClock(30), Is.False);
+            Assert.That(sim.FrozenTimeLeft, Is.EqualTo(30));
+        }
+
+        [Test]
+        public void FreezeClock_AfterLevelEnded_Refused()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules(clockWaitsForFirstMove: false));
+            sim.AdvanceClock(61);
+
+            Assert.That(sim.FreezeClock(30), Is.False);
+        }
+
+        [Test]
+        public void RemoveBlock_LeavesBoard_WithDestroyedEvent()
+        {
+            var sim = new BoardSimulation(TwoBlocksTwoGates(), Rules());
+            var block = Find(sim, "A");
+
+            Assert.That(sim.RemoveBlock(block), Is.True);
+
+            Assert.That(sim.Blocks, Has.No.Member(block));
+            Assert.That(sim.BlockAt(new BoardPoint(0.5, 0.5)), Is.Null);
+            var removed = sim.TakeEvents().Single();
+            Assert.That(removed.Type, Is.EqualTo(BoardEventType.BlockDestroyed));
+            Assert.That(removed.Block, Is.SameAs(block));
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Playing));
+        }
+
+        [Test]
+        public void RemoveBlock_CracksIce_LikeAnExit()
+        {
+            var sim = IcedLevel(1);
+            var iced = Find(sim, "B");
+
+            sim.RemoveBlock(Find(sim, "A"));
+
+            Assert.That(iced.Ice, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void RemoveBlock_LastBlock_Won()
+        {
+            var sim = new BoardSimulation(OneBlockOneGate(60), Rules());
+
+            sim.RemoveBlock(Find(sim, "A"));
+
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+        }
+
+        [Test]
+        public void RemoveBlock_IcedOrHeldBlock_Refused()
+        {
+            var sim = IcedLevel(1);
+            Assert.That(sim.RemoveBlock(Find(sim, "B")), Is.False);
+
+            var held = Find(sim, "A");
+            sim.BeginDrag(held);
+            Assert.That(sim.RemoveBlock(held), Is.False);
+            Assert.That(sim.Blocks, Has.Member(held));
+        }
+
+        private static BoardSimulation SingleBlockLevel(params int[] cells)
+        {
+            var blocks = new[] { Block("A", 1, 1, BlockColor.Red, Cells(cells)) };
+            var gates = new[] { Gate(BoardEdge.Left, 1, 1, BlockColor.Red) };
+            return new BoardSimulation(Create(GridSize, GridSize, 60, blocks, gates), Rules());
+        }
+
+        [Test]
+        public void BreakCell_SquareLosesOneCell_KeepsTheOtherThree()
+        {
+            var sim = SingleBlockLevel(0, 0, 1, 0, 0, 1, 1, 1);
+            var block = Find(sim, "A");
+
+            // The bottom-left piece of the 2x2 (offset (0,1) at origin (1,1)).
+            Assert.That(sim.BreakCell(block, new CellCoord(1, 2)), Is.True);
+
+            Assert.That(block.Cells, Is.EquivalentTo(Cells(0, 0, 1, 0, 1, 1)));
+            Assert.That(sim.Blocks.Count, Is.EqualTo(1));
+            var broken = sim.TakeEvents().Single();
+            Assert.That(broken.Type, Is.EqualTo(BoardEventType.BlockBroken));
+            Assert.That(broken.Cell, Is.EqualTo(new CellCoord(1, 2)));
+        }
+
+        [Test]
+        public void BreakCell_MiddleOfALine_SplitsIntoTwoBlocks()
+        {
+            var sim = SingleBlockLevel(0, 0, 1, 0, 2, 0);
+            var block = Find(sim, "A");
+
+            sim.BreakCell(block, new CellCoord(2, 1));
+
+            Assert.That(sim.Blocks.Count, Is.EqualTo(2));
+            var other = sim.Blocks.Single(b => b != block);
+            Assert.That(other.Color, Is.EqualTo(BlockColor.Red));
+            Assert.That(other.Id, Is.Not.EqualTo(block.Id));
+            var cells = sim.Blocks.SelectMany(b => b.OccupiedCells(b.Origin)).ToList();
+            Assert.That(cells, Is.EquivalentTo(new[] { new CellCoord(1, 1), new CellCoord(3, 1) }));
+            Assert.That(sim.TakeEvents().Select(e => e.Type),
+                Is.EqualTo(new[] { BoardEventType.BlockBroken, BoardEventType.BlockAdded }));
+        }
+
+        [Test]
+        public void BreakCell_OneCellBlock_LeavesLikeAnExit()
+        {
+            var sim = SingleBlockLevel(0, 0);
+
+            sim.BreakCell(Find(sim, "A"), new CellCoord(1, 1));
+
+            Assert.That(sim.Blocks, Is.Empty);
+            Assert.That(sim.Status, Is.EqualTo(BoardStatus.Won));
+        }
+
+        [Test]
+        public void BreakCell_ShrinkingBlock_DoesNotCrackIce()
+        {
+            var b = Block("B", GridSize - 1, GridSize - 1, BlockColor.Blue, Cells(0, 0));
+            b.Ice = 1;
+            var blocks = new[] { Block("A", 0, 0, BlockColor.Red, Cells(0, 0, 1, 0)), b };
+            var sim = new BoardSimulation(Create(GridSize, GridSize, 60, blocks, new GateData[0]), Rules());
+
+            sim.BreakCell(Find(sim, "A"), new CellCoord(1, 0));
+
+            Assert.That(Find(sim, "B").Ice, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void BreakCell_IcedBlockOrForeignCell_Refused()
+        {
+            var sim = IcedLevel(1);
+
+            Assert.That(sim.BreakCell(Find(sim, "B"), new CellCoord(GridSize - 1, GridSize - 1)), Is.False);
+            Assert.That(sim.BreakCell(Find(sim, "A"), new CellCoord(3, 3)), Is.False);
+            Assert.That(sim.Blocks.Count, Is.EqualTo(2));
+        }
     }
 }

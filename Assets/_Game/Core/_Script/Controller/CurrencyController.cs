@@ -39,6 +39,7 @@ namespace ColorBlockJam.Core.Controller
                 booster1 = _currencySettings.StartBoosterCount,
                 booster2 = _currencySettings.StartBoosterCount,
                 booster3 = _currencySettings.StartBoosterCount,
+                booster4 = _currencySettings.StartBoosterCount,
                 removeAdCount = 0
             };
 
@@ -57,6 +58,8 @@ namespace ColorBlockJam.Core.Controller
                     return _model.booster2;
                 case CurrencyType.Booster3:
                     return _model.booster3;
+                case CurrencyType.Booster4:
+                    return _model.booster4;
                 case CurrencyType.RemoveAds:
                     return _model.removeAdCount;
                 default:
@@ -72,6 +75,7 @@ namespace ColorBlockJam.Core.Controller
                 case CurrencyType.Booster1:
                 case CurrencyType.Booster2:
                 case CurrencyType.Booster3:
+                case CurrencyType.Booster4:
                 case CurrencyType.RemoveAds:
                     return currencyData.currencyValue <= GetCurrency(currencyData.currencyType);
                 default:
@@ -99,6 +103,9 @@ namespace ColorBlockJam.Core.Controller
                     break;
                 case CurrencyType.Booster3:
                     _model.booster3 = currencyData.currencyValue;
+                    break;
+                case CurrencyType.Booster4:
+                    _model.booster4 = currencyData.currencyValue;
                     break;
                 case CurrencyType.RemoveAds:
                     _model.removeAdCount = currencyData.currencyValue;

@@ -13,3 +13,10 @@ MonoBehaviour:
   m_Name: ApplicationSettings
   m_EditorClassIdentifier: 
   ApplicationName: Color Block Jam
+  TargetFrameRate: 60
+  NeverSleep: 1
+  MultiTouch: 0
+  RunInBackground: 0
+  FixedDeltaTime: 0.02
+  TweenCapacity: 800
+  SequenceCapacity: 100

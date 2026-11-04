@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    public class FloorTileView : MonoBehaviour
+    public class FloorTileView : ColorBlockJam.Views.BaseView
     {
         [SerializeField] private MeshRenderer meshRenderer;
 

@@ -1,5 +1,8 @@
 using System;
 using ColorBlockJam.Core.Controller;
+using ColorBlockJam.Core.Model;
+using ColorBlockJam.Core.Settings;
+using ColorBlockJam.Enums;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
 using MessagePipe;
@@ -20,20 +23,38 @@ namespace ColorBlockJam.Views
         [SerializeField] private TextMeshProUGUI levelText;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private TextMeshProUGUI resultText;
+        [SerializeField] private InGameBoosterView[] boosterViews;
+        [SerializeField] private TutorialView tutorialView;
+        [SerializeField] private GraphicRaycaster raycaster;
 
         private IPopupService _popupService;
         private PlayerController _playerController;
         private ISubscriber<LevelTimeChangedSignal> _timeChangedSubscriber;
         private ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
         private ISubscriber<TimePurchasedSignal> _timePurchasedSubscriber;
+        private ISubscriber<CurrencyUpdateSignal> _currencyUpdateSubscriber;
+        private ISubscriber<BoosterRequestedSignal> _boosterRequestedSubscriber;
+        private ISubscriber<BoosterEndedSignal> _boosterEndedSubscriber;
+        private CurrencyController _currencyController;
         private IDisposable _subscriptions;
 
         [Inject]
         public void Construct(IPopupService popupService, PlayerController playerController,
             ISubscriber<LevelTimeChangedSignal> timeChangedSubscriber,
             ISubscriber<LevelEndedSignal> levelEndedSubscriber,
-            ISubscriber<TimePurchasedSignal> timePurchasedSubscriber)
+            ISubscriber<TimePurchasedSignal> timePurchasedSubscriber,
+            CurrencyController currencyController, BoosterSettings boosterSettings,
+            IPublisher<BoosterRequestedSignal> boosterRequestedPublisher,
+            ISubscriber<BoosterRequestedSignal> boosterRequestedSubscriber,
+            ISubscriber<BoosterEndedSignal> boosterEndedSubscriber,
+            ISubscriber<CurrencyUpdateSignal> currencyUpdateSubscriber)
         {
+            _currencyController = currencyController;
+            _currencyUpdateSubscriber = currencyUpdateSubscriber;
+            _boosterRequestedSubscriber = boosterRequestedSubscriber;
+            _boosterEndedSubscriber = boosterEndedSubscriber;
+            foreach (var view in boosterViews)
+                view.Construct(currencyController, playerController, boosterSettings, boosterRequestedPublisher);
             _timePurchasedSubscriber = timePurchasedSubscriber;
             _popupService = popupService;
             _playerController = playerController;
@@ -50,6 +71,10 @@ namespace ColorBlockJam.Views
             _levelEndedSubscriber.Subscribe(OnLevelEnded).AddTo(bag);
             // Play On resumes the lost level.
             _timePurchasedSubscriber.Subscribe(_ => resultText.gameObject.SetActive(false)).AddTo(bag);
+            _currencyUpdateSubscriber.Subscribe(_ => RefreshBoosters()).AddTo(bag);
+            // One booster at a time: every button waits until the board has finished with the requested one.
+            _boosterRequestedSubscriber.Subscribe(_ => SetBoostersBlocked(true)).AddTo(bag);
+            _boosterEndedSubscriber.Subscribe(OnBoosterEnded).AddTo(bag);
             _subscriptions = bag.Build();
         }
 
@@ -69,7 +94,18 @@ namespace ColorBlockJam.Views
         {
             resultText.gameObject.SetActive(false);
             levelText.text = string.Format(LevelFormat, _playerController.GetVisualLevel());
+            SetBoostersBlocked(false);
             gameObject.SetActive(true);
+        }
+
+        private void SetBoostersBlocked(bool blocked)
+        {
+            foreach (var view in boosterViews) view.SetBlocked(blocked);
+        }
+
+        private void RefreshBoosters()
+        {
+            foreach (var view in boosterViews) view.Refresh();
         }
 
         private void OnTimeChanged(LevelTimeChangedSignal signal)
@@ -77,6 +113,41 @@ namespace ColorBlockJam.Views
             var seconds = Mathf.Max(0, signal.SecondsLeft);
             timerText.text = $"{seconds / 60}:{seconds % 60:00}";
             retryButton.interactable = signal.IsClockRunning;
+            var timer = BoosterView(CurrencyType.Booster1);
+            if (timer == null) return;
+            timer.SetUnavailable(!signal.IsClockRunning || signal.IsClockFrozen);
+            timer.SetEffectActive(signal.IsClockFrozen);
+        }
+
+        // The board spends nothing itself (it holds no Core controller); a used booster is taken off here.
+        private void OnBoosterEnded(BoosterEndedSignal signal)
+        {
+            if (signal.Used) _currencyController.TryConsume(new CurrencyData(signal.Type, 1));
+            SetBoostersBlocked(false);
+        }
+
+        public TutorialView Tutorial => tutorialView;
+
+        public RectTransform BoosterButton(CurrencyType type)
+        {
+            var view = BoosterView(type);
+            return view != null ? (RectTransform)view.transform : null;
+        }
+
+        // Off: no HUD button takes a tap and taps reach the board (a booster tutorial waiting for its target).
+        public void SetRaycasts(bool on)
+        {
+            raycaster.enabled = on;
+        }
+
+        private InGameBoosterView BoosterView(CurrencyType type)
+        {
+            foreach (var view in boosterViews)
+            {
+                if (view.BoosterType == type) return view;
+            }
+
+            return null;
         }
 
         // A win goes straight on to the LevelComplete popup (ApplicationController); only a loss is shown here.

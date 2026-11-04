@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ColorBlockJam.SandBox
 {
     // The arrow on a block that may only slide one way.
-    public class BlockAxisView : MonoBehaviour
+    public class BlockAxisView : ColorBlockJam.Views.BaseView
     {
         // The arrow meshes run along board rows (local z); a horizontal block turns them a quarter.
         private const float HorizontalYaw = 90f;

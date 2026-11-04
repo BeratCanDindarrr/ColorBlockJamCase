@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace ColorBlockJam.Views
 {
     // On/off switch of the settings popups: each click flips it; while off its graphics draw in grayscale.
-    public class SettingsToggleButtonView : MonoBehaviour
+    public class SettingsToggleButtonView : BaseView
     {
         [SerializeField] private Button button;
         [SerializeField] private Graphic[] graphics;
@@ -22,7 +22,7 @@ namespace ColorBlockJam.Views
             UpdateLook();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             button.onClick.RemoveListener(OnClicked);
             _onChanged = null;

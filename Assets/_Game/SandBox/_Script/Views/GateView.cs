@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ColorBlockJam.SandBox
 {
     // One door mesh per gate cell, laid along the gate's local x.
-    public class GateView : MonoBehaviour, IPoolable
+    public class GateView : ColorBlockJam.Views.BaseView, IPoolable
     {
         private const float Half = 0.5f;
 

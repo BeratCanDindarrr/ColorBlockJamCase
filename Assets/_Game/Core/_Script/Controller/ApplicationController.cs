@@ -68,6 +68,7 @@ namespace ColorBlockJam.Core.Controller
         public void Initialize()
         {
             DebugExtension.Log("ApplicationController initialized " + _applicationSettings.ApplicationName);
+            _applicationSettings.Apply();
             // First: everything after it may read the save.
             _storageService.Init();
             _playerController.Init();

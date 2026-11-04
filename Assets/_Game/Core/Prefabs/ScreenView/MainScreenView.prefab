@@ -451,7 +451,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7259767483903189742}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4163627405190783393}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4163627405190783393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -760,7 +772,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6588286664654834071}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8431381329472576020}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8431381329472576020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1439,7 +1463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1579,7 +1603,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7991472529469477637}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8287729597257674368}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &3472905976702556845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1736,7 +1772,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 396157150062759424}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6166932279257611624}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2639320008421977546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2430,7 +2478,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 902873692028079594}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5707270171868796684}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4784790509455062629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2776,7 +2836,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8895860635666777638}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1573078852539575991}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7377234395403449540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3274,7 +3346,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8732538996595993057}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 644629200012432557}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5716055957636572593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3643,7 +3727,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2319216607197447654}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5249600172309865214}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!222 &6383707227369275481
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4149,7 +4245,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4241568585566827470}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2389638980474718071}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!222 &1957692166201453028
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4893,7 +5001,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 168846901525731653}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3301747763232292300}
+        m_TargetAssemblyTypeName: ColorBlockJam.Views.HapticComponent, ColorBlockJam.Core
+        m_MethodName: PlayHaptic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5231048470594553209
 MonoBehaviour:
   m_ObjectHideFlags: 0

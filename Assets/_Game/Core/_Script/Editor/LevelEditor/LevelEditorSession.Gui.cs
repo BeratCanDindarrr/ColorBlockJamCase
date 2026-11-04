@@ -143,7 +143,7 @@ namespace ColorBlockJam.LevelEditor
                 "Properties\nColours and the selected blocks or gates");
             DrawPanelToggle(LevelEditorSceneOverlays.ShapesId, "d_Prefab Icon", "Shapes\nSaved block shapes to drag onto the board");
             DrawPanelToggle(LevelEditorSceneOverlays.LevelOrderId, "d_VerticalLayoutGroup Icon",
-                "Level Order\nThe order the game plays the levels in: drag, ▲ ▼ or type a position");
+                "Level Order\nThe order the game plays the levels in, and the boosters' unlock levels, pictures and texts");
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
         }

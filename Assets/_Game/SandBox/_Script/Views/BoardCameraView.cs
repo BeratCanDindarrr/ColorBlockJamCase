@@ -4,7 +4,7 @@ using VContainer;
 
 namespace ColorBlockJam.SandBox
 {
-    public class BoardCameraView : MonoBehaviour
+    public class BoardCameraView : ColorBlockJam.Views.BaseView
     {
         private const float Half = 0.5f;
         private const float CellCountTolerance = 0.001f;

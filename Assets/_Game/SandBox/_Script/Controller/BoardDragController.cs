@@ -23,6 +23,8 @@ namespace ColorBlockJam.SandBox
         private readonly ISubscriber<OnFingerUpSignal> _fingerUpSubscriber;
         private readonly IAudioService _audioService;
         private readonly IHapticService _hapticService;
+        private readonly BoardBoosterController _boosterController;
+        private readonly BoardTutorialController _tutorialController;
 
         private IDisposable _subscriptions;
         private BlockState _heldBlock;
@@ -35,8 +37,11 @@ namespace ColorBlockJam.SandBox
             ISubscriber<OnFingerDownSignal> fingerDownSubscriber,
             ISubscriber<OnFingerUpdateSignal> fingerUpdateSubscriber,
             ISubscriber<OnFingerUpSignal> fingerUpSubscriber,
-            IAudioService audioService, IHapticService hapticService)
+            IAudioService audioService, IHapticService hapticService, BoardBoosterController boosterController,
+            BoardTutorialController tutorialController)
         {
+            _tutorialController = tutorialController;
+            _boosterController = boosterController;
             _audioService = audioService;
             _hapticService = hapticService;
             _boardController = boardController;
@@ -78,12 +83,22 @@ namespace ColorBlockJam.SandBox
 
             // Pressed a HUD button (e.g. Home) over the board: let the UI handle it, don't pick up a block.
             if (finger.StartedOverGui) return;
+            if (_boosterController.IsBusy) return;
 
-            if (!TryGetBoardPoint(finger.ScreenPosition, out var point)) return;
+            var onBoard = TryGetBoardPoint(finger.ScreenPosition, out var point);
+            // A booster waiting for a target takes the tap instead of the drag.
+            if (_boosterController.IsSelecting)
+            {
+                _boosterController.HandleTap(onBoard ? point : (BoardPoint?)null);
+                return;
+            }
+
+            if (!onBoard) return;
 
             var block = simulation.BlockAt(point);
-            if (!simulation.BeginDrag(block)) return;
+            if (!_tutorialController.CanPick(block) || !simulation.BeginDrag(block)) return;
             _boardController.Flush();
+            _tutorialController.OnDragStarted(block);
             // Picking a block clicks like a button.
             _audioService.PlaySfx(SfxName.Buttons);
             _hapticService.Play(MOST_HapticFeedback.HapticTypes.Selection);
@@ -104,6 +119,7 @@ namespace ColorBlockJam.SandBox
             // Pushed into a gate it fits: the rules let go of it; the view follows the BlockExitStarted event.
             if (simulation.DraggedBlock != _heldBlock)
             {
+                _tutorialController.OnDragEnded(_heldBlock);
                 Reset();
                 return;
             }
@@ -118,6 +134,7 @@ namespace ColorBlockJam.SandBox
 
             _boardController.Simulation.EndDrag();
             _boardController.Flush();
+            _tutorialController.OnDragEnded(_heldBlock);
             Reset();
         }
 

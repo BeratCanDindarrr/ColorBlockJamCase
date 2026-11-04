@@ -10,7 +10,7 @@ using VContainer;
 namespace ColorBlockJam.SandBox
 {
     // A block built from quarter-cell modular pieces (see BlockOutline). Local units are cells.
-    public class BlockView : MonoBehaviour, IPoolable
+    public partial class BlockView : ColorBlockJam.Views.BaseView, IPoolable
     {
         private const float Quarter = 0.25f;
         private const float Half = 0.5f;
@@ -26,6 +26,8 @@ namespace ColorBlockJam.SandBox
         [SerializeField] private BlockAxisView axisView;
 
         private readonly List<BlockPieceView> _pieces = new List<BlockPieceView>();
+        // The block cell (offset from Origin) each entry of _pieces belongs to.
+        private readonly List<CellCoord> _pieceCells = new List<CellCoord>();
         private readonly HashSet<CellCoord> _cells = new HashSet<CellCoord>();
         // Pieces still riding the exit slide; a piece leaves this list when it shatters.
         private readonly List<BlockPieceView> _intact = new List<BlockPieceView>();
@@ -65,7 +67,15 @@ namespace ColorBlockJam.SandBox
             transform.localPosition = layout.CellToLocal(block.Origin);
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one * layout.CellSize;
+            _color = color;
+            BuildShape();
+        }
 
+        // Pieces, ice count and axis arrow for Block's current cells.
+        private void BuildShape()
+        {
+            var block = Block;
+            var color = _color;
             _cells.Clear();
             _cells.UnionWith(block.Cells);
             _centroid = Vector3.zero;
@@ -73,7 +83,6 @@ namespace ColorBlockJam.SandBox
                 _centroid += new Vector3(cell.Col, 0f, -cell.Row);
             if (block.Cells.Count > 0) _centroid /= block.Cells.Count;
 
-            _color = color;
             var frozen = block.Ice > 0;
             var shown = frozen ? IceTinted(color) : color;
             var texture = frozen ? _boardSettings.IceTexture : null;
@@ -174,6 +183,47 @@ namespace ColorBlockJam.SandBox
                 .OnComplete(ShatterIntact);
         }
 
+        // Hammer / Vacuum: a jolt, then every piece breaks off upward; onShattered runs once all are gone.
+        public void PlayDestroy(Action<BlockView> onShattered)
+        {
+            _exitDirection = Vector3.up;
+            _onShattered = onShattered;
+            _intact.Clear();
+            _intact.AddRange(_pieces);
+            axisView.Hide();
+
+            transform.DOKill();
+            ResetHeldPose();
+            transform.DOPunchScale(transform.localScale * _animationSettings.DestroyPunch, _animationSettings.DestroyPunchDuration)
+                .SetLink(gameObject)
+                .OnComplete(ShatterIntact);
+        }
+
+        // Vacuum: the block swells, then shrinks into the floor under it as if sucked in. It scales about its own centre.
+        public void PlayVacuum(Action<BlockView> onDone)
+        {
+            _onShattered = onDone;
+            axisView.Hide();
+            transform.DOKill();
+            ResetHeldPose();
+
+            var start = transform.localPosition;
+            var baseScale = transform.localScale;
+            // Scaling the block about its centre: the origin moves by centre * (1 - scale).
+            var centre = _centroid * baseScale.x;
+            var grow = _animationSettings.VacuumGrowScale;
+            var sink = Vector3.down * (_animationSettings.VacuumSinkDepth * baseScale.x);
+            var grown = _animationSettings.VacuumGrowDuration;
+            var shrink = _animationSettings.VacuumShrinkDuration;
+
+            DOTween.Sequence().SetTarget(transform).SetLink(gameObject)
+                .Append(transform.DOScale(baseScale * grow, grown).SetEase(Ease.OutQuad))
+                .Join(transform.DOLocalMove(start + centre * (1f - grow), grown).SetEase(Ease.OutQuad))
+                .Append(transform.DOScale(Vector3.zero, shrink).SetEase(Ease.InQuad))
+                .Join(transform.DOLocalMove(start + centre + sink, shrink).SetEase(Ease.InQuad))
+                .OnComplete(FinishShatter);
+        }
+
         public void SetLayer(int layer)
         {
             foreach (var child in GetComponentsInChildren<Transform>(true))
@@ -192,7 +242,10 @@ namespace ColorBlockJam.SandBox
             }
 
             _pieces.Clear();
+            _pieceCells.Clear();
             _intact.Clear();
+            ReleaseBrokenPieces();
+            SetTargetMark(false);
             iceView.Hide();
             axisView.Hide();
             ResetHeldPose();
@@ -334,6 +387,7 @@ namespace ColorBlockJam.SandBox
             view.transform.localRotation = Quaternion.Euler(0f, GetYaw(piece), 0f);
             view.Set(piece.Kind, color, texture);
             _pieces.Add(view);
+            _pieceCells.Add(cell);
         }
 
         private static float GetYaw(BlockPiece piece)

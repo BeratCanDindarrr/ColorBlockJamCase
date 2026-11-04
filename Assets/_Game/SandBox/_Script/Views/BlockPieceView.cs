@@ -7,7 +7,7 @@ namespace ColorBlockJam.SandBox
 {
     // One quarter-cell piece of a block. The kit tiles span [0,1] in mesh x/y (the inner corner spans [-1,1]),
     // so the mesh child is shifted to centre the tile on this transform and to put its bottom on the floor.
-    public class BlockPieceView : MonoBehaviour, IPoolable
+    public class BlockPieceView : ColorBlockJam.Views.BaseView, IPoolable
     {
         // Measured from BlockParts.fbx at the prefab's 0.5 kit scale: tile centre (0.25, 0.25), bottom 0.33 below the pivot.
         private const float TileShift = 0.25f;

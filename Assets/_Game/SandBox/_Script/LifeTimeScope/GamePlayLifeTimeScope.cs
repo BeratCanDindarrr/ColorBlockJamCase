@@ -33,12 +33,16 @@ namespace ColorBlockJam.SandBox
             builder.Register<LevelController>(Lifetime.Singleton);
             builder.Register<BoardController>(Lifetime.Singleton);
             builder.Register<BoardDragController>(Lifetime.Singleton);
+            builder.Register<BoardBoosterController>(Lifetime.Singleton);
+            builder.Register<BoardTutorialController>(Lifetime.Singleton);
             // No VContainer entry points in gameplay: the board starts here, explicitly, once the container is built.
             builder.RegisterBuildCallback(container =>
             {
                 var playerController = container.Resolve<PlayerController>();
                 container.Resolve<LevelController>().LoadLevel(playerController.GetDataLevel());
                 container.Resolve<BoardDragController>().Init();
+                container.Resolve<BoardBoosterController>().Init();
+                container.Resolve<BoardTutorialController>().Init();
             });
         }
     }

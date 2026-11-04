@@ -13,7 +13,7 @@ namespace ColorBlockJam.SandBox.Board
         public BlockColor Color { get; }
         public CellCoord Origin { get; private set; }
         // Cell offsets from Origin that make up this block's footprint.
-        public IReadOnlyList<CellCoord> Cells { get; }
+        public IReadOnlyList<CellCoord> Cells { get; private set; }
 
         // Frozen (cannot be picked up) until this many more blocks have left the board.
         public int Ice { get; internal set; }
@@ -32,6 +32,9 @@ namespace ColorBlockJam.SandBox.Board
         }
 
         internal void MoveTo(CellCoord origin) => Origin = origin;
+
+        // Rocket: the block's footprint after a piece broke off (offsets from the same Origin).
+        internal void Reshape(IEnumerable<CellCoord> cells) => Cells = new List<CellCoord>(cells).ToArray();
 
         // The finger's target with the locked axis held at the block's current position.
         public BoardPoint LockToAxis(BoardPoint current, BoardPoint target)

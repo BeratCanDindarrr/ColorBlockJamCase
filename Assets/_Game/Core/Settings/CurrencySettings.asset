@@ -13,18 +13,20 @@ MonoBehaviour:
   m_Name: CurrencySettings
   m_EditorClassIdentifier: 
   StartCoin: 1000
-  StartBoosterCount: 3
+  StartBoosterCount: 4
   Icons:
   - Type: 0
     Icon: {fileID: 21300000, guid: cabdc010301914d1d8210f9fb17662eb, type: 3}
   - Type: 1
-    Icon: {fileID: 21300000, guid: c9c6ae929bbd64ae9890cca7f33b8a88, type: 3}
+    Icon: {fileID: 21300000, guid: 061ba72da62d94d4196ec9d498356c1c, type: 3}
   - Type: 2
     Icon: {fileID: 21300000, guid: ac6e06c6ca081468faad5b6b5aec8015, type: 3}
   - Type: 3
-    Icon: {fileID: 21300000, guid: 0231c6116f6b9405595bb3984a56c4b7, type: 3}
+    Icon: {fileID: 21300000, guid: c9c6ae929bbd64ae9890cca7f33b8a88, type: 3}
   - Type: 4
     Icon: {fileID: 21300000, guid: 508c8ea0d27324869aeea37351d785f2, type: 3}
+  - Type: 6
+    Icon: {fileID: 21300000, guid: b639fc31d4036452ba90627bbc41bceb, type: 3}
   CoinViewPrefab: {fileID: 7909533529630191656, guid: b0daea0eeac2444938e63885527695cf, type: 3}
   LifeTimeViewPrefab: {fileID: 8260779201235931853, guid: 0cc7c8da7e30944ac81c64f44027a334, type: 3}
   BoosterViewPrefab: {fileID: 7470654253059322667, guid: 43c4de3abc3584aa29e334cce971ef9e, type: 3}

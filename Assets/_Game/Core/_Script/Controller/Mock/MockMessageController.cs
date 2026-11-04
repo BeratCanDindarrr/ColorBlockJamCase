@@ -16,7 +16,7 @@ namespace ColorBlockJam.Core.Controller.Mock
     // knit_Out's MockMessageController: a scene object whose Inspector (MockMessageControllerEditor) has buttons that
     // drive the running game's controllers, popups and tasks, for checking flows by hand in Play Mode. The fields are
     // the buttons' inputs. Optional: ControllerLifeTimeScope injects it when the scene has one.
-    public class MockMessageController : MonoBehaviour
+    public class MockMessageController : BaseView
     {
         [Header("Currency")]
         public CurrencyType currencyType = CurrencyType.Coin;

@@ -27,7 +27,7 @@ MonoBehaviour:
     - Col: 1
       Row: 1
     Color: 0
-    Ice: 1
+    Ice: 3
     Axis: 0
   - Id: B
     Col: 2

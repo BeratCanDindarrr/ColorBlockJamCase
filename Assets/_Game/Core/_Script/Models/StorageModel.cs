@@ -11,6 +11,7 @@ namespace ColorBlockJam.Core.Model
         public CurrencyModel currencyModel;
         public LifeModel lifeModel;
         public SettingsModel settingsModel;
+        public BoosterTutorialModel boosterTutorialModel;
     }
 
     // What StorageService writes to PlayerPrefs: the serialized StorageModel and its save count.

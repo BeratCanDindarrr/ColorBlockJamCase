@@ -34,7 +34,9 @@ namespace ColorBlockJam.Enums
         Booster3 = 3,
         // Limitless life, value in seconds.
         Time = 4,
-        RemoveAds = 5
+        RemoveAds = 5,
+        // After the original five so saved values keep their meaning.
+        Booster4 = 6
     }
 
     public enum CurrencyUpdateType

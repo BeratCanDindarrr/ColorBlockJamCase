@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace ColorBlockJam.Views
 {
     // One reward in the collect popup: the currency's picture and how much of it.
-    public class CollectRewardItemView : MonoBehaviour
+    public class CollectRewardItemView : BaseView
     {
         [SerializeField] private Image icon;
         [SerializeField] private TextMeshProUGUI countLabel;
