@@ -1,4 +1,5 @@
 using System;
+using ColorBlockJam.Utils;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -15,6 +16,10 @@ namespace ColorBlockJam.Views
         [SerializeField] private Button lifeButton;
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private TextMeshProUGUI lifeText;
+        // Under the life icon: how long limitless lives last; hidden otherwise.
+        [SerializeField] private TextMeshProUGUI lifeTimeText;
+        // The ∞ shown while lives are limitless is drawn this many times the count's size.
+        [SerializeField] private float infinityScale = 1.6f;
         [SerializeField] private Transform coinImageTransform;
         [SerializeField] private Transform lifeImageTransform;
         public Transform CoinImageTransform => coinImageTransform;
@@ -61,7 +66,12 @@ namespace ColorBlockJam.Views
                 .SetLink(gameObject);
         }
 
-        public void SetLife(string life) => lifeText.SetText(life);
+        public void SetLife(string life, bool limitless, long secondsLeft)
+        {
+            lifeText.SetText(limitless ? $"<size={infinityScale * 100f:0}%>{life}</size>" : life);
+            lifeTimeText.gameObject.SetActive(limitless);
+            if (limitless) lifeTimeText.SetText(CurrencyText.Countdown(secondsLeft));
+        }
 
         private void OnProfileClicked() => ProfileClicked?.Invoke();
 

@@ -10,7 +10,7 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    public class MainScreenPage2View : MainScreenBasePageView
+    public class MainScreenPage2View : MainScreenBasePageView, ITimerOwner
     {
         // Page 0 of the main screen is the shop.
         private const int ShopPage = 0;
@@ -29,6 +29,7 @@ namespace ColorBlockJam.Views
         private ISubscriber<LifeModelSync> _lifeModelSyncSubscriber;
         private ISubscriber<LevelUpSignal> _levelUpSubscriber;
         private IAudioService _audioService;
+        private ITimerSubscriber _timerSubscriber;
         private IDisposable _subscriptions;
 
         [Inject]
@@ -41,8 +42,10 @@ namespace ColorBlockJam.Views
             , ISubscriber<CurrencyUpdateSignal> currencyUpdateSubscriber
             , ISubscriber<LifeModelSync> lifeModelSyncSubscriber
             , ISubscriber<LevelUpSignal> levelUpSubscriber
-            , IAudioService audioService)
+            , IAudioService audioService
+            , ITimerSubscriber timerSubscriber)
         {
+            _timerSubscriber = timerSubscriber;
             _audioService = audioService;
             _applicationController = applicationController;
             _screenController = screenController;
@@ -68,6 +71,8 @@ namespace ColorBlockJam.Views
                 _lifeModelSyncSubscriber.Subscribe(_ => RefreshHeader()),
                 // A set level shows at once; a won level waits for LevelButtonUpdateGameTask's animation.
                 _levelUpSubscriber.Subscribe(_ => levelButton.SetLevel(_playerController.GetVisualLevel())));
+            // The limitless-life countdown ticks every second.
+            _timerSubscriber.Subscribe(this);
             RefreshHeader();
             levelButton.SetLevel(_playerController.GetVisualLevel());
             _screenController.MainScreenView.SetCurrencyTargets(header, playButton.transform);
@@ -86,12 +91,23 @@ namespace ColorBlockJam.Views
             }
             _subscriptions?.Dispose();
             _subscriptions = null;
+            _timerSubscriber?.UnSubscribe(this);
         }
+
+        public void UpdateTime(float intervalTime) => RefreshLife();
+
+        public void ResumeTime(float passedRealtime) => RefreshLife();
 
         private void RefreshHeader()
         {
             header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin));
-            header.SetLife(_lifeController.GetLifeTime().Item1);
+            RefreshLife();
+        }
+
+        private void RefreshLife()
+        {
+            var (life, secondsLeft) = _lifeController.GetLifeTime();
+            header.SetLife(life, _lifeController.IsLimitless(), secondsLeft);
         }
 
         private void OnCoinClicked()
