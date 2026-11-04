@@ -319,39 +319,47 @@ MonoBehaviour:
     Length: 2
     Color: 2
     Depth: 0
+    Ice: 0
   - Edge: 0
     Index: 2
     Length: 2
     Color: 5
     Depth: 0
+    Ice: 7
   - Edge: 0
     Index: 4
     Length: 2
     Color: 0
     Depth: 0
+    Ice: 7
   - Edge: 2
     Index: 0
     Length: 1
     Color: 1
     Depth: 0
+    Ice: 0
   - Edge: 2
     Index: 7
     Length: 2
     Color: 4
     Depth: 0
+    Ice: 7
   - Edge: 3
     Index: 0
     Length: 1
     Color: 6
     Depth: 0
+    Ice: 7
   - Edge: 3
     Index: 7
     Length: 2
     Color: 3
     Depth: 0
+    Ice: 8
   - Edge: 1
     Index: 2
     Length: 2
     Color: 7
     Depth: 0
+    Ice: 8
   Holes: []

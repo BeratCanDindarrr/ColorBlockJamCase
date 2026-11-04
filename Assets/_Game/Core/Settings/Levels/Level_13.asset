@@ -211,26 +211,31 @@ MonoBehaviour:
     Length: 3
     Color: 1
     Depth: 0
+    Ice: 6
   - Edge: 2
     Index: 6
     Length: 3
     Color: 0
     Depth: 0
+    Ice: 3
   - Edge: 3
     Index: 0
     Length: 3
     Color: 4
     Depth: 0
+    Ice: 8
   - Edge: 3
     Index: 4
     Length: 1
     Color: 3
     Depth: 2
+    Ice: 0
   - Edge: 3
     Index: 6
     Length: 3
     Color: 2
     Depth: 0
+    Ice: 8
   Holes:
   - Col: 0
     Row: 3

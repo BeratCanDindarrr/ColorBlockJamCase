@@ -260,24 +260,29 @@ MonoBehaviour:
     Length: 1
     Color: 1
     Depth: 0
+    Ice: 0
   - Edge: 3
     Index: 3
     Length: 1
     Color: 3
     Depth: 0
+    Ice: 5
   - Edge: 3
     Index: 4
     Length: 1
     Color: 0
     Depth: 0
+    Ice: 4
   - Edge: 3
     Index: 5
     Length: 1
     Color: 4
     Depth: 0
+    Ice: 13
   - Edge: 1
     Index: 0
     Length: 3
     Color: 2
     Depth: 0
+    Ice: 0
   Holes: []

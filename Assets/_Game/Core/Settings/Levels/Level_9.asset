@@ -236,16 +236,19 @@ MonoBehaviour:
     Length: 2
     Color: 1
     Depth: 0
+    Ice: 1
   - Edge: 3
     Index: 4
     Length: 2
     Color: 2
     Depth: 0
+    Ice: 0
   - Edge: 1
     Index: 3
     Length: 2
     Color: 0
     Depth: 0
+    Ice: 2
   Holes:
   - Col: 0
     Row: 0
