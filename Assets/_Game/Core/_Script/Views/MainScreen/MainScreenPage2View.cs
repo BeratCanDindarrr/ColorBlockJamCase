@@ -1,5 +1,6 @@
 using System;
 using ColorBlockJam.Core.Controller;
+using ColorBlockJam.Core.Settings;
 using ColorBlockJam.Enums;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
@@ -17,6 +18,7 @@ namespace ColorBlockJam.Views
 
         [SerializeField] private Button playButton;
         [SerializeField] private LevelButtonView levelButton;
+        [SerializeField] private LevelPathView levelPath;
         [SerializeField] private MainScreenHeaderView header;
 
         private ApplicationController _applicationController;
@@ -30,6 +32,7 @@ namespace ColorBlockJam.Views
         private ISubscriber<LevelUpSignal> _levelUpSubscriber;
         private IAudioService _audioService;
         private ITimerSubscriber _timerSubscriber;
+        private LevelSettings _levelSettings;
         private IDisposable _subscriptions;
 
         [Inject]
@@ -43,8 +46,10 @@ namespace ColorBlockJam.Views
             , ISubscriber<LifeModelSync> lifeModelSyncSubscriber
             , ISubscriber<LevelUpSignal> levelUpSubscriber
             , IAudioService audioService
-            , ITimerSubscriber timerSubscriber)
+            , ITimerSubscriber timerSubscriber
+            , LevelSettings levelSettings)
         {
+            _levelSettings = levelSettings;
             _timerSubscriber = timerSubscriber;
             _audioService = audioService;
             _applicationController = applicationController;
@@ -70,13 +75,14 @@ namespace ColorBlockJam.Views
                 _currencyUpdateSubscriber.Subscribe(_ => RefreshHeader()),
                 _lifeModelSyncSubscriber.Subscribe(_ => RefreshHeader()),
                 // A set level shows at once; a won level waits for LevelButtonUpdateGameTask's animation.
-                _levelUpSubscriber.Subscribe(_ => levelButton.SetLevel(_playerController.GetVisualLevel())));
+                _levelUpSubscriber.Subscribe(_ => ShowLevel(_playerController.GetVisualLevel())));
             // The limitless-life countdown ticks every second.
             _timerSubscriber.Subscribe(this);
             RefreshHeader();
-            levelButton.SetLevel(_playerController.GetVisualLevel());
+            ShowLevel(_playerController.GetVisualLevel());
             _screenController.MainScreenView.SetCurrencyTargets(header, playButton.transform);
             _screenController.MainScreenView.SetLevelButton(levelButton);
+            _screenController.MainScreenView.SetLevelPath(levelPath);
         }
 
         public override void Dispose()
@@ -102,6 +108,12 @@ namespace ColorBlockJam.Views
         {
             header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin));
             RefreshLife();
+        }
+
+        private void ShowLevel(int level)
+        {
+            levelButton.SetLevel(level);
+            levelPath.SetLevel(level, _levelSettings);
         }
 
         private void RefreshLife()

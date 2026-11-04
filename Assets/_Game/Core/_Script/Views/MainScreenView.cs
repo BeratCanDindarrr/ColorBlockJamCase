@@ -47,6 +47,10 @@ namespace ColorBlockJam.Views
 
         public void SetLevelButton(LevelButtonView levelButton) => LevelButton = levelButton;
 
+        public LevelPathView LevelPath { get; private set; }
+
+        public void SetLevelPath(LevelPathView levelPath) => LevelPath = levelPath;
+
         public void SnapToPage(int page) => pageSnapper.SnapTo(page);
 
         public override void Dispose()

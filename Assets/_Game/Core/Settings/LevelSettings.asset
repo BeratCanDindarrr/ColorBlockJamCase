@@ -44,3 +44,8 @@ MonoBehaviour:
   LevelButtonShakeAngle: 8
   LevelButtonShineAlpha: 0.6
   LevelButtonShineDuration: 0.4
+  LevelPathVisibleNodes: 3
+  LevelPathSpacing: 600
+  LevelPathSlideDuration: 0.5
+  LevelPathSlideEase: 7
+  LevelPathLockHideDuration: 0.35

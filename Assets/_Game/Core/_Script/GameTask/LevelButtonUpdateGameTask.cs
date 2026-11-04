@@ -8,7 +8,8 @@ using VContainer;
 
 namespace ColorBlockJam.GameTask
 {
-    // After a win: the main screen's level button plays its level-up and shows the level now up next.
+    // After a win: the level path above the main screen's Play button slides on to the new level, then the button plays
+    // its level-up and shows the level now up next.
     public class LevelButtonUpdateGameTask : IGameTask
     {
         private ScreenController _screenController;
@@ -33,8 +34,11 @@ namespace ColorBlockJam.GameTask
             var button = _screenController.MainScreenView.LevelButton;
             if (button == null) return;
 
+            var level = _playerController.GetVisualLevel();
+            var path = _screenController.MainScreenView.LevelPath;
+            if (path != null) await path.PlayAdvance(level, _levelSettings, cancellationToken);
             _audioService.PlaySfx(SfxName.LevelUp);
-            await button.PlayLevelUp(_playerController.GetVisualLevel(), _levelSettings, cancellationToken);
+            await button.PlayLevelUp(level, _levelSettings, cancellationToken);
         }
 
         public void Dispose()

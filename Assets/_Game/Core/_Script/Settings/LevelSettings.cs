@@ -1,4 +1,5 @@
 using ColorBlockJam.Const;
+using DG.Tweening;
 using UnityEngine;
 
 namespace ColorBlockJam.Core.Settings
@@ -24,6 +25,15 @@ namespace ColorBlockJam.Core.Settings
         public float LevelButtonShakeAngle = 8f;
         public float LevelButtonShineAlpha = 0.6f;
         public float LevelButtonShineDuration = 0.4f;
+
+        // The level path above the Play button: this many round nodes, the current level's on the bottom, this far
+        // apart (canvas units). After a win it slides down one node, then the new level's lock shrinks away.
+        [Header("Level Path")]
+        public int LevelPathVisibleNodes = 3;
+        public float LevelPathSpacing = 600f;
+        public float LevelPathSlideDuration = 0.5f;
+        public Ease LevelPathSlideEase = Ease.InOutQuad;
+        public float LevelPathLockHideDuration = 0.35f;
 
         public int LevelCount => Levels?.Length ?? 0;
 
