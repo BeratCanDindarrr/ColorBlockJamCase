@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39e0e074927024f8f82941f8f302c6b2, type: 3}
   m_Name: LevelCameraSettings
   m_EditorClassIdentifier: 
-  UseManualCamera: 1
+  UseManualCamera: 0
   LevelCameraDatas:
   - ColumnCount: 4
     CameraPos: {x: 0, y: 7.7, z: 0}
@@ -134,3 +134,7 @@ MonoBehaviour:
       ToAspect: 0.75
       ToCameraPos: {x: 0, y: 16.2, z: 0}
       ToCameraFieldOfView: 60
+  TiltDegrees: 15
+  BoardWidthFill: 0.9
+  BoardMaxHeightFill: 0.62
+  BoardViewportCenterY: 0.47

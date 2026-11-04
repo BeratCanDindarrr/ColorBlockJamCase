@@ -17,6 +17,8 @@ namespace ColorBlockJam.SandBox
         // The kit pieces are authored with their rounded/open side toward +x/+z; yaw 0 faces +z.
         private const float CornerYawOffset = 45f;
 
+        // The cut-off piece bursts from about the top of the block.
+        private const float BurstHeightInCells = 0.35f;
         private static readonly CellCoord[] Quarters =
         {
             new CellCoord(1, 1), new CellCoord(1, -1), new CellCoord(-1, -1), new CellCoord(-1, 1)
@@ -39,6 +41,8 @@ namespace ColorBlockJam.SandBox
         private float _exitLine;
         private int _shattering;
         private Action<BlockView> _onShattered;
+        // Set while exiting: a piece crossing the gate is cut off there and bursts into cubes instead of flying off.
+        private ExitBurstView _exitBurst;
         // Held pose: board-plane position, lift height and lean are kept apart and composed in ApplyHeldPose,
         // so the lean pivots on the block's centre instead of its origin cell.
         private Vector3 _planar;
@@ -153,9 +157,11 @@ namespace ColorBlockJam.SandBox
         // Slides `distance` (board local) along `direction` from the block's resting cell, back down onto the floor,
         // over `seconds`. The slide ends with the rearmost piece wholly past the wall line; each piece shatters as it
         // crosses that line (that is how the part past the wall is hidden), and onShattered runs once all are gone.
-        public void PlayExit(Vector3 direction, float distance, float seconds, Action<BlockView> onShattered)
+        public void PlayExit(Vector3 direction, float distance, float seconds, ExitBurstView burst,
+            Action<BlockView> onShattered)
         {
             _exitDirection = direction;
+            _exitBurst = burst;
             _onShattered = onShattered;
             _intact.Clear();
             _intact.AddRange(_pieces);
@@ -167,6 +173,8 @@ namespace ColorBlockJam.SandBox
 
             var target = _layout.CellToLocal(Block.Origin) + direction * distance;
             _exitLine = Vector3.Dot(target, direction) + rearmost;
+            // Cut off where the piece goes into the gate rather than once it has crossed the wall.
+            if (burst != null) _exitLine -= _boardSettings.ExitClipInset * scale;
 
             transform.DOKill();
             ResetHeldPose();
@@ -187,6 +195,7 @@ namespace ColorBlockJam.SandBox
         public void PlayDestroy(Action<BlockView> onShattered)
         {
             _exitDirection = Vector3.up;
+            _exitBurst = null;
             _onShattered = onShattered;
             _intact.Clear();
             _intact.AddRange(_pieces);
@@ -230,6 +239,13 @@ namespace ColorBlockJam.SandBox
                 child.gameObject.layer = layer;
         }
 
+        // The white outline round the held block.
+        public void SetOutline(bool visible)
+        {
+            foreach (var piece in _pieces)
+                piece.SetOutline(visible);
+        }
+
         public void OnDespawned()
         {
             transform.DOKill();
@@ -244,6 +260,7 @@ namespace ColorBlockJam.SandBox
             _pieces.Clear();
             _pieceCells.Clear();
             _intact.Clear();
+            _exitBurst = null;
             ReleaseBrokenPieces();
             SetTargetMark(false);
             iceView.Hide();
@@ -344,6 +361,17 @@ namespace ColorBlockJam.SandBox
         // block, so it also keeps the slide's motion.
         private void PlayShatter(BlockPieceView piece)
         {
+            if (_exitBurst != null)
+            {
+                var direction = transform.parent != null ? transform.parent.TransformDirection(_exitDirection) : _exitDirection;
+                var top = piece.transform.position + Vector3.up * BurstHeightInCells * transform.lossyScale.y;
+                _exitBurst.Burst(top, direction, _color, _boardSettings.ExitBurstCubesPerPiece,
+                    _boardSettings.ExitBurstSpeed, _boardSettings.ExitBurstSpread, _boardSettings.ExitBurstLift);
+                // Hidden at once: the part past the gate is gone; the pool restores the scale.
+                piece.transform.localScale = Vector3.zero;
+                return;
+            }
+
             var scale = transform.localScale.x;
             var spread = UnityEngine.Random.insideUnitSphere * _boardSettings.ShatterSpread;
             spread.y = Mathf.Abs(spread.y);

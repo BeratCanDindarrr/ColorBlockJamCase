@@ -9,18 +9,8 @@ namespace ColorBlockJam.SandBox
 {
     // Builds the board's floor, walls, gates and blocks from pooled views and parents them under this
     // scene object, so they live (and unload) with the gameplay scene.
-    public class BoardViewController : ColorBlockJam.Views.BaseView
+    public partial class BoardViewController : ColorBlockJam.Views.BaseView
     {
-        // Wall pieces are half a cell long: two per edge cell, centred a quarter cell either side of it.
-        private const double WallPieceReach = 0.25;
-        // The corner pieces sit a quarter cell past a cell's corner (0.75 from its centre) on both sides.
-        private const double CornerReach = 0.75;
-        private const float CornerYawTopRight = 0f;
-        private const float CornerYawBottomRight = 90f;
-        private const float CornerYawBottomLeft = 180f;
-        private const float CornerYawTopLeft = 270f;
-
-        private static readonly BoardEdge[] Edges = { BoardEdge.Top, BoardEdge.Bottom, BoardEdge.Left, BoardEdge.Right };
         private const float HalfCell = 0.5f;
 
         private readonly List<FloorTileView> _floorTiles = new List<FloorTileView>();
@@ -42,6 +32,7 @@ namespace ColorBlockJam.SandBox
         private IMemoryPool<GateView> _gatePool;
         private IMemoryPool<BlockView> _blockPool;
         private BlockView _heldView;
+        private ExitBurstView _exitBurst;
         private Vector3 _heldTarget;
 
         public BoardLayout Layout { get; private set; }
@@ -67,11 +58,12 @@ namespace ColorBlockJam.SandBox
             BuildFloor(simulation.Holes);
             BuildWalls(simulation.Gates, simulation.Holes);
             foreach (var gate in simulation.Gates)
-                Spawn(_gatePool, _gates).Init(gate, Layout, _boardSettings.GetColor(gate.Color));
+                Spawn(_gatePool, _gates).Init(gate, Layout, _boardSettings.GetColor(gate.Color), _boardSettings.GateArrowSize);
             foreach (var block in simulation.Blocks)
                 SpawnBlock(block);
 
-            _cameraView.Frame(transform.position, Layout.OuterHalfExtents, _boardSettings.CameraMargin, Layout.CellSize);
+            _cameraView.SetBackground(_boardSettings.BackgroundColor);
+            _cameraView.Frame(transform.position, Layout.OuterHalfExtents, Layout.CellSize);
         }
 
         // Called before the rules remove the block, so its view sucks in rather than breaks apart.
@@ -158,10 +150,19 @@ namespace ColorBlockJam.SandBox
             foreach (var cell in block.OccupiedCells(block.Origin))
                 rearEdge = Mathf.Min(rearEdge, Vector3.Dot(Layout.CellToLocal(cell), direction) - HalfCell * Layout.CellSize);
 
-            view.PlayExit(direction, wall - rearEdge, _boardSettings.ExitSeconds, OnBlockShattered);
+            view.PlayExit(direction, wall - rearEdge, _boardSettings.ExitSeconds, ExitBurst(), OnBlockShattered);
         }
 
         private void OnBlockShattered(BlockView view) => ReleaseBlock(view.Block);
+
+        // One cube burst per board, made on first exit under the board root (unloads with the scene); none without a
+        // prefab, then the pieces fly off as before.
+        private ExitBurstView ExitBurst()
+        {
+            if (_exitBurst == null && _boardSettings.ExitBurstPrefab != null)
+                _exitBurst = Instantiate(_boardSettings.ExitBurstPrefab, transform);
+            return _exitBurst;
+        }
 
         private void ReleaseBlock(BlockState block)
         {
@@ -178,6 +179,7 @@ namespace ColorBlockJam.SandBox
 
             _heldTarget = _heldView.transform.localPosition;
             _heldView.SetLayer(LayerMask.NameToLayer(BoardLayers.SelectedItem));
+            _heldView.SetOutline(true);
             _heldView.Lift();
         }
 
@@ -198,7 +200,12 @@ namespace ColorBlockJam.SandBox
         {
             var view = GetView(block);
             if (view == _heldView) _heldView = null;
-            if (view) view.SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
+            if (view)
+            {
+                view.SetLayer(LayerMask.NameToLayer(BoardLayers.Board));
+                view.SetOutline(false);
+            }
+
             return view;
         }
 
@@ -234,71 +241,9 @@ namespace ColorBlockJam.SandBox
 
                     var tile = Spawn(_floorPool, _floorTiles);
                     Place(tile.transform, Layout.CellToLocal(cell), Quaternion.identity);
-                    tile.SetColor(_boardSettings.FloorColor);
+                    tile.SetColor(_boardSettings.FloorColor, _boardSettings.FloorGapColor);
                 }
             }
-        }
-
-        // Walls follow the board's shape: every side of a board cell that faces off the board or a removed cell gets a
-        // wall (two half pieces), unless a gate stands there; every corner where two such sides meet gets a corner piece.
-        private void BuildWalls(IReadOnlyList<GateState> gates, IReadOnlyCollection<CellCoord> holes)
-        {
-            var holeSet = holes as ICollection<CellCoord> ?? new HashSet<CellCoord>(holes);
-            for (var row = 0; row < Layout.Rows; row++)
-            {
-                for (var col = 0; col < Layout.Cols; col++)
-                {
-                    var cell = new CellCoord(col, row);
-                    if (holeSet.Contains(cell)) continue;
-
-                    foreach (var edge in Edges)
-                    {
-                        if (!GateGeometry.IsWallSide(cell, edge, Layout.Cols, Layout.Rows, holeSet)) continue;
-                        GateGeometry.PlaceOf(cell, edge, Layout.Cols, Layout.Rows, out var index, out var depth);
-                        if (IsGateCell(gates, edge, index, depth)) continue;
-
-                        var rotation = Layout.GateRotation(edge);
-                        AddWallPiece(Layout.EdgeLocal(edge, index - WallPieceReach, depth), rotation, false);
-                        AddWallPiece(Layout.EdgeLocal(edge, index + WallPieceReach, depth), rotation, false);
-                    }
-
-                    AddCornerIfWalls(cell, BoardEdge.Top, BoardEdge.Right, CornerYawTopRight, holeSet);
-                    AddCornerIfWalls(cell, BoardEdge.Bottom, BoardEdge.Right, CornerYawBottomRight, holeSet);
-                    AddCornerIfWalls(cell, BoardEdge.Bottom, BoardEdge.Left, CornerYawBottomLeft, holeSet);
-                    AddCornerIfWalls(cell, BoardEdge.Top, BoardEdge.Left, CornerYawTopLeft, holeSet);
-                }
-            }
-        }
-
-        // The corner mesh rounds toward +x/+z at yaw 0; each yaw step turns it a quarter clockwise. It sits a quarter cell
-        // past the cell's corner on both sides, where the two walls' centre lines meet.
-        private void AddCornerIfWalls(CellCoord cell, BoardEdge vertical, BoardEdge horizontal, float yaw,
-            ICollection<CellCoord> holes)
-        {
-            if (!GateGeometry.IsWallSide(cell, vertical, Layout.Cols, Layout.Rows, holes) ||
-                !GateGeometry.IsWallSide(cell, horizontal, Layout.Cols, Layout.Rows, holes)) return;
-
-            GateGeometry.PlaceOf(cell, vertical, Layout.Cols, Layout.Rows, out var index, out var depth);
-            var sideways = horizontal == BoardEdge.Right ? CornerReach : -CornerReach;
-            AddWallPiece(Layout.EdgeLocal(vertical, index + sideways, depth), Quaternion.Euler(0f, yaw, 0f), true);
-        }
-
-        private void AddWallPiece(Vector3 local, Quaternion rotation, bool isCorner)
-        {
-            var piece = Spawn(_wallPool, _wallPieces);
-            Place(piece.transform, local, rotation);
-            piece.SetCorner(isCorner);
-        }
-
-        private static bool IsGateCell(IReadOnlyList<GateState> gates, BoardEdge edge, int index, int depth)
-        {
-            foreach (var gate in gates)
-            {
-                if (gate.Edge == edge && gate.Depth == depth && index >= gate.Index && index < gate.Index + gate.Length)
-                    return true;
-            }
-
-            return false;
         }
 
         private T Spawn<T>(IMemoryPool<T> pool, List<T> spawned) where T : Component

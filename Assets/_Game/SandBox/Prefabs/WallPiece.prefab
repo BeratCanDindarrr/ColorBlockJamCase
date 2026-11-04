@@ -131,3 +131,4 @@ MonoBehaviour:
   meshFilter: {fileID: 7903269508421006302}
   wallMesh: {fileID: 8733429697405204941, guid: 1dccd1d8070a94786a6a4f079a3ac197, type: 3}
   cornerMesh: {fileID: 5732635521261682974, guid: 1dccd1d8070a94786a6a4f079a3ac197, type: 3}
+  meshRenderer: {fileID: 4662459171920675403}

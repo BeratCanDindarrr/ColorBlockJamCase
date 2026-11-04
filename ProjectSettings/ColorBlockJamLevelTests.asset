@@ -128,8 +128,8 @@ MonoBehaviour:
     AsideMoves: 11
     StuckBlocks: []
   - Guid: 20dd00fb072ab442584e7dabeb20787f
-    Hash: 293ddcb5ae9a231e9ac7425485831c48
+    Hash: 5dded3980d963473e2e03ae349f747a8
     Verdict: 0
-    Drags: 22
-    AsideMoves: 5
+    Drags: 28
+    AsideMoves: 11
     StuckBlocks: []

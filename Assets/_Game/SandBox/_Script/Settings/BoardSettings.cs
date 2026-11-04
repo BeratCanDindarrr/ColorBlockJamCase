@@ -46,6 +46,15 @@ namespace ColorBlockJam.SandBox
         public float ShatterForce = 3f;
         // Random sideways/upward speed added to each shattering piece, world units per second.
         public float ShatterSpread = 1.5f;
+        // An exiting block's piece is cut off at the gate and bursts into this many small cubes of its colour.
+        public ExitBurstView ExitBurstPrefab;
+        public int ExitBurstCubesPerPiece = 4;
+        // Outward and random speed of those cubes, world units per second.
+        public float ExitBurstSpeed = 3f;
+        public float ExitBurstSpread = 1.5f;
+        // Upward speed the cubes start with, and how far in (cells) from the wall's outer face a piece is cut off.
+        public float ExitBurstLift = 2.5f;
+        public float ExitClipInset = 0.7f;
 
         public ColorEntry[] Colors =
         {
@@ -69,8 +78,14 @@ namespace ColorBlockJam.SandBox
         public Color ArrowColor = Color.white;
 
         public Color FloorColor = new Color(0.82f, 0.86f, 0.92f);
-        // World units kept free around the walled board when the camera frames it.
-        public float CameraMargin = 0.5f;
+        // The thin lines between floor tiles.
+        public Color FloorGapColor = new Color(0.49f, 0.55f, 0.65f);
+        public Color WallColor = new Color(0.23f, 0.26f, 0.38f);
+        // Removed cells are filled with solid wall (each along its longer straight run) instead of walls round them.
+        public bool FillHolesSolid;
+        public Color BackgroundColor = new Color(0.81f, 0.87f, 0.97f);
+        // The white arrow on each gate pointing out of the board, in cells.
+        public float GateArrowSize = 0.45f;
 
         public FloorTileView FloorTilePrefab;
         public WallPieceView WallPiecePrefab;
@@ -103,7 +118,12 @@ namespace ColorBlockJam.SandBox
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             ExitAlignDuration = Mathf.Max(0f, ExitAlignDuration);
             CellSize = Mathf.Max(MinPositive, CellSize);
-            CameraMargin = Mathf.Max(0f, CameraMargin);
+            GateArrowSize = Mathf.Max(0f, GateArrowSize);
+            ExitBurstCubesPerPiece = Mathf.Max(0, ExitBurstCubesPerPiece);
+            ExitBurstSpeed = Mathf.Max(0f, ExitBurstSpeed);
+            ExitBurstSpread = Mathf.Max(0f, ExitBurstSpread);
+            ExitBurstLift = Mathf.Max(0f, ExitBurstLift);
+            ExitClipInset = Mathf.Max(0f, ExitClipInset);
             FollowSharpness = Mathf.Max(MinPositive, FollowSharpness);
             LiftDuration = Mathf.Max(0f, LiftDuration);
             DropDuration = Mathf.Max(0f, DropDuration);

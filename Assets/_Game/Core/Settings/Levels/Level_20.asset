@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_20
   m_EditorClassIdentifier: 
   Cols: 5
-  Rows: 7
+  Rows: 8
   TimeLimitSec: 80
   Blocks:
   - Id: A
@@ -22,7 +22,7 @@ MonoBehaviour:
     Cells:
     - Col: 0
       Row: 0
-    Color: 4
+    Color: 2
     Ice: 0
     Axis: 0
   - Id: B
@@ -31,7 +31,7 @@ MonoBehaviour:
     Cells:
     - Col: 0
       Row: 0
-    Color: 2
+    Color: 4
     Ice: 0
     Axis: 0
   - Id: C
@@ -118,7 +118,7 @@ MonoBehaviour:
     Axis: 0
   - Id: K
     Col: 0
-    Row: 4
+    Row: 5
     Cells:
     - Col: 0
       Row: 0
@@ -129,7 +129,7 @@ MonoBehaviour:
     Axis: 0
   - Id: L
     Col: 2
-    Row: 4
+    Row: 5
     Cells:
     - Col: 0
       Row: 0
@@ -140,7 +140,7 @@ MonoBehaviour:
     Axis: 0
   - Id: M
     Col: 4
-    Row: 4
+    Row: 5
     Cells:
     - Col: 0
       Row: 0
@@ -153,7 +153,7 @@ MonoBehaviour:
     Axis: 0
   - Id: N
     Col: 0
-    Row: 5
+    Row: 6
     Cells:
     - Col: 0
       Row: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
     Axis: 0
   - Id: O
     Col: 2
-    Row: 5
+    Row: 6
     Cells:
     - Col: 0
       Row: 0
@@ -175,7 +175,7 @@ MonoBehaviour:
     Axis: 0
   - Id: P
     Col: 0
-    Row: 6
+    Row: 7
     Cells:
     - Col: 0
       Row: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
     Axis: 0
   - Id: Q
     Col: 2
-    Row: 6
+    Row: 7
     Cells:
     - Col: 0
       Row: 0
@@ -212,8 +212,8 @@ MonoBehaviour:
     Color: 3
     Depth: 0
   - Edge: 2
-    Index: 5
-    Length: 2
+    Index: 7
+    Length: 1
     Color: 3
     Depth: 0
   - Edge: 3
@@ -222,8 +222,8 @@ MonoBehaviour:
     Color: 2
     Depth: 0
   - Edge: 3
-    Index: 4
-    Length: 2
+    Index: 5
+    Length: 1
     Color: 1
     Depth: 0
   - Edge: 1
@@ -245,3 +245,11 @@ MonoBehaviour:
     Row: 3
   - Col: 4
     Row: 3
+  - Col: 0
+    Row: 4
+  - Col: 1
+    Row: 4
+  - Col: 3
+    Row: 4
+  - Col: 4
+    Row: 4

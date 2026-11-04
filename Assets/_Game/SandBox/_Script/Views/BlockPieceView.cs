@@ -19,16 +19,21 @@ namespace ColorBlockJam.SandBox
         [SerializeField] private Mesh edgeMesh;
         [SerializeField] private Mesh innerCornerMesh;
         [SerializeField] private Mesh outerCornerMesh;
+        // Same mesh drawn grown and inside out in white: the held block's outline.
+        [SerializeField] private MeshFilter outlineFilter;
 
         public void Set(BlockPieceKind kind, Color color, Texture texture = null)
         {
             meshFilter.sharedMesh = GetMesh(kind);
+            outlineFilter.sharedMesh = meshFilter.sharedMesh;
             var shift = kind == BlockPieceKind.InnerCorner ? 0f : TileShift;
             meshFilter.transform.localPosition = new Vector3(-shift, FloorLift, -shift);
             Tint(color, texture);
         }
 
         public void Tint(Color color, Texture texture = null) => RendererTint.Apply(meshRenderer, color, texture);
+
+        public void SetOutline(bool visible) => outlineFilter.gameObject.SetActive(visible);
 
         public void OnSpawned()
         {
@@ -38,6 +43,7 @@ namespace ColorBlockJam.SandBox
         {
             // A shatter may still be running (block cleared mid-exit); the pool must get an intact piece back.
             transform.DOKill();
+            SetOutline(false);
             transform.localScale = Vector3.one;
             transform.localRotation = Quaternion.identity;
         }

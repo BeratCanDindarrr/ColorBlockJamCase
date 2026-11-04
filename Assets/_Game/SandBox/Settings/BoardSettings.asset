@@ -30,31 +30,41 @@ MonoBehaviour:
   ShatterDuration: 0.4
   ShatterForce: 3
   ShatterSpread: 1.5
+  ExitBurstPrefab: {fileID: 3199265254495813357, guid: c93c62d248d244748a87688ce0101be2, type: 3}
+  ExitBurstCubesPerPiece: 5
+  ExitBurstSpeed: 3
+  ExitBurstSpread: 1.5
+  ExitBurstLift: 2.5
+  ExitClipInset: 0.7
   Colors:
   - Key: 0
-    Value: {r: 0.9, g: 0.22, b: 0.21, a: 1}
+    Value: {r: 0.8156863, g: 0.1254902, b: 0.18039216, a: 1}
   - Key: 1
-    Value: {r: 0.2, g: 0.45, b: 0.9, a: 1}
+    Value: {r: 0.16470589, g: 0.42352942, b: 1, a: 1}
   - Key: 2
-    Value: {r: 0.3, g: 0.75, b: 0.3, a: 1}
+    Value: {r: 0.29803923, g: 0.72156864, b: 0.101960786, a: 1}
   - Key: 3
-    Value: {r: 0.98, g: 0.82, b: 0.2, a: 1}
+    Value: {r: 1, g: 0.74509805, b: 0.18039216, a: 1}
   - Key: 4
-    Value: {r: 0.58, g: 0.32, b: 0.8, a: 1}
+    Value: {r: 0.7607843, g: 0.2784314, b: 0.8392157, a: 1}
   - Key: 5
-    Value: {r: 0.98, g: 0.55, b: 0.15, a: 1}
+    Value: {r: 1, g: 0.49803922, b: 0.16470589, a: 1}
   - Key: 6
-    Value: {r: 0.96, g: 0.45, b: 0.7, a: 1}
+    Value: {r: 0.9411765, g: 0.30980393, b: 0.65882355, a: 1}
   - Key: 7
-    Value: {r: 0.25, g: 0.82, b: 0.88, a: 1}
+    Value: {r: 0.16862746, g: 0.70980394, b: 0.9411765, a: 1}
   IceColor: {r: 0.8, g: 0.93, b: 1, a: 1}
   IceTint: 0.65
   IcePunch: 0.3
   IcePunchDuration: 0.25
   IceTexture: {fileID: 2800000, guid: 95c90317ab1f24956891668e304db98e, type: 3}
   ArrowColor: {r: 1, g: 1, b: 1, a: 1}
-  FloorColor: {r: 0.82, g: 0.86, b: 0.92, a: 1}
-  CameraMargin: 0.5
+  FloorColor: {r: 0.40784314, g: 0.47058824, b: 0.5803922, a: 1}
+  FloorGapColor: {r: 0.49019608, g: 0.54509807, b: 0.64705884, a: 1}
+  WallColor: {r: 0.22745098, g: 0.25882354, b: 0.3764706, a: 1}
+  FillHolesSolid: 0
+  BackgroundColor: {r: 0.827451, g: 0.88235295, b: 0.972549, a: 1}
+  GateArrowSize: 0.3
   FloorTilePrefab: {fileID: 5239408864572576000, guid: 39372db85ff79414885187f9b365c474, type: 3}
   WallPiecePrefab: {fileID: 8809354281171706736, guid: 02f8e35e6be5e4b3da3608474175b9f2, type: 3}
   GatePrefab: {fileID: 7828083420127014481, guid: 325523fc44e044e538b17a2eea5edef9, type: 3}
