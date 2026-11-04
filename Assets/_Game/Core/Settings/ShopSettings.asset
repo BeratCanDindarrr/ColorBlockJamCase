@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a9aadfdffba94b67aa711ccd052c095, type: 3}
+  m_Name: ShopSettings
+  m_EditorClassIdentifier: 
+  CoinPacks:
+  - Title: 1000 Coins
+    Price: TRY 59.99
+    IconScale: 0.75
+    Rewards:
+    - currencyType: 0
+      currencyValue: 1000
+  - Title: 5000 Coins
+    Price: TRY 219.99
+    IconScale: 0.85
+    Rewards:
+    - currencyType: 0
+      currencyValue: 5000
+  - Title: 10000 Coins
+    Price: TRY 419.99
+    IconScale: 0.95
+    Rewards:
+    - currencyType: 0
+      currencyValue: 10000
+  - Title: 25000 Coins
+    Price: TRY 829.99
+    IconScale: 1.05
+    Rewards:
+    - currencyType: 0
+      currencyValue: 25000
+  - Title: 50000 Coins
+    Price: TRY 1,499.99
+    IconScale: 1.15
+    Rewards:
+    - currencyType: 0
+      currencyValue: 50000
+  - Title: 100000 Coins
+    Price: TRY 2,799.99
+    IconScale: 1.25
+    Rewards:
+    - currencyType: 0
+      currencyValue: 100000
+  Bundles:
+  - Title: Small Bundle
+    Price: TRY 279.99
+    IconScale: 1
+    Rewards:
+    - currencyType: 0
+      currencyValue: 6000
+    - currencyType: 4
+      currencyValue: 3600
+    - currencyType: 1
+      currencyValue: 2
+    - currencyType: 2
+      currencyValue: 2
+    - currencyType: 3
+      currencyValue: 2
+    - currencyType: 6
+      currencyValue: 2
