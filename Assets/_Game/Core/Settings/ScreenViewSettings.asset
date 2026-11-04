@@ -15,3 +15,5 @@ MonoBehaviour:
   loadingScreenView: {fileID: 281034483505900164, guid: 55e1e768a80324acfa7b4b7d097fe3ea, type: 3}
   mainScreenView: {fileID: 2083527599992284008, guid: 11ed8b593c9814295a17f83b7216a595, type: 3}
   gamePlayScreenView: {fileID: 2538512016484656721, guid: 6de186f4225d349cfbc7ae837923625a, type: 3}
+  showAdminPanel: 1
+  adminPanelButtonView: {fileID: 3215384149502455913, guid: c47b192d786344cb3988cb139eb0fb33, type: 3}

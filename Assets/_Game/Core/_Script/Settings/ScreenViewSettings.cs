@@ -12,5 +12,8 @@ namespace ColorBlockJam.Core.Settings
         public LoadingScreenView loadingScreenView;
         public MainScreenView mainScreenView;
         public GamePlayScreenView gamePlayScreenView;
+        [Tooltip("Development builds: a small button over every screen opens the admin panel (knit_Out's).")]
+        public bool showAdminPanel = true;
+        public AdminPanelButtonView adminPanelButtonView;
     }
 }

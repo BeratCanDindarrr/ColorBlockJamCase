@@ -2,6 +2,7 @@ using System;
 using ColorBlockJam.Core.Settings;
 using ColorBlockJam.Enums;
 using ColorBlockJam.Views;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -36,6 +37,9 @@ namespace ColorBlockJam.Core.Controller
             LoadingScreenView.Hide();
             MainScreenView.Hide();
             GamePlayScreenView.Hide();
+            // Development builds and the editor only, like knit_Out's DevelopmentBuild check.
+            if (_screenViewSettings.showAdminPanel && Debug.isDebugBuild && _screenViewSettings.adminPanelButtonView != null)
+                _objectResolver.Instantiate(_screenViewSettings.adminPanelButtonView);
         }
 
         // After a screen is shown (e.g. the main menu once loading is over).

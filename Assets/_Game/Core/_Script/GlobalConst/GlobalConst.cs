@@ -14,6 +14,7 @@ namespace ColorBlockJam.Const
             public const string CollectPopup = "CollectPopup";
             public const string LevelCompletePopup = "LevelCompletePopup";
             public const string BoosterPromotePopup = "BoosterPromotePopup";
+            public const string AdminPanelPopup = "AdminPanelPopup";
         }
 
         public struct SceneName
