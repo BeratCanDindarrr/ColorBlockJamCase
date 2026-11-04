@@ -57,6 +57,7 @@ namespace ColorBlockJam.LevelEditor
             _playbackIndex = Mathf.Clamp(index, 0, _playback.Length);
             JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(working), _playbackLevel);
             var blocks = _playbackLevel.Blocks.ToList();
+            var exits = 0;
             for (var i = 0; i < _playbackIndex; i++)
             {
                 var step = _playback[i];
@@ -64,9 +65,14 @@ namespace ColorBlockJam.LevelEditor
                 if (block == null) continue;
                 block.Col = step.Col;
                 block.Row = step.Row;
-                if (step.Exits) blocks.Remove(block);
+                if (!step.Exits) continue;
+                blocks.Remove(block);
+                exits++;
             }
 
+            // Every block that left cracked one ice off each iced block and gate, as in the game (thawed at 0).
+            foreach (var block in blocks) block.Ice = Mathf.Max(0, block.Ice - exits);
+            foreach (var gate in _playbackLevel.Gates) gate.Ice = Mathf.Max(0, gate.Ice - exits);
             _playbackLevel.Blocks = blocks.ToArray();
             WorkingLevelChanged?.Invoke(_playbackLevel);
             RaiseStateChanged();
