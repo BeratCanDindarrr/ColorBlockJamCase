@@ -18,7 +18,7 @@ namespace ColorBlockJam.LevelEditor
             var session = instance;
             Undo.IncrementCurrentGroup();
             session._undoGroup = Undo.GetCurrentGroup();
-            session._erasing = shift;
+            session._erasing = session.ErasesNow(shift);
             session._adding = shift || command;
             session.Press(session.SceneHit(point, within), point);
             Repaint();

@@ -19,6 +19,7 @@ namespace ColorBlockJam.LevelEditor
         public const string PanelId = "colorblockjam-level-editor-properties";
         public const string ShapesId = "colorblockjam-level-editor-shapes";
         public const string LevelBarId = "colorblockjam-level-editor-level-bar";
+        public const string ModeId = "colorblockjam-level-editor-mode";
 
         public static bool InEditorScene => SceneManager.GetActiveScene().path == LevelEditorSceneHook.EditorScenePath;
 
@@ -131,7 +132,7 @@ namespace ColorBlockJam.LevelEditor
         private EditingVisibility _visibility;
 
         public LevelEditorToolsOverlay() : base(SelectToolButton.Id, BlockToolButton.Id, GateToolButton.Id,
-            CellToolButton.Id, LevelBarButton.Id, PanelButton.Id, ShapesButton.Id)
+            CellToolButton.Id)
         {
         }
 
@@ -168,29 +169,29 @@ namespace ColorBlockJam.LevelEditor
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
     }
 
-    // The selected block or gate: shows when something is picked and hides again when nothing is.
-    [Overlay(typeof(SceneView), LevelEditorSceneOverlays.PanelId, "Properties", defaultDisplay = false,
+    // The colour palette and what can be done to the selected blocks or gates; shown while editing.
+    [Overlay(typeof(SceneView), LevelEditorSceneOverlays.PanelId, "Properties", defaultDisplay = true,
         defaultDockZone = DockZone.RightColumn)]
     internal sealed class LevelEditorPropertiesOverlay : Overlay
     {
         private const float Width = 250f;
+        private const int SwatchesPerRow = 7;
 
         private IMGUIContainer _content;
         private EditingVisibility _visibility;
 
         public override VisualElement CreatePanelContent()
         {
-            _content = new IMGUIContainer(() => LevelEditorSession.Current?.DrawScenePanel());
+            _content = new IMGUIContainer(() => LevelEditorSession.Current?.DrawScenePanel(SwatchesPerRow, Width));
             _content.style.width = Width;
             return _content;
         }
 
         private bool _wasDisplayed;
 
-        public override void OnCreated() => _visibility = new EditingVisibility(this, OnState,
-            () => LevelEditorSceneOverlays.IsEditing && LevelEditorSession.Current.HasAnySelection);
+        public override void OnCreated() => _visibility = new EditingVisibility(this, OnState);
 
-        // A pick opens it unfolded; folding it by hand afterwards is left alone.
+        // Editing opens it unfolded; folding it by hand afterwards is left alone.
         private void OnState()
         {
             if (displayed && !_wasDisplayed) collapsed = false;
@@ -311,11 +312,15 @@ namespace ColorBlockJam.LevelEditor
             Refresh();
         }
 
+        // The button of the current tool, for the "+ / −" panel to sit beside.
+        internal static ToolButton Active { get; private set; }
+
         // A tool button cannot be switched off by clicking it; another tool takes over.
         private void Refresh()
         {
             var window = LevelEditorSession.Current;
             SetValueWithoutNotify(window != null && window.CurrentTool == _tool);
+            if (value) Active = this;
         }
     }
 
@@ -336,7 +341,7 @@ namespace ColorBlockJam.LevelEditor
         public const string Id = "ColorBlockJam/LevelEditor/Block";
 
         public BlockToolButton() : base(LevelEditorTool.Block, "Grid.PaintTool",
-            "Block (2)\nClick or drag to paint cells in the brush colour, Shift erases")
+            "Block (2)\n+ paints cells in the brush colour, − erases block cells (Shift flips)")
         {
         }
     }
@@ -347,7 +352,7 @@ namespace ColorBlockJam.LevelEditor
         public const string Id = "ColorBlockJam/LevelEditor/Gate";
 
         public GateToolButton() : base(LevelEditorTool.Gate, "Grid.BoxTool",
-            "Gate (3)\nClick a wall around the board or beside a removed cell to add a gate in the brush colour, Shift deletes")
+            "Gate (3)\n+ adds a gate on a wall around the board or beside a removed cell, − deletes gates (Shift flips)")
         {
         }
     }
@@ -358,74 +363,8 @@ namespace ColorBlockJam.LevelEditor
         public const string Id = "ColorBlockJam/LevelEditor/Cell";
 
         public CellToolButton() : base(LevelEditorTool.Cell, "Grid.EraserTool",
-            "Cell (4)\nClick or drag to remove board cells or put them back, Shift puts back")
+            "Cell (4)\n− removes board cells, + puts them back (Shift flips)")
         {
-        }
-    }
-
-    // Shows or hides the properties panel.
-    [EditorToolbarElement(Id, typeof(SceneView))]
-    internal sealed class LevelBarButton : OverlayToggleButton
-    {
-        public const string Id = "ColorBlockJam/LevelEditor/LevelBar";
-
-        public LevelBarButton() : base(LevelEditorSceneOverlays.LevelBarId, "d_SaveAs",
-            "Level bar\nLevel, Save / Play, size, time, problems and colours")
-        {
-        }
-    }
-
-    [EditorToolbarElement(Id, typeof(SceneView))]
-    internal sealed class PanelButton : OverlayToggleButton
-    {
-        public const string Id = "ColorBlockJam/LevelEditor/Panel";
-
-        public PanelButton() : base(LevelEditorSceneOverlays.PanelId, "d_UnityEditor.InspectorWindow",
-            "Properties\nThe selected block or gate (opens by itself on a pick)")
-        {
-        }
-    }
-
-    [EditorToolbarElement(Id, typeof(SceneView))]
-    internal sealed class ShapesButton : OverlayToggleButton
-    {
-        public const string Id = "ColorBlockJam/LevelEditor/Shapes";
-
-        public ShapesButton() : base(LevelEditorSceneOverlays.ShapesId, "d_Prefab Icon",
-            "Shapes\nSaved block shapes to drag onto the board")
-        {
-        }
-    }
-
-    // Opens and closes one of the level editor's overlays in every Scene view.
-    internal abstract class OverlayToggleButton : EditorToolbarToggle
-    {
-        private readonly string _overlayId;
-
-        protected OverlayToggleButton(string overlayId, string iconName, string tip)
-        {
-            _overlayId = overlayId;
-            icon = EditorGUIUtility.IconContent(iconName).image as Texture2D;
-            tooltip = tip;
-            this.RegisterValueChangedCallback(change => LevelEditorSceneOverlays.SetShown(_overlayId, change.newValue));
-            RegisterCallback<AttachToPanelEvent>(_ =>
-            {
-                LevelEditorSession.StateChanged += Refresh;
-                EditorApplication.update += Refresh;
-                Refresh();
-            });
-            RegisterCallback<DetachFromPanelEvent>(_ =>
-            {
-                LevelEditorSession.StateChanged -= Refresh;
-                EditorApplication.update -= Refresh;
-            });
-        }
-
-        // The overlay can also be closed from its own menu; the button follows it.
-        private void Refresh()
-        {
-            var shown = LevelEditorSceneOverlays.IsShown(_overlayId);
-            if (value != shown) SetValueWithoutNotify(shown);
         }
     }
 }

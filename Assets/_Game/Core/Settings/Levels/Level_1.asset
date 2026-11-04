@@ -25,6 +25,8 @@ MonoBehaviour:
     - Col: 1
       Row: 0
     Color: 0
+    Ice: 0
+    Axis: 1
   - Id: C
     Col: 0
     Row: 5
@@ -32,6 +34,8 @@ MonoBehaviour:
     - Col: 0
       Row: 0
     Color: 2
+    Ice: 0
+    Axis: 0
   - Id: B
     Col: 3
     Row: 0
@@ -45,6 +49,8 @@ MonoBehaviour:
     - Col: 1
       Row: 0
     Color: 1
+    Ice: 0
+    Axis: 0
   - Id: D
     Col: 5
     Row: 5
@@ -52,12 +58,9 @@ MonoBehaviour:
     - Col: 0
       Row: 0
     Color: 7
+    Ice: 1
+    Axis: 0
   Gates:
-  - Edge: 3
-    Index: 2
-    Length: 1
-    Color: 0
-    Depth: 0
   - Edge: 2
     Index: 4
     Length: 1
@@ -73,4 +76,28 @@ MonoBehaviour:
     Length: 1
     Color: 7
     Depth: 0
-  Holes: []
+  Holes:
+  - Col: 7
+    Row: 1
+  - Col: 7
+    Row: 4
+  - Col: 7
+    Row: 2
+  - Col: 8
+    Row: 2
+  - Col: 8
+    Row: 4
+  - Col: 8
+    Row: 1
+  - Col: 6
+    Row: 1
+  - Col: 6
+    Row: 2
+  - Col: 6
+    Row: 4
+  - Col: 6
+    Row: 5
+  - Col: 7
+    Row: 5
+  - Col: 8
+    Row: 5

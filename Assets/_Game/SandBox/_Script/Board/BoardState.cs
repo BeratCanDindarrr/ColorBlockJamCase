@@ -15,6 +15,9 @@ namespace ColorBlockJam.SandBox.Board
         // Cell offsets from Origin that make up this block's footprint.
         public IReadOnlyList<CellCoord> Cells { get; }
 
+        // Frozen (cannot be picked up) until this many more blocks have left the board.
+        public int Ice { get; internal set; }
+        public BlockAxis Axis { get; }
         public bool IsExiting { get; internal set; }
         public GateState ExitGate { get; internal set; }
 
@@ -23,10 +26,23 @@ namespace ColorBlockJam.SandBox.Board
             Id = data.Id;
             Color = data.Color;
             Origin = new CellCoord(data.Col, data.Row);
+            Ice = Math.Max(0, data.Ice);
+            Axis = data.Axis;
             Cells = (CellCoord[])(data.Cells ?? Array.Empty<CellCoord>()).Clone();
         }
 
         internal void MoveTo(CellCoord origin) => Origin = origin;
+
+        // The finger's target with the locked axis held at the block's current position.
+        public BoardPoint LockToAxis(BoardPoint current, BoardPoint target)
+        {
+            switch (Axis)
+            {
+                case BlockAxis.Horizontal: return new BoardPoint(target.Col, current.Row);
+                case BlockAxis.Vertical: return new BoardPoint(current.Col, target.Row);
+                default: return target;
+            }
+        }
 
         // The board cells this block would occupy if its origin were at the given cell.
         public IEnumerable<CellCoord> OccupiedCells(CellCoord origin)

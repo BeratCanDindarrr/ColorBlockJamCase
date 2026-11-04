@@ -22,6 +22,14 @@ namespace ColorBlockJam.Core.Level
         Right = 3
     }
 
+    // The one direction a block may slide in; Free moves both ways.
+    public enum BlockAxis
+    {
+        Free = 0,
+        Horizontal = 1,
+        Vertical = 2
+    }
+
     [Serializable]
     public struct CellCoord : IEquatable<CellCoord>
     {
@@ -52,6 +60,9 @@ namespace ColorBlockJam.Core.Level
         public int Row;
         public CellCoord[] Cells;
         public BlockColor Color;
+        // Frozen until this many blocks have left through gates; 0 = no ice.
+        public int Ice;
+        public BlockAxis Axis;
     }
 
     // A gate in a wall: every cell from Index to Index + Length - 1 along the wall accepts a block of its Color.

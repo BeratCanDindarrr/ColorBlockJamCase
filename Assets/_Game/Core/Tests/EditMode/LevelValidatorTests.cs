@@ -143,5 +143,28 @@ namespace ColorBlockJam.Core.Level.Tests
 
             Assert.That(issues.Single(i => i.IsError).Message, Does.Contain("off the board"));
         }
+
+        [Test]
+        public void IceAboveOtherBlockCount_IsError()
+        {
+            var iced = Block("B", 3, 3, BlockColor.Red, (0, 0));
+            iced.Ice = 2;
+            var errors = Errors(new[] { Block("A", 0, 0, BlockColor.Red, (0, 0)), iced },
+                new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) });
+
+            Assert.That(errors.Single().BlockIndex, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AxisBlockWithoutGateOnItsAxis_IsWarning()
+        {
+            var block = Block("A", 0, 0, BlockColor.Red, (0, 0));
+            block.Axis = BlockAxis.Vertical;
+            var issues = LevelValidator.Validate(4, 4, 60, new[] { block },
+                new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red) });
+
+            Assert.That(issues.Single().IsError, Is.False);
+            Assert.That(issues.Single().Message, Does.Contain("Vertical"));
+        }
     }
 }

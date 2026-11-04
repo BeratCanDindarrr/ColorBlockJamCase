@@ -49,7 +49,7 @@ namespace ColorBlockJam.LevelEditor
         }
 
         public void Draw(LevelData level, Func<int, bool> isBlockSelected, Func<int, bool> isGateSelected,
-            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces)
+            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces, Color hoverColor)
         {
             EditorGUI.DrawRect(new Rect(_origin, new Vector2((_cols + 2) * _cell, (_rows + 2) * _cell)), LevelEditorStyle.Wall);
             var holes = new HashSet<CellCoord>(level.Holes ?? new CellCoord[0]);
@@ -60,17 +60,18 @@ namespace ColorBlockJam.LevelEditor
                 EditorGUI.DrawRect(Inset(CellRect(col, row)), removed ? LevelEditorStyle.Background : LevelEditorStyle.Cell);
             }
 
-            if (hover.Kind == BoardHitKind.Wall)
-                EditorGUI.DrawRect(StripRect(hover.Edge, hover.Index, hover.Depth), LevelEditorStyle.WallSlotHover);
-            else if (hover.InGrid)
-                EditorGUI.DrawRect(CellRect(hover.Cell.Col, hover.Cell.Row), LevelEditorStyle.WallSlotHover);
-
             var gates = level.Gates ?? new GateData[0];
             for (var i = 0; i < gates.Length; i++) DrawGate(gates[i], isGateSelected(i), errorGates.Contains(i));
 
             var blocks = level.Blocks ?? new BlockData[0];
             for (var i = 0; i < blocks.Length; i++) DrawBlock(blocks[i], isBlockSelected(i), errorBlocks.Contains(i));
             foreach (var place in growPlaces) DrawPlus(CellRect(place.Col, place.Row));
+
+            // Over the blocks and gates, so the red of an erase shows on what it takes away.
+            if (hover.Kind == BoardHitKind.Wall)
+                EditorGUI.DrawRect(StripRect(hover.Edge, hover.Index, hover.Depth), hoverColor);
+            else if (hover.InGrid)
+                EditorGUI.DrawRect(CellRect(hover.Cell.Col, hover.Cell.Row), hoverColor);
         }
 
         // A green "+" where the picked block or gate can grow.
@@ -164,12 +165,28 @@ namespace ColorBlockJam.LevelEditor
             {
                 var rect = CellRect(cell.Col, cell.Row);
                 if (selected || hasError) EditorGUI.DrawRect(rect, hasError ? LevelEditorStyle.Error : LevelEditorStyle.Selection);
-                EditorGUI.DrawRect(Inset(rect, selected || hasError ? 4f : Gap), color);
+                var inner = Inset(rect, selected || hasError ? 4f : Gap);
+                EditorGUI.DrawRect(inner, color);
+                if (block.Ice > 0) EditorGUI.DrawRect(inner, IceTint);
+                DrawAxisMark(inner, block.Axis);
             }
 
             if (cells.Count == 0) return;
             var label = CellRect(cells[0].Col, cells[0].Row);
-            GUI.Label(label, block.Id, EditorStyles.whiteBoldLabel);
+            GUI.Label(label, block.Ice > 0 ? $"{block.Id} ❄{block.Ice}" : block.Id, EditorStyles.whiteBoldLabel);
+        }
+
+        private static readonly Color IceTint = new Color(0.85f, 0.95f, 1f, 0.55f);
+        private static readonly Color AxisMark = new Color(1f, 1f, 1f, 0.8f);
+
+        // A one-way block gets a bar through each cell along the way it can move.
+        private static void DrawAxisMark(Rect cell, BlockAxis axis)
+        {
+            var thickness = Mathf.Max(2f, cell.width * 0.12f);
+            if (axis == BlockAxis.Horizontal)
+                EditorGUI.DrawRect(new Rect(cell.x, cell.center.y - thickness / 2f, cell.width, thickness), AxisMark);
+            else if (axis == BlockAxis.Vertical)
+                EditorGUI.DrawRect(new Rect(cell.center.x - thickness / 2f, cell.y, thickness, cell.height), AxisMark);
         }
 
         private void DrawGate(GateData gate, bool selected, bool hasError)

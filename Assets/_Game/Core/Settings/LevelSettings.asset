@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Levels:
   - {fileID: 11400000, guid: c9353d1c29f814edb82c156da76bbc76, type: 2}
+  - {fileID: 11400000, guid: 826166c16c5eb42f282cf0ebe9b9556e, type: 2}
   EndlessLoopCount: 5
   LevelReward: 20
   WinLevelDelaySeconds: 1.5

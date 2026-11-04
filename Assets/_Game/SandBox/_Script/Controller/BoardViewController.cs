@@ -92,6 +92,10 @@ namespace ColorBlockJam.SandBox
                         ReleaseHeld(boardEvent.Block);
                         PlayExit(boardEvent.Block, boardEvent.Gate);
                         break;
+                    case BoardEventType.IceChanged:
+                        var iced = GetView(boardEvent.Block);
+                        if (iced) iced.CrackIce();
+                        break;
                     case BoardEventType.Won:
                     case BoardEventType.Lost:
                         // The level end drops the drag without a DragEnded; set the held block back down.

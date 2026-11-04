@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using ColorBlockJam.Core.Level;
 using UnityEditor;
 using UnityEngine;
@@ -21,85 +23,64 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndVertical();
         }
 
+        // What can be done to the selection: ice and axis of blocks, then rotate / mirror / duplicate / delete.
         private void DrawSelectionInspector()
         {
             PruneSelection();
-            var count = selectedBlocks.Count + selectedGates.Count;
-            if (count > 1) DrawManyInspector();
-            else if (PrimaryBlock >= 0) DrawBlockInspector(PrimaryBlock);
-            else if (PrimaryGate >= 0) DrawGateInspector(PrimaryGate);
-            else EditorGUILayout.HelpBox("Nothing selected.\nSelect tool: click a block or gate, or drag a box.", MessageType.None);
+            DropFieldFocusOnNewSelection();
+            var blocks = SelectedBlockIndices();
+            if (blocks.Count > 0)
+            {
+                DrawBlockRules(blocks);
+                DrawBlockActions();
+            }
+            else if (selectedGates.Count > 0)
+            {
+                if (GUILayout.Button("Delete")) DeleteSelection();
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Select a block or gate to edit it.", MessageType.None);
+            }
         }
 
-        // The SceneView properties overlay: the selected block or gate.
-        internal void DrawScenePanel()
+        // The SceneView properties overlay: the palette, then the selection.
+        internal void DrawScenePanel(int swatchesPerRow, float width)
         {
             if (EnsureWorking() == null) return;
+            DrawPalette(swatchesPerRow, width);
+            GUILayout.Space(6f);
             DrawSelectionInspector();
         }
 
-        internal bool HasAnySelection => HasSelection;
+        private string _inspectedSelection;
 
-        private void DrawBlockInspector(int index)
+        // A field being typed in keeps its text in IMGUI; a new selection must not take it over, so focus is dropped.
+        private void DropFieldFocusOnNewSelection()
         {
-            var block = working.Blocks[index];
-            GUILayout.Label($"Block {block.Id}", EditorStyles.boldLabel);
-
-            var id = EditorGUILayout.DelayedTextField("Id", block.Id);
-            if (id != block.Id)
-            {
-                var before = block.Id;
-                Edit("Rename Block", l => Set(ref l.Blocks[index].Id, id));
-                FollowBlock(before, index);
-            }
-
-            var color = (BlockColor)EditorGUILayout.EnumPopup("Colour", block.Color);
-            if (color != block.Color) Edit("Recolour Block", l => Set(ref l.Blocks[index].Color, color));
-
-            EditorGUILayout.LabelField("Origin", $"{block.Col}, {block.Row}");
-            EditorGUILayout.LabelField("Cells", block.Cells?.Length.ToString() ?? "0");
-            DrawBlockActions();
+            var key = string.Join(",", selectedBlocks) + "|" + string.Join(",", selectedGates.Select(g => $"{g.Edge}{g.Index}:{g.Depth}"));
+            if (key == _inspectedSelection) return;
+            _inspectedSelection = key;
+            GUIUtility.keyboardControl = 0;
         }
 
-        private void DrawGateInspector(int index)
+        // Ice and move axis of the given blocks; a field shows "—" while they differ and sets all of them when changed.
+        private void DrawBlockRules(List<int> blocks)
         {
-            var gate = working.Gates[index];
-            GUILayout.Label($"Gate #{index}", EditorStyles.boldLabel);
-            var before = GateKey.Of(gate);
+            var first = working.Blocks[blocks[0]];
 
-            var edge = (BoardEdge)EditorGUILayout.EnumPopup("Wall", gate.Edge);
-            var slot = EditorGUILayout.DelayedIntField("Index", gate.Index);
-            var depth = EditorGUILayout.DelayedIntField(new GUIContent("Depth", "Cells in from the outer edge; 0 is the outer wall"), gate.Depth);
-            if (edge != gate.Edge || slot != gate.Index || depth != gate.Depth)
-                Edit("Move Gate", l => LevelEditorGateOps.Move(l, index, edge, slot, depth));
+            EditorGUI.showMixedValue = blocks.Any(i => working.Blocks[i].Ice != first.Ice);
+            EditorGUI.BeginChangeCheck();
+            var ice = Mathf.Max(0, EditorGUILayout.IntField(
+                new GUIContent("Ice", "Frozen until this many blocks have left through gates; 0 = no ice"), first.Ice));
+            if (EditorGUI.EndChangeCheck()) Edit("Set Ice", l => blocks.Aggregate(false, (any, i) => Set(ref l.Blocks[i].Ice, ice) | any));
 
-            var length = EditorGUILayout.DelayedIntField("Length", gate.Length);
-            if (length != gate.Length)
-            {
-                Edit("Resize Gate", l =>
-                {
-                    var wall = LevelValidator.EdgeLength(l.Gates[index].Edge, l.Cols, l.Rows);
-                    l.Gates[index].Length = Mathf.Clamp(length, 1, wall);
-                    LevelEditorGateOps.Move(l, index, l.Gates[index].Edge, l.Gates[index].Index, l.Gates[index].Depth);
-                    return true;
-                });
-            }
-
-            FollowGate(before, index);
-
-            var color = (BlockColor)EditorGUILayout.EnumPopup("Colour", gate.Color);
-            if (color != gate.Color) Edit("Recolour Gate", l => Set(ref l.Gates[index].Color, color));
-
-            if (GUILayout.Button("Delete")) DeleteSelection();
-        }
-
-        // Several picked: what can be done to all of them at once.
-        private void DrawManyInspector()
-        {
-            GUILayout.Label($"{selectedBlocks.Count} block(s), {selectedGates.Count} gate(s) selected", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Pick a colour in the palette to recolour them all.", MessageType.None);
-            if (selectedBlocks.Count > 0) DrawBlockActions();
-            else if (GUILayout.Button("Delete")) DeleteSelection();
+            EditorGUI.showMixedValue = blocks.Any(i => working.Blocks[i].Axis != first.Axis);
+            EditorGUI.BeginChangeCheck();
+            var axis = (BlockAxis)EditorGUILayout.EnumPopup(
+                new GUIContent("Axis", "Free moves anywhere; Horizontal only along a row, Vertical only along a column"), first.Axis);
+            if (EditorGUI.EndChangeCheck()) Edit("Set Axis", l => blocks.Aggregate(false, (any, i) => Set(ref l.Blocks[i].Axis, axis) | any));
+            EditorGUI.showMixedValue = false;
         }
 
         private void DrawBlockActions()

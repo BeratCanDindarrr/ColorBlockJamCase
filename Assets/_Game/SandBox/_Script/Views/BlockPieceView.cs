@@ -20,13 +20,15 @@ namespace ColorBlockJam.SandBox
         [SerializeField] private Mesh innerCornerMesh;
         [SerializeField] private Mesh outerCornerMesh;
 
-        public void Set(BlockPieceKind kind, Color color)
+        public void Set(BlockPieceKind kind, Color color, Texture texture = null)
         {
             meshFilter.sharedMesh = GetMesh(kind);
             var shift = kind == BlockPieceKind.InnerCorner ? 0f : TileShift;
             meshFilter.transform.localPosition = new Vector3(-shift, FloorLift, -shift);
-            RendererTint.Apply(meshRenderer, color);
+            Tint(color, texture);
         }
+
+        public void Tint(Color color, Texture texture = null) => RendererTint.Apply(meshRenderer, color, texture);
 
         public void OnSpawned()
         {

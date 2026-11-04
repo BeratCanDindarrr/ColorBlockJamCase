@@ -22,6 +22,9 @@ namespace ColorBlockJam.SandBox
             new CellCoord(1, 1), new CellCoord(1, -1), new CellCoord(-1, -1), new CellCoord(-1, 1)
         };
 
+        [SerializeField] private BlockIceView iceView;
+        [SerializeField] private BlockAxisView axisView;
+
         private readonly List<BlockPieceView> _pieces = new List<BlockPieceView>();
         private readonly HashSet<CellCoord> _cells = new HashSet<CellCoord>();
         // Pieces still riding the exit slide; a piece leaves this list when it shatters.
@@ -40,6 +43,7 @@ namespace ColorBlockJam.SandBox
         private float _liftY;
         private Quaternion _tilt = Quaternion.identity;
         private Vector3 _centroid;
+        private Color _color;
 
         public BlockState Block { get; private set; }
         // Every piece has shattered and finished its tween; the view is safe to despawn.
@@ -69,11 +73,29 @@ namespace ColorBlockJam.SandBox
                 _centroid += new Vector3(cell.Col, 0f, -cell.Row);
             if (block.Cells.Count > 0) _centroid /= block.Cells.Count;
 
+            _color = color;
+            var frozen = block.Ice > 0;
+            var shown = frozen ? IceTinted(color) : color;
+            var texture = frozen ? _boardSettings.IceTexture : null;
             foreach (var cell in block.Cells)
             {
                 foreach (var quarter in Quarters)
-                    AddPiece(BlockOutline.PieceFor(_cells, cell, quarter.Col, quarter.Row), cell, quarter, color);
+                    AddPiece(BlockOutline.PieceFor(_cells, cell, quarter.Col, quarter.Row), cell, quarter, shown, texture);
             }
+
+            iceView.Show(block.Ice, IceAnchor());
+            var span = LongestRun(block.Axis, out var runCentre);
+            axisView.Show(block.Axis, runCentre, span, _boardSettings.ArrowColor);
+        }
+
+        // Another block left the board: the count drops; at 0 the block thaws back to its own colour and texture.
+        public void CrackIce()
+        {
+            iceView.Crack(Block.Ice, _boardSettings.IcePunch, _boardSettings.IcePunchDuration);
+            if (Block.Ice > 0) return;
+
+            foreach (var piece in _pieces)
+                piece.Tint(_color);
         }
 
         public void OnSpawned()
@@ -171,6 +193,8 @@ namespace ColorBlockJam.SandBox
 
             _pieces.Clear();
             _intact.Clear();
+            iceView.Hide();
+            axisView.Hide();
             ResetHeldPose();
             transform.localRotation = Quaternion.identity;
             _shattering = 0;
@@ -191,6 +215,53 @@ namespace ColorBlockJam.SandBox
         {
             _liftY = 0f;
             _tilt = Quaternion.identity;
+        }
+
+        private Color IceTinted(Color color) => Color.Lerp(color, _boardSettings.IceColor, _boardSettings.IceTint);
+
+        // The ice count sits on the block's centre, or on the cell nearest it when the centre falls outside the block (an L).
+        private Vector3 IceAnchor()
+        {
+            var best = _centroid;
+            var bestDistance = float.MaxValue;
+            foreach (var cell in _cells)
+            {
+                var local = new Vector3(cell.Col, 0f, -cell.Row);
+                if (Mathf.Abs(_centroid.x - local.x) <= Half && Mathf.Abs(_centroid.z - local.z) <= Half) return _centroid;
+
+                var distance = (local - _centroid).sqrMagnitude;
+                if (distance >= bestDistance) continue;
+                best = local;
+                bestDistance = distance;
+            }
+
+            return best;
+        }
+
+        // The longest straight run of cells along the axis (its length in cells and its block-local centre), so the
+        // arrow stays on the block whatever its shape.
+        private int LongestRun(BlockAxis axis, out Vector3 centre)
+        {
+            centre = _centroid;
+            if (axis == BlockAxis.Free) return 0;
+
+            var step = axis == BlockAxis.Horizontal ? new CellCoord(1, 0) : new CellCoord(0, 1);
+            var best = 0;
+            foreach (var cell in _cells)
+            {
+                // Count only from the first cell of a run.
+                if (_cells.Contains(new CellCoord(cell.Col - step.Col, cell.Row - step.Row))) continue;
+
+                var length = 1;
+                while (_cells.Contains(new CellCoord(cell.Col + step.Col * length, cell.Row + step.Row * length))) length++;
+                if (length <= best) continue;
+
+                best = length;
+                var mid = (length - 1) * Half;
+                centre = new Vector3(cell.Col + step.Col * mid, 0f, -(cell.Row + step.Row * mid));
+            }
+
+            return best;
         }
 
         private void ShatterPiecesPastLine()
@@ -249,7 +320,7 @@ namespace ColorBlockJam.SandBox
             onShattered?.Invoke(this);
         }
 
-        private void AddPiece(BlockPiece piece, CellCoord cell, CellCoord quarter, Color color)
+        private void AddPiece(BlockPiece piece, CellCoord cell, CellCoord quarter, Color color, Texture texture)
         {
             if (piece.Kind == BlockPieceKind.None) return;
 
@@ -261,7 +332,7 @@ namespace ColorBlockJam.SandBox
             view.transform.SetParent(transform, false);
             view.transform.localPosition = position;
             view.transform.localRotation = Quaternion.Euler(0f, GetYaw(piece), 0f);
-            view.Set(piece.Kind, color);
+            view.Set(piece.Kind, color, texture);
             _pieces.Add(view);
         }
 

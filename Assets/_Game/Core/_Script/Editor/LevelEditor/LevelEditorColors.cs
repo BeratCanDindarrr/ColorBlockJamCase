@@ -33,7 +33,7 @@ namespace ColorBlockJam.LevelEditor
 
         public static Color Of(BlockColor color)
         {
-            var colors = FindColors();
+            var colors = CachedColors();
             if (colors == null) return Color.magenta;
             for (var i = 0; i < colors.arraySize; i++)
             {
@@ -158,17 +158,29 @@ namespace ColorBlockJam.LevelEditor
             return true;
         }
 
+        // Of runs for every block/gate/swatch on every GUI event, so the asset and its SerializedObject are kept.
+        private static ScriptableObject _settings;
+        private static SerializedObject _serialized;
+
+        private static SerializedProperty CachedColors()
+        {
+            if (_settings == null || _serialized == null || _serialized.targetObject != _settings)
+            {
+                _settings = FindSettings();
+                _serialized = _settings == null ? null : new SerializedObject(_settings);
+            }
+
+            if (_serialized == null) return null;
+            _serialized.UpdateIfRequiredOrScript();
+            return _serialized.FindProperty(ColorsField);
+        }
+
         private static ScriptableObject FindSettings()
         {
             var guid = AssetDatabase.FindAssets("t:" + SettingsType).FirstOrDefault();
             return guid == null ? null : AssetDatabase.LoadAssetAtPath<ScriptableObject>(AssetDatabase.GUIDToAssetPath(guid));
         }
 
-        private static SerializedProperty FindColors()
-        {
-            var settings = FindSettings();
-            return settings == null ? null : new SerializedObject(settings).FindProperty(ColorsField);
-        }
     }
 
     // The "+" of the colour palette: a name and a colour for a new block colour.

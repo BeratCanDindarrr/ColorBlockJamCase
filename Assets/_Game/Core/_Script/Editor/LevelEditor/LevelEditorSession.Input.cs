@@ -14,7 +14,8 @@ namespace ColorBlockJam.LevelEditor
         private bool _draggingGate;
         private bool _boxing;
         private bool _removingCells;
-        private CellCoord _dragCell;
+        // Grabbed cell relative to the first selected block, so the blocks stay under the mouse while dragging.
+        private CellCoord _grabOffset;
         private CellCoord _boxStart;
         private CellCoord _boxEnd;
         private int _undoGroup;
@@ -38,7 +39,7 @@ namespace ColorBlockJam.LevelEditor
                     GUIUtility.hotControl = id;
                     Undo.IncrementCurrentGroup();
                     _undoGroup = Undo.GetCurrentGroup();
-                    _erasing = e.shift;
+                    _erasing = ErasesNow(e.shift);
                     _adding = e.shift || e.control || e.command;
                     Press(_board.HitTest(e.mousePosition, Holes), _board.PointAt(e.mousePosition));
                     e.Use();
@@ -91,12 +92,10 @@ namespace ColorBlockJam.LevelEditor
             }
         }
 
-        // Cell tool: the first cell decides whether this press removes cells or puts them back (Shift always puts back);
-        // dragging keeps doing the same to every cell it passes.
+        // Cell tool: "−" removes cells, "+" puts them back (Shift flips it); dragging does the same to every cell passed.
         private void PressCell(CellCoord cell)
         {
-            var isRemoved = Holes.Contains(cell);
-            _removingCells = !_erasing && !isRemoved;
+            _removingCells = _erasing;
             SetCellRemoved(cell);
         }
 
@@ -135,9 +134,9 @@ namespace ColorBlockJam.LevelEditor
                 _boxEnd = point;
                 Repaint();
             }
-            else if (_draggingBlocks && hit.Kind == BoardHitKind.Cell && hit.Cell != _dragCell)
+            else if (_draggingBlocks)
             {
-                DragBlocks(hit.Cell);
+                DragBlocks(point);
             }
             else if (_draggingGate && hit.Kind == BoardHitKind.Wall)
             {
@@ -180,7 +179,8 @@ namespace ColorBlockJam.LevelEditor
 
                 if (!IsBlockSelected(block)) SelectOnly(block, -1);
                 _draggingBlocks = true;
-                _dragCell = hit.Cell;
+                var first = working.Blocks[SelectedBlockIndices()[0]];
+                _grabOffset = new CellCoord(hit.Cell.Col - first.Col, hit.Cell.Row - first.Row);
             }
             else if (gate >= 0)
             {
@@ -202,20 +202,21 @@ namespace ColorBlockJam.LevelEditor
             }
         }
 
-        // Every selected block moves with the one under the mouse.
-        private void DragBlocks(CellCoord cell)
+        // Every selected block heads for where the mouse holds it; off the board or blocked they wait at the nearest
+        // place they got to and follow again as soon as the mouse is back, until the press is released.
+        private void DragBlocks(CellCoord point)
         {
             var blocks = SelectedBlockIndices();
             if (blocks.Count == 0) return;
 
             var first = working.Blocks[blocks[0]];
-            var before = new CellCoord(first.Col, first.Row);
-            Edit("Move Blocks", l => LevelEditorBlockOps.MoveMany(l, blocks, cell.Col - _dragCell.Col, cell.Row - _dragCell.Row));
-            // Only the part of the move the board allowed counts, so the blocks stay under the same cell.
-            _dragCell = _dragCell + new CellCoord(first.Col - before.Col, first.Row - before.Row);
+            var deltaCol = point.Col - _grabOffset.Col - first.Col;
+            var deltaRow = point.Row - _grabOffset.Row - first.Row;
+            if (deltaCol == 0 && deltaRow == 0) return;
+            Edit("Move Blocks", l => LevelEditorBlockOps.MoveMany(l, blocks, deltaCol, deltaRow));
         }
 
-        // Block tool press: Shift erases; a block picks it (its "+" places show); a "+" grows the picked block; any
+        // Block tool press: "−" (or Shift on "+") erases; a block picks it (its "+" places show); a "+" grows the picked block; any
         // other free cell leaves the picked block, or starts a new one when nothing is picked.
         private void PaintCell(CellCoord cell)
         {
@@ -266,7 +267,7 @@ namespace ColorBlockJam.LevelEditor
             PruneSelection();
         }
 
-        // Gate tool press: Shift deletes; a gate picks it (its "+" places show); a "+" grows the picked gate; any other
+        // Gate tool press: "−" (or Shift on "+") deletes; a gate picks it (its "+" places show); a "+" grows the picked gate; any other
         // free slot leaves the picked gate, or adds a new one when nothing is picked.
         private void PressGate(BoardHit hit)
         {

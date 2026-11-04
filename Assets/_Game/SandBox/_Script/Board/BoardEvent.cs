@@ -6,6 +6,8 @@ namespace ColorBlockJam.SandBox.Board
         DragEnded,
         // Block was pushed into Gate and left the board; its view slides out through the gate.
         BlockExitStarted,
+        // A frozen block's ice count went down (Block.Ice is the new count; 0 = thawed).
+        IceChanged,
         Won,
         Lost
     }

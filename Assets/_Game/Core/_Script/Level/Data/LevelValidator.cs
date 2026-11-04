@@ -46,8 +46,18 @@ namespace ColorBlockJam.Core.Level
 
             for (var i = 0; i < blocks.Length; i++)
             {
-                if (blocks[i] != null && !HasGateOfColor(gates, blocks[i].Color))
-                    issues.Add(new LevelIssue($"Block {blocks[i].Id} ({blocks[i].Color}) has no gate of its colour", false, i));
+                var block = blocks[i];
+                if (block == null) continue;
+
+                if (!HasGateOfColor(gates, block.Color, BlockAxis.Free))
+                    issues.Add(new LevelIssue($"Block {block.Id} ({block.Color}) has no gate of its colour", false, i));
+                else if (!HasGateOfColor(gates, block.Color, block.Axis))
+                    issues.Add(new LevelIssue($"Block {block.Id} moves only {block.Axis} but has no {block.Color} gate that way", false, i));
+
+                // Every other block leaving first is the most exits that can happen before it thaws.
+                if (block.Ice < 0) issues.Add(new LevelIssue($"Block {block.Id} has negative ice", true, i));
+                else if (block.Ice > blocks.Length - 1)
+                    issues.Add(new LevelIssue($"Block {block.Id} needs {block.Ice} exits to thaw but only {blocks.Length - 1} other blocks exist", true, i));
             }
 
             return issues;
@@ -188,14 +198,25 @@ namespace ColorBlockJam.Core.Level
             yield return new CellCoord(cell.Col, cell.Row - 1);
         }
 
-        private static bool HasGateOfColor(GateData[] gates, BlockColor color)
+        // A block locked to an axis can only leave through gates on the walls that axis runs into.
+        private static bool HasGateOfColor(GateData[] gates, BlockColor color, BlockAxis axis)
         {
             foreach (var gate in gates)
             {
-                if (gate != null && gate.Color == color) return true;
+                if (gate != null && gate.Color == color && RunsInto(axis, gate.Edge)) return true;
             }
 
             return false;
+        }
+
+        private static bool RunsInto(BlockAxis axis, BoardEdge edge)
+        {
+            switch (axis)
+            {
+                case BlockAxis.Horizontal: return edge == BoardEdge.Left || edge == BoardEdge.Right;
+                case BlockAxis.Vertical: return edge == BoardEdge.Top || edge == BoardEdge.Bottom;
+                default: return true;
+            }
         }
     }
 }

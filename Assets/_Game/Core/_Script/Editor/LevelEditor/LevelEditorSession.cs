@@ -30,8 +30,6 @@ namespace ColorBlockJam.LevelEditor
         [SerializeField] private BlockColor brush;
 
         private readonly LevelEditorBoardGui _board = new LevelEditorBoardGui();
-        // The palette shows every colour, not only the favourites.
-        private bool _showAllColors;
         private List<LevelIssue> _issues = new List<LevelIssue>();
         private readonly HashSet<int> _errorBlocks = new HashSet<int>();
         private readonly HashSet<int> _errorGates = new HashSet<int>();

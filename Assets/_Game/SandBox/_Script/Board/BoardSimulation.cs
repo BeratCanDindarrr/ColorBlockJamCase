@@ -59,6 +59,7 @@ namespace ColorBlockJam.SandBox.Board
         public bool BeginDrag(BlockState block)
         {
             if (Status != BoardStatus.Playing || DraggedBlock != null || block == null || block.IsExiting ||
+                block.Ice > 0 ||
                 !_blocks.Contains(block))
                 return false;
 
@@ -76,6 +77,7 @@ namespace ColorBlockJam.SandBox.Board
             if (DraggedBlock == null)
                 return DragPosition;
 
+            target = DraggedBlock.LockToAxis(DragPosition, target);
             DragPosition = _movement.SlideBlock(DraggedBlock, DragPosition, target);
             var position = DragPosition;
             TryStartExit(target);
@@ -169,8 +171,23 @@ namespace ColorBlockJam.SandBox.Board
             // The rules are done with it at once; the slide through the gate is the view's animation.
             _blocks.Remove(block);
             _pendingEvents.Add(new BoardEvent(BoardEventType.BlockExitStarted, block, best));
+            CrackIce();
             if (_blocks.Count == 0)
                 EndLevel(BoardStatus.Won);
+        }
+
+        // Every block that leaves takes one off each frozen block's count.
+        private void CrackIce()
+        {
+            for (var i = 0; i < _blocks.Count; i++)
+            {
+                var block = _blocks[i];
+                if (block.Ice == 0)
+                    continue;
+
+                block.Ice--;
+                _pendingEvents.Add(new BoardEvent(BoardEventType.IceChanged, block));
+            }
         }
 
         private void ClearDrag()

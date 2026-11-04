@@ -205,5 +205,89 @@ namespace ColorBlockJam.SandBox.Board.Tests
             Assert.That(position.Row, Is.EqualTo(3).Within(1e-9));
             Assert.That(sim.DraggedBlock, Is.SameAs(block));
         }
+
+        // A (red, top-left) next to its gate; B (blue, bottom-right) frozen for one exit.
+        private static BoardSimulation IcedLevel(int ice)
+        {
+            var b = Block("B", GridSize - 1, GridSize - 1, BlockColor.Blue, Cells(0, 0));
+            b.Ice = ice;
+            var blocks = new[] { Block("A", 0, 0, BlockColor.Red, Cells(0, 0)), b };
+            var gates = new[]
+            {
+                Gate(BoardEdge.Left, 0, 1, BlockColor.Red),
+                Gate(BoardEdge.Right, GridSize - 1, 1, BlockColor.Blue)
+            };
+            return new BoardSimulation(Create(GridSize, GridSize, 60, blocks, gates), Rules());
+        }
+
+        // One red block in the top-left corner locked to an axis, with red gates on the left and top walls.
+        private static BoardSimulation AxisLevel(BlockAxis axis)
+        {
+            var a = Block("A", 0, 0, BlockColor.Red, Cells(0, 0));
+            a.Axis = axis;
+            var gates = new[] { Gate(BoardEdge.Left, 0, 1, BlockColor.Red), Gate(BoardEdge.Top, 0, 1, BlockColor.Red) };
+            return new BoardSimulation(Create(GridSize, GridSize, 60, new[] { a }, gates), Rules());
+        }
+
+        [Test]
+        public void BeginDrag_IcedBlock_ReturnsFalse()
+        {
+            var sim = IcedLevel(1);
+
+            Assert.That(sim.BeginDrag(Find(sim, "B")), Is.False);
+            Assert.That(sim.DraggedBlock, Is.Null);
+        }
+
+        [Test]
+        public void BlockExit_CracksIce_AndThawedBlockCanBeDragged()
+        {
+            var sim = IcedLevel(1);
+            var iced = Find(sim, "B");
+
+            PushAIntoLeftGate(sim);
+
+            Assert.That(iced.Ice, Is.EqualTo(0));
+            Assert.That(sim.TakeEvents().Any(e => e.Type == BoardEventType.IceChanged && e.Block == iced), Is.True);
+            Assert.That(sim.BeginDrag(iced), Is.True);
+        }
+
+        [Test]
+        public void BlockExit_IceAboveOne_StaysFrozen()
+        {
+            var sim = IcedLevel(2);
+            var iced = Find(sim, "B");
+
+            PushAIntoLeftGate(sim);
+
+            Assert.That(iced.Ice, Is.EqualTo(1));
+            Assert.That(sim.BeginDrag(iced), Is.False);
+        }
+
+        [Test]
+        public void MoveDrag_HorizontalBlock_MovesOnlyAlongColumns()
+        {
+            var sim = AxisLevel(BlockAxis.Horizontal);
+            sim.BeginDrag(Find(sim, "A"));
+
+            Assert.That(sim.MoveDrag(new BoardPoint(0, 3)).Row, Is.EqualTo(0));
+            var moved = sim.MoveDrag(new BoardPoint(3, 2));
+            Assert.That(moved.Col, Is.EqualTo(3));
+            Assert.That(moved.Row, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void MoveDrag_VerticalBlock_ExitsTopGate_NotLeftGate()
+        {
+            var sim = AxisLevel(BlockAxis.Vertical);
+            var block = Find(sim, "A");
+            sim.BeginDrag(block);
+
+            sim.MoveDrag(new BoardPoint(-1, 0));
+            Assert.That(block.IsExiting, Is.False);
+
+            sim.MoveDrag(new BoardPoint(0, -1));
+            Assert.That(block.IsExiting, Is.True);
+            Assert.That(block.ExitGate.Edge, Is.EqualTo(BoardEdge.Top));
+        }
     }
 }

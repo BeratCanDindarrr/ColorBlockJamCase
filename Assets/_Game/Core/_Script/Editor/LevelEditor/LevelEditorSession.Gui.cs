@@ -17,9 +17,14 @@ namespace ColorBlockJam.LevelEditor
         internal const float BarWidth = 620f;
         private const float BarLabelWidth = 62f;
         private const float BarFieldWidth = 105f;
-        private const int BarSwatchesPerRow = 20;
+        private const float PanelButtonWidth = 30f;
+        private const float PanelButtonHeight = 20f;
+        private const string FavoritesFoldKey = "ColorBlockJam.LevelEditor.PaletteFavoritesOpen";
+        private const string AllColorsFoldKey = "ColorBlockJam.LevelEditor.PaletteAllOpen";
 
         private static readonly string[] ToolNames = { "1 Select", "2 Block", "3 Gate", "4 Cell" };
+        private static readonly string[] ModeNames = { "+ Add", "− Erase" };
+        private bool _lastShift;
 
         private Vector2 _statusScroll;
         private Vector2 _inspectorScroll;
@@ -64,9 +69,7 @@ namespace ColorBlockJam.LevelEditor
                 if (GUILayout.Button("‹", EditorStyles.toolbarButton, GUILayout.Width(24f))) TryOpen(levels[current - 1]);
             }
 
-            var names = levels.Select(l => l.name).ToArray();
-            var picked = EditorGUILayout.Popup(current, names, EditorStyles.toolbarPopup, GUILayout.Width(160f));
-            if (picked != current && picked >= 0) TryOpen(levels[picked]);
+            LevelEditorLevelPicker.Draw(levels, current, l => TryOpen(l), EditorStyles.toolbarPopup, 160f);
 
             using (new EditorGUI.DisabledScope(current < 0 || current >= levels.Count - 1))
             {
@@ -90,7 +93,7 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndHorizontal();
         }
 
-        // The SceneView level bar, three short rows: which level and save / play; its size, time and problems; the palette.
+        // The SceneView level bar: which level and save / play; its size, time and problems; switches for the other panels.
         internal void DrawLevelBar()
         {
             if (EnsureWorking() == null) return;
@@ -103,8 +106,7 @@ namespace ColorBlockJam.LevelEditor
                 if (GUILayout.Button("‹", EditorStyles.miniButtonLeft, GUILayout.Width(22f))) TryOpen(levels[current - 1]);
             }
 
-            var picked = EditorGUILayout.Popup(current, levels.Select(l => l.name).ToArray(), GUILayout.Width(130f));
-            if (picked != current && picked >= 0) TryOpen(levels[picked]);
+            LevelEditorLevelPicker.Draw(levels, current, l => TryOpen(l), EditorStyles.popup, 130f);
 
             using (new EditorGUI.DisabledScope(current < 0 || current >= levels.Count - 1))
             {
@@ -135,7 +137,23 @@ namespace ColorBlockJam.LevelEditor
             DrawProblemsLine();
             EditorGUILayout.EndHorizontal();
 
-            DrawSwatches(BarSwatchesPerRow, BarWidth);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Panels", EditorStyles.miniBoldLabel, GUILayout.Width(BarLabelWidth));
+            DrawPanelToggle(LevelEditorSceneOverlays.PanelId, "d_UnityEditor.InspectorWindow",
+                "Properties\nColours and the selected blocks or gates");
+            DrawPanelToggle(LevelEditorSceneOverlays.ShapesId, "d_Prefab Icon", "Shapes\nSaved block shapes to drag onto the board");
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+        }
+
+        // Opens or closes one of the Scene view panels: a small icon button, lit while the panel is open.
+        private static void DrawPanelToggle(string overlayId, string iconName, string tip)
+        {
+            var shown = LevelEditorSceneOverlays.IsShown(overlayId);
+            var content = new GUIContent(EditorGUIUtility.IconContent(iconName).image, tip);
+            var now = GUILayout.Toggle(shown, content, EditorStyles.miniButton, GUILayout.Width(PanelButtonWidth),
+                GUILayout.Height(PanelButtonHeight));
+            if (now != shown) LevelEditorSceneOverlays.SetShown(overlayId, now);
         }
 
         // One line: the first error (or warning) and the counts; the tooltip lists them all.
@@ -161,72 +179,80 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.BeginVertical(GUILayout.Width(SideWidth));
             GUILayout.Label("Tool", EditorStyles.boldLabel);
             CurrentTool = (LevelEditorTool)GUILayout.SelectionGrid((int)tool, ToolNames, 1);
+            if (HasModes) EraseMode = GUILayout.Toolbar(EraseMode ? 1 : 0, ModeNames) == 1;
 
             GUILayout.Space(8f);
             GUILayout.Label("Colour", EditorStyles.boldLabel);
-            DrawSwatches();
+            DrawPalette();
 
             GUILayout.Space(8f);
             GUILayout.Label("Level", EditorStyles.boldLabel);
             DrawLevelFields();
 
             GUILayout.Space(8f);
-            EditorGUILayout.HelpBox("Select: Shift/Ctrl+click adds,\ndrag on empty = box\nBlock/Gate: Shift erases\n" +
-                                    "Cell: click/drag removes or\nrestores cells, Shift restores\n" +
+            EditorGUILayout.HelpBox("Select: Shift/Ctrl+click adds,\ndrag on empty = box\nBlock/Gate/Cell: + adds, − erases\n" +
+                                    "(red = will be erased),\nShift flips + / −\n" +
                                     "Del: delete   R: rotate\nCtrl+D: duplicate\nCtrl+C / Ctrl+V: copy, paste\n" +
                                     "Ctrl+S: save   Esc: deselect", MessageType.None);
             EditorGUILayout.EndVertical();
         }
 
-        // Picks the brush colour; with a block or gate selected it also recolours it.
-        // The favourite colours (all of them after "…", or when none is starred; a double click stars one), then "+" adds
-        // a colour, the pencil opens the colour list and "…" shows the rest.
-        private void DrawSwatches(int perRow = 6, float width = SideWidth)
+        // Picks the brush colour; with a block or gate selected it also recolours it. A tools row (eyedropper, "+" adds a
+        // colour, pencil edits them), then two lists that fold away: the favourite colours and all colours.
+        private void DrawPalette(int perRow = 6, float width = SideWidth)
         {
+            DrawPaletteTools();
             var all = (BlockColor[])Enum.GetValues(typeof(BlockColor));
             var favorites = all.Where(LevelEditorColors.IsFavorite).ToArray();
-            var hasMore = favorites.Length > 0 && favorites.Length < all.Length;
-            var colors = hasMore && !_showAllColors ? favorites : all;
-            // After the colours: eyedropper, "+", pencil, and "…" when some colours are hidden.
-            var slots = colors.Length + (hasMore ? 4 : 3);
-            for (var i = 0; i < slots; i += perRow)
+
+            if (DrawColorFold(FavoritesFoldKey, new GUIContent($"Favourites ({favorites.Length})",
+                    "Double-click a colour to add it to or remove it from favourites")))
             {
-                var row = GUILayoutUtility.GetRect(width, SwatchSize + 4f);
-                for (var j = 0; j < perRow && i + j < slots; j++)
-                {
-                    var rect = new Rect(row.x + j * (SwatchSize + 4f), row.y, SwatchSize, SwatchSize);
-                    var slot = i + j - colors.Length - 1;
-                    if (slot == -1)
-                    {
-                        if (_pickingColor) EditorGUI.DrawRect(rect, LevelEditorStyle.Selection);
-                        var eyedropper = new GUIContent(EditorGUIUtility.IconContent("d_eyeDropper.Large").image,
-                            "Eyedropper: click a block or gate to copy its colour (Esc cancels)");
-                        if (GUI.Button(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), eyedropper))
-                            ToggleEyedropper();
-                    }
-                    else if (slot == 0)
-                    {
-                        if (GUI.Button(rect, new GUIContent("+", "Add a colour"))) PopupWindow.Show(rect, new AddColorPopup());
-                    }
-                    else if (slot == 1)
-                    {
-                        if (GUI.Button(rect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image,
-                                "Edit colours and favourites"))) LevelEditorColorsWindow.Open();
-                    }
-                    else if (slot == 2)
-                    {
-                        if (GUI.Button(rect, new GUIContent(_showAllColors ? "▴" : "…",
-                                _showAllColors ? "Show only favourites" : "Show all colours")))
-                            _showAllColors = !_showAllColors;
-                    }
-                    else
-                    {
-                        DrawSwatch(rect, colors[i + j]);
-                    }
-                }
+                if (favorites.Length == 0) GUILayout.Label("None yet", EditorStyles.centeredGreyMiniLabel);
+                DrawSwatchGrid(favorites, perRow, width);
             }
 
-            GUILayout.Label(brush.ToString(), EditorStyles.miniLabel);
+            if (DrawColorFold(AllColorsFoldKey, new GUIContent($"All colours ({all.Length})"))) DrawSwatchGrid(all, perRow, width);
+
+            GUILayout.Label($"Brush: {brush}", EditorStyles.miniBoldLabel);
+        }
+
+        private void DrawPaletteTools()
+        {
+            var row = GUILayoutUtility.GetRect(SwatchSize * 3f + 8f, SwatchSize + 4f, GUILayout.ExpandWidth(false));
+            var rect = new Rect(row.x, row.y, SwatchSize, SwatchSize);
+
+            if (_pickingColor) EditorGUI.DrawRect(rect, LevelEditorStyle.Selection);
+            var eyedropper = new GUIContent(EditorGUIUtility.IconContent("d_eyeDropper.Large").image,
+                "Eyedropper: click a block or gate to copy its colour (Esc cancels)");
+            if (GUI.Button(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), eyedropper))
+                ToggleEyedropper();
+
+            rect.x += SwatchSize + 4f;
+            if (GUI.Button(rect, new GUIContent("+", "Add a colour"))) PopupWindow.Show(rect, new AddColorPopup());
+
+            rect.x += SwatchSize + 4f;
+            if (GUI.Button(rect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image,
+                    "Edit colours and favourites"))) LevelEditorColorsWindow.Open();
+        }
+
+        // A folding header whose open state is kept per user.
+        private static bool DrawColorFold(string key, GUIContent label)
+        {
+            var open = EditorPrefs.GetBool(key, true);
+            var now = EditorGUILayout.Foldout(open, label, true);
+            if (now != open) EditorPrefs.SetBool(key, now);
+            return now;
+        }
+
+        private void DrawSwatchGrid(BlockColor[] colors, int perRow, float width)
+        {
+            for (var i = 0; i < colors.Length; i += perRow)
+            {
+                var row = GUILayoutUtility.GetRect(width, SwatchSize + 4f);
+                for (var j = 0; j < perRow && i + j < colors.Length; j++)
+                    DrawSwatch(new Rect(row.x + j * (SwatchSize + 4f), row.y, SwatchSize, SwatchSize), colors[i + j]);
+            }
         }
 
         // A click picks the colour, a double click stars or unstars it as a favourite.
@@ -297,10 +323,18 @@ namespace ColorBlockJam.LevelEditor
         private void DrawBoard(Rect rect)
         {
             EditorGUI.DrawRect(rect, LevelEditorStyle.Background);
+            // The hover tint follows Shift, so a Shift press or release redraws the board.
+            if (Event.current.shift != _lastShift)
+            {
+                _lastShift = Event.current.shift;
+                Repaint();
+            }
+
             _board.Layout(new Rect(rect.x + 8f, rect.y + 8f, rect.width - 16f, rect.height - 16f), working);
             if (Event.current.type == EventType.Repaint)
             {
-                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, GrowPlaces());
+                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, GrowPlaces(),
+                    HoverColor(Event.current.shift));
                 if (_boxing) _board.DrawBox(BoxMin, BoxMax);
                 if (_ghost.Count > 0) _board.DrawGhost(_ghost, _ghostFits);
             }

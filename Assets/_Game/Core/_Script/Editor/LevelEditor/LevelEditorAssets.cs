@@ -12,10 +12,24 @@ namespace ColorBlockJam.LevelEditor
     {
         private const string LevelFolder = "Assets/_Game/Core/Settings/Levels";
 
+        // The level bar asks for these on every GUI event; AssetDatabase searches are kept until the project changes.
+        private static LevelSettings _levelSettings;
+        private static List<LevelData> _allLevels;
+
+        static LevelEditorAssets() => EditorApplication.projectChanged += ClearCache;
+
+        private static void ClearCache()
+        {
+            _levelSettings = null;
+            _allLevels = null;
+        }
+
         public static LevelSettings FindLevelSettings()
         {
+            if (_levelSettings != null) return _levelSettings;
             var guid = AssetDatabase.FindAssets("t:" + nameof(LevelSettings)).FirstOrDefault();
-            return guid == null ? null : AssetDatabase.LoadAssetAtPath<LevelSettings>(AssetDatabase.GUIDToAssetPath(guid));
+            _levelSettings = guid == null ? null : AssetDatabase.LoadAssetAtPath<LevelSettings>(AssetDatabase.GUIDToAssetPath(guid));
+            return _levelSettings;
         }
 
         public static List<LevelData> FindLevels()
@@ -25,12 +39,12 @@ namespace ColorBlockJam.LevelEditor
                 ? settings.Levels.Where(l => l != null).Distinct().ToList()
                 : new List<LevelData>();
 
-            foreach (var guid in AssetDatabase.FindAssets("t:" + nameof(LevelData)))
-            {
-                var level = AssetDatabase.LoadAssetAtPath<LevelData>(AssetDatabase.GUIDToAssetPath(guid));
-                if (level != null && !levels.Contains(level)) levels.Add(level);
-            }
+            if (_allLevels == null || _allLevels.Any(l => l == null))
+                _allLevels = AssetDatabase.FindAssets("t:" + nameof(LevelData))
+                    .Select(guid => AssetDatabase.LoadAssetAtPath<LevelData>(AssetDatabase.GUIDToAssetPath(guid)))
+                    .Where(l => l != null).ToList();
 
+            levels.AddRange(_allLevels.Where(l => !levels.Contains(l)));
             return levels;
         }
 
@@ -52,6 +66,7 @@ namespace ColorBlockJam.LevelEditor
             level.Blocks = new BlockData[0];
             level.Gates = new GateData[0];
             AssetDatabase.CreateAsset(level, path);
+            ClearCache();
 
             if (settings != null)
             {

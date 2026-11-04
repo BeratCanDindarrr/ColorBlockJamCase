@@ -90,8 +90,14 @@ namespace ColorBlockJam.LevelEditor
         }
 
         // Quarter turn clockwise (rows grow downwards), kept at the same top-left corner.
-        public static void Rotate(LevelData level, int index) =>
-            Transform(level.Blocks[index], c => new CellCoord(-c.Row, c.Col));
+        // A quarter turn also turns a one-way block's axis.
+        public static void Rotate(LevelData level, int index)
+        {
+            var block = level.Blocks[index];
+            Transform(block, c => new CellCoord(-c.Row, c.Col));
+            if (block.Axis == BlockAxis.Horizontal) block.Axis = BlockAxis.Vertical;
+            else if (block.Axis == BlockAxis.Vertical) block.Axis = BlockAxis.Horizontal;
+        }
 
         public static void Mirror(LevelData level, int index) =>
             Transform(level.Blocks[index], c => new CellCoord(-c.Col, c.Row));
@@ -133,7 +139,7 @@ namespace ColorBlockJam.LevelEditor
                 blocks.Add(new BlockData
                 {
                     Id = NextId(blocks), Col = col, Row = row, Color = template.Color,
-                    Cells = (CellCoord[])offsets.Clone()
+                    Cells = (CellCoord[])offsets.Clone(), Ice = template.Ice, Axis = template.Axis
                 });
                 level.Blocks = blocks.ToArray();
                 return blocks.Count - 1;

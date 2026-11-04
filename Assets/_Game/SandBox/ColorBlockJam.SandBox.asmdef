@@ -9,7 +9,8 @@
         "MessagePipe",
         "UniTask",
         "DOTween.Modules",
-        "LeanTouch"
+        "LeanTouch",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

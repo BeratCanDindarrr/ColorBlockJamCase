@@ -14,7 +14,6 @@ namespace ColorBlockJam.SandBox.Editor
     {
         // Marks float just above the pick plane so they read over the blocks.
         private const float MarkLift = 0.02f;
-        private static readonly Color HoverFill = new Color(1f, 1f, 1f, 0.12f);
         private static readonly Color SelectionFill = new Color(1f, 1f, 1f, 0.18f);
         private static readonly Color BoxFill = new Color(1f, 1f, 1f, 0.06f);
 
@@ -27,6 +26,7 @@ namespace ColorBlockJam.SandBox.Editor
         private static readonly Color GrowFill = new Color(0.20f, 0.72f, 0.30f, 0.85f);
         private static readonly Vector3[] Quad = new Vector3[4];
         private static CellCoord? _hover;
+        private static bool _lastShift;
 
         static LevelEditorSceneInput()
         {
@@ -47,8 +47,21 @@ namespace ColorBlockJam.SandBox.Editor
             // Clicks on the board edit the level instead of picking scene objects.
             if (e.type == EventType.Layout) HandleUtility.AddDefaultControl(id);
 
-            var point = PointUnderMouse(board, e.mousePosition, out var within);
+            // While a press is held the point is kept to the wall ring, so a drag past the board stays at its edge.
+            var holding = GUIUtility.hotControl == id;
+            var point = PointUnderMouse(board, e.mousePosition, holding, out var within);
             if (HandleShapeDrag(e, point)) return;
+
+            // The hover tint follows Shift (it flips + / −), so pressing or letting go of it redraws.
+            if (e.shift != _lastShift)
+            {
+                _lastShift = e.shift;
+                sceneView.Repaint();
+            }
+
+            if (_hover.HasValue && LevelEditorSession.ErasesFromScene(e.shift))
+                EditorGUIUtility.AddCursorRect(new Rect(0f, 0f, sceneView.position.width, sceneView.position.height),
+                    MouseCursor.ArrowMinus);
 
             switch (e.GetTypeForControl(id))
             {
@@ -123,9 +136,10 @@ namespace ColorBlockJam.SandBox.Editor
             }
         }
 
-        // The grid position under the mouse, held to the wall ring around the board; null off the board plane or
-        // beyond the ring.
-        private static CellCoord? PointUnderMouse(BoardViewController board, Vector2 mouse, out Vector2 within)
+        // The grid position under the mouse, within the wall ring around the board; null off the board plane, or beyond
+        // the ring unless `clampToRing` (then the nearest ring position).
+        private static CellCoord? PointUnderMouse(BoardViewController board, Vector2 mouse, bool clampToRing,
+            out Vector2 within)
         {
             within = new Vector2(0.5f, 0.5f);
             var root = board.transform;
@@ -137,7 +151,9 @@ namespace ColorBlockJam.SandBox.Editor
             var point = layout.LocalToBoard(root.InverseTransformPoint(ray.GetPoint(enter)));
             var col = Mathf.FloorToInt((float)point.Col);
             var row = Mathf.FloorToInt((float)point.Row);
-            if (col < -1 || row < -1 || col > layout.Cols || row > layout.Rows) return null;
+            var outside = col < -1 || row < -1 || col > layout.Cols || row > layout.Rows;
+            if (outside && !clampToRing) return null;
+            if (outside) return new CellCoord(Mathf.Clamp(col, -1, layout.Cols), Mathf.Clamp(row, -1, layout.Rows));
             within = new Vector2((float)point.Col - col, (float)point.Row - row);
             return new CellCoord(col, row);
         }
@@ -153,7 +169,9 @@ namespace ColorBlockJam.SandBox.Editor
                 foreach (var cell in Ghost) DrawRect(board, cell, cell, fill, fill);
             }
             if (boxing) DrawRect(board, boxMin, boxMax, BoxFill, Color.white);
-            if (_hover.HasValue) DrawRect(board, _hover.Value, _hover.Value, HoverFill, new Color(1f, 1f, 1f, 0.5f));
+            if (!_hover.HasValue) return;
+            var hoverFill = LevelEditorSession.HoverColor(Event.current.shift);
+            DrawRect(board, _hover.Value, _hover.Value, hoverFill, new Color(hoverFill.r, hoverFill.g, hoverFill.b, 0.9f));
         }
 
         // A green "+" where the picked block or gate can grow.

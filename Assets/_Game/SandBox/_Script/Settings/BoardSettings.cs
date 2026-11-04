@@ -59,6 +59,15 @@ namespace ColorBlockJam.SandBox
             new ColorEntry { Key = BlockColor.Cyan, Value = new Color(0.25f, 0.82f, 0.88f) },
         };
 
+        // A frozen block is tinted this far (0-1) toward IceColor; its count punches by IcePunch when a block leaves.
+        public Color IceColor = new Color(0.80f, 0.93f, 1f);
+        public float IceTint = 0.65f;
+        public float IcePunch = 0.3f;
+        public float IcePunchDuration = 0.25f;
+        // Laid over a frozen block's pieces (multiplied by the ice tint); none = tint only.
+        public Texture2D IceTexture;
+        public Color ArrowColor = Color.white;
+
         public Color FloorColor = new Color(0.82f, 0.86f, 0.92f);
         // World units kept free around the walled board when the camera frames it.
         public float CameraMargin = 0.5f;
@@ -104,6 +113,9 @@ namespace ColorBlockJam.SandBox
             ShatterDuration = Mathf.Max(MinPositive, ShatterDuration);
             ShatterForce = Mathf.Max(0f, ShatterForce);
             ShatterSpread = Mathf.Max(0f, ShatterSpread);
+            IceTint = Mathf.Clamp01(IceTint);
+            IcePunch = Mathf.Max(0f, IcePunch);
+            IcePunchDuration = Mathf.Max(MinPositive, IcePunchDuration);
             BlockPoolSize = Mathf.Clamp(BlockPoolSize, 0, MaxPoolSize);
             PiecePoolSize = Mathf.Clamp(PiecePoolSize, 0, MaxPoolSize);
         }

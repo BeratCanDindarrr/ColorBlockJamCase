@@ -118,13 +118,6 @@ namespace ColorBlockJam.LevelEditor
             if (at >= 0 && index >= 0 && index < working.Gates.Length) selectedGates[at] = GateKey.Of(working.Gates[index]);
         }
 
-        // A selected block was renamed: it stays selected.
-        private void FollowBlock(string before, int index)
-        {
-            var at = selectedBlocks.IndexOf(before);
-            if (at >= 0) selectedBlocks[at] = working.Blocks[index].Id;
-        }
-
         // Drops what is no longer in the level (after undo, delete or a raw data edit).
         private void PruneSelection()
         {
