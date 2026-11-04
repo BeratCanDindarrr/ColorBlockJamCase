@@ -8,7 +8,6 @@ using ColorBlockJam.GameTask;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Signals;
 using ColorBlockJam.Views;
-using ColorBlockJam.Views.TestPopup;
 using ColorBlockJam.Utils;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
@@ -32,6 +31,7 @@ namespace ColorBlockJam.Core.Controller
         private readonly SceneLoaderController _sceneLoaderController;
         private readonly LevelSettings _levelSettings;
         private readonly ISubscriber<LevelEndedSignal> _levelEndedSubscriber;
+        private readonly IAudioService _audioService;
 
         private IDisposable _levelEndedSubscription;
         
@@ -47,8 +47,10 @@ namespace ColorBlockJam.Core.Controller
         , SettingsController settingsController
         , SceneLoaderController sceneLoaderController
         , LevelSettings levelSettings
-        , ISubscriber<LevelEndedSignal> levelEndedSubscriber)
+        , ISubscriber<LevelEndedSignal> levelEndedSubscriber
+        , IAudioService audioService)
         {
+            _audioService = audioService;
             _applicationSettings = applicationSettings;
             _taskService = taskService;
             _popupService = popupService;
@@ -88,12 +90,9 @@ namespace ColorBlockJam.Core.Controller
             waitForSeconds.Init(2f);
             _taskService.AddTask(waitForSeconds);
             CallBackGameTask callBackGameTask = new CallBackGameTask();
-            callBackGameTask.Init(() =>
-            {
-                DebugExtension.Log("CallBackGameTask " + _applicationSettings.ApplicationName);
-            });
+            // Loading is over (the SFXManager scene object is awake by now): start the music.
+            callBackGameTask.Init(() => _audioService.PlayMusic(SfxName.GameplayMusic));
             _taskService.AddTask(callBackGameTask);
-            _popupService.AddPopup(new TestPopupParameter());
 #if UNITY_EDITOR
             // Started from the level editor's Play: go straight into its level once loading is over.
             if (UnityEditor.SessionState.GetInt(GlobalConst.LevelEditor.PlayLevelKey, GlobalConst.LevelEditor.NoPlayLevel)

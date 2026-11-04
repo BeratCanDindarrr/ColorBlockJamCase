@@ -1,7 +1,9 @@
 using System.Threading;
+using ColorBlockJam.Enums;
 using ColorBlockJam.Interfaces;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 
 namespace ColorBlockJam.Views
 {
@@ -9,12 +11,21 @@ namespace ColorBlockJam.Views
     {
         private T _popupParameters;
         private bool _isPopupClosed = false;
+        private IAudioService _audioService;
 
         protected T Parameters => _popupParameters;
+
+        // Named apart from the popups' own Construct methods; VContainer calls both.
+        [Inject]
+        public void ConstructBasePopup(IAudioService audioService)
+        {
+            _audioService = audioService;
+        }
 
         public void Init(BasePopupParameters parameters)
         {
             _popupParameters = (T)parameters;
+            _audioService?.PlaySfx(SfxName.PopupOpen);
             ShowPopup();
         }
 
@@ -25,6 +36,8 @@ namespace ColorBlockJam.Views
 
         public virtual void ClosePopup()
         {
+            if (_isPopupClosed) return;
+            _audioService?.PlaySfx(SfxName.PopupClose);
             _isPopupClosed = true;
         }
 

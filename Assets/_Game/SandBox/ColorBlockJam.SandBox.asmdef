@@ -10,7 +10,8 @@
         "UniTask",
         "DOTween.Modules",
         "LeanTouch",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "MOST.HapticFeedback"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

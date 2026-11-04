@@ -10,7 +10,8 @@
         "DOTween.Modules",
         "UnityEngine.UI",
         "LeanTouch",
-        "BroAudio",
+        "QFSW.AudioManagerPro",
+        "MOST.HapticFeedback",
         "Unity.TextMeshPro"
     ],
     "includePlatforms": [],

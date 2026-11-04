@@ -1,8 +1,11 @@
 using System;
+using ColorBlockJam.Enums;
+using ColorBlockJam.Interfaces;
 using ColorBlockJam.SandBox.Board;
 using ColorBlockJam.Signals;
 using Lean.Touch;
 using MessagePipe;
+using Solo.MOST_IN_ONE;
 using UnityEngine;
 
 namespace ColorBlockJam.SandBox
@@ -18,6 +21,8 @@ namespace ColorBlockJam.SandBox
         private readonly ISubscriber<OnFingerDownSignal> _fingerDownSubscriber;
         private readonly ISubscriber<OnFingerUpdateSignal> _fingerUpdateSubscriber;
         private readonly ISubscriber<OnFingerUpSignal> _fingerUpSubscriber;
+        private readonly IAudioService _audioService;
+        private readonly IHapticService _hapticService;
 
         private IDisposable _subscriptions;
         private BlockState _heldBlock;
@@ -29,8 +34,11 @@ namespace ColorBlockJam.SandBox
             BoardCameraView cameraView, BoardSettings boardSettings,
             ISubscriber<OnFingerDownSignal> fingerDownSubscriber,
             ISubscriber<OnFingerUpdateSignal> fingerUpdateSubscriber,
-            ISubscriber<OnFingerUpSignal> fingerUpSubscriber)
+            ISubscriber<OnFingerUpSignal> fingerUpSubscriber,
+            IAudioService audioService, IHapticService hapticService)
         {
+            _audioService = audioService;
+            _hapticService = hapticService;
             _boardController = boardController;
             _boardViewController = boardViewController;
             _cameraView = cameraView;
@@ -76,6 +84,9 @@ namespace ColorBlockJam.SandBox
             var block = simulation.BlockAt(point);
             if (!simulation.BeginDrag(block)) return;
             _boardController.Flush();
+            // Picking a block clicks like a button.
+            _audioService.PlaySfx(SfxName.Buttons);
+            _hapticService.Play(MOST_HapticFeedback.HapticTypes.Selection);
 
             _heldBlock = block;
             _finger = finger;

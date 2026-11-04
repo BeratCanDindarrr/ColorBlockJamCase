@@ -14,11 +14,13 @@ namespace ColorBlockJam.GameTask
         private ScreenController _screenController;
         private PlayerController _playerController;
         private LevelSettings _levelSettings;
+        private IAudioService _audioService;
 
         [Inject]
         public void Construct(ScreenController screenController, PlayerController playerController,
-            LevelSettings levelSettings)
+            LevelSettings levelSettings, IAudioService audioService)
         {
+            _audioService = audioService;
             _screenController = screenController;
             _playerController = playerController;
             _levelSettings = levelSettings;
@@ -31,6 +33,7 @@ namespace ColorBlockJam.GameTask
             var button = _screenController.MainScreenView.LevelButton;
             if (button == null) return;
 
+            _audioService.PlaySfx(SfxName.LevelUp);
             await button.PlayLevelUp(_playerController.GetVisualLevel(), _levelSettings, cancellationToken);
         }
 

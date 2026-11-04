@@ -341,6 +341,7 @@ GameObject:
   - component: {fileID: 385341514635797715}
   - component: {fileID: 7259767483903189742}
   - component: {fileID: 3622719905384730449}
+  - component: {fileID: 4163627405190783393}
   m_Layer: 5
   m_Name: LifeHolder
   m_TagString: Untagged
@@ -451,6 +452,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4163627405190783393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119642142158833696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &1430280596372613577
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,6 +649,7 @@ GameObject:
   - component: {fileID: 8927593517722196129}
   - component: {fileID: 6588286664654834071}
   - component: {fileID: 1833684574851959038}
+  - component: {fileID: 8431381329472576020}
   m_Layer: 5
   m_Name: CoinHolder
   m_TagString: Untagged
@@ -746,6 +761,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8431381329472576020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2465535433876936001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &2874866081736079843
 GameObject:
   m_ObjectHideFlags: 0
@@ -1441,6 +1469,7 @@ GameObject:
   - component: {fileID: 7991472529469477637}
   - component: {fileID: 5325926690471252185}
   - component: {fileID: 3472905976702556845}
+  - component: {fileID: 8287729597257674368}
   m_Layer: 5
   m_Name: LeftLocked
   m_TagString: Untagged
@@ -1570,6 +1599,19 @@ MonoBehaviour:
   highlightIconOffsetY: 60
   highlightIconScale: 1.2
   tweenDuration: 0.2
+--- !u!114 &8287729597257674368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3653626871373273304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &3764769052163317812
 GameObject:
   m_ObjectHideFlags: 0
@@ -1583,6 +1625,7 @@ GameObject:
   - component: {fileID: 396157150062759424}
   - component: {fileID: 4119137894832501696}
   - component: {fileID: 2639320008421977546}
+  - component: {fileID: 6166932279257611624}
   m_Layer: 5
   m_Name: MenuButton3
   m_TagString: Untagged
@@ -1713,6 +1756,19 @@ MonoBehaviour:
   highlightIconOffsetY: 60
   highlightIconScale: 1.2
   tweenDuration: 0.2
+--- !u!114 &6166932279257611624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3764769052163317812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &3799034164619549037
 GameObject:
   m_ObjectHideFlags: 0
@@ -2264,6 +2320,7 @@ GameObject:
   - component: {fileID: 902873692028079594}
   - component: {fileID: 8179407261708735538}
   - component: {fileID: 4784790509455062629}
+  - component: {fileID: 5707270171868796684}
   m_Layer: 5
   m_Name: RightLocked
   m_TagString: Untagged
@@ -2393,6 +2450,19 @@ MonoBehaviour:
   highlightIconOffsetY: 60
   highlightIconScale: 1.2
   tweenDuration: 0.2
+--- !u!114 &5707270171868796684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4239008469329557153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &4647689267877034339
 GameObject:
   m_ObjectHideFlags: 0
@@ -2595,6 +2665,7 @@ GameObject:
   - component: {fileID: 8895860635666777638}
   - component: {fileID: 6194998633383676612}
   - component: {fileID: 7377234395403449540}
+  - component: {fileID: 1573078852539575991}
   m_Layer: 5
   m_Name: MenuButton1
   m_TagString: Untagged
@@ -2725,6 +2796,19 @@ MonoBehaviour:
   highlightIconOffsetY: 60
   highlightIconScale: 1.2
   tweenDuration: 0.2
+--- !u!114 &1573078852539575991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4833751336674550960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &4962541343227970761
 GameObject:
   m_ObjectHideFlags: 0
@@ -3080,6 +3164,7 @@ GameObject:
   - component: {fileID: 8732538996595993057}
   - component: {fileID: 7297174730343748868}
   - component: {fileID: 5716055957636572593}
+  - component: {fileID: 644629200012432557}
   m_Layer: 5
   m_Name: PlayButton
   m_TagString: Untagged
@@ -3204,6 +3289,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: {fileID: 2635544464227159728}
   shine: {fileID: 1374747925999132550}
+--- !u!114 &644629200012432557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370089909348632408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &6706910128525785011
 GameObject:
   m_ObjectHideFlags: 0
@@ -3474,6 +3572,7 @@ GameObject:
   - component: {fileID: 3780250226033434708}
   - component: {fileID: 6383707227369275481}
   - component: {fileID: 2319216607197447654}
+  - component: {fileID: 5249600172309865214}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -3583,6 +3682,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5249600172309865214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230917992059936026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &7292587723169522882
 GameObject:
   m_ObjectHideFlags: 0
@@ -3967,6 +4079,7 @@ GameObject:
   - component: {fileID: 928450706909527102}
   - component: {fileID: 1957692166201453028}
   - component: {fileID: 4241568585566827470}
+  - component: {fileID: 2389638980474718071}
   m_Layer: 5
   m_Name: ProfileButton
   m_TagString: Untagged
@@ -4075,6 +4188,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2389638980474718071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7591141719694037559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &7996068977324434323
 GameObject:
   m_ObjectHideFlags: 0
@@ -4656,6 +4782,7 @@ GameObject:
   - component: {fileID: 168846901525731653}
   - component: {fileID: 7967301525873222716}
   - component: {fileID: 5231048470594553209}
+  - component: {fileID: 3301747763232292300}
   m_Layer: 5
   m_Name: MenuButton2
   m_TagString: Untagged
@@ -4786,3 +4913,16 @@ MonoBehaviour:
   highlightIconOffsetY: 60
   highlightIconScale: 1.2
   tweenDuration: 0.2
+--- !u!114 &3301747763232292300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9202521264111288234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0

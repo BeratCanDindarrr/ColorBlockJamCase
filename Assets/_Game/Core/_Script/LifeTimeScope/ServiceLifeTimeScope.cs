@@ -14,6 +14,7 @@ namespace ColorBlockJam
             builder.Register<TaskService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<PopupService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.Register<AudioService>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<HapticService>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<StorageService>(Lifetime.Singleton).AsSelf();
             builder.RegisterEntryPoint<TimerService>(Lifetime.Singleton).AsSelf();
         }

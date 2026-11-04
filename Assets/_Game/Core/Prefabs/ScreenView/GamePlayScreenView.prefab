@@ -917,6 +917,7 @@ GameObject:
   - component: {fileID: 3453655393716051689}
   - component: {fileID: 6310471323474808795}
   - component: {fileID: 4640943105660278297}
+  - component: {fileID: 1986652798070169832}
   m_Layer: 5
   m_Name: RetryButton
   m_TagString: Untagged
@@ -1038,6 +1039,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1986652798070169832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7700138105495839125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &7967002764536117361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1168,6 +1182,7 @@ GameObject:
   - component: {fileID: 2557100602785994127}
   - component: {fileID: 1710848952238103146}
   - component: {fileID: 8687769086089823748}
+  - component: {fileID: 8987243041038984001}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -1289,6 +1304,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8987243041038984001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8017791628551053100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &9061658549128869585
 GameObject:
   m_ObjectHideFlags: 0

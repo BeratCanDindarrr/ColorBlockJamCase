@@ -44,7 +44,7 @@ namespace ColorBlockJam.Core.Controller
             _audioService.SetSfxEnabled(isOn);
         }
 
-        // TODO: nothing vibrates yet; a haptic service should check Model.haptic before vibrating.
+        // HapticService reads Model.haptic before every vibration.
         public void SetHaptic(bool isOn)
         {
             Model.haptic = isOn;

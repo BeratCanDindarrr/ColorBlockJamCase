@@ -1,0 +1,2 @@
+Copied from knit_Out (Assets/MOST_HapticFeedback; Scenes and HapticsExample.cs left out).
+Project-side change: MOST.HapticFeedback.asmdef added so ColorBlockJam.Core (an asmdef) can reference it.

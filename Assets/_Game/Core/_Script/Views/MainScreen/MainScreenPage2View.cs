@@ -28,6 +28,7 @@ namespace ColorBlockJam.Views
         private ISubscriber<CurrencyUpdateSignal> _currencyUpdateSubscriber;
         private ISubscriber<LifeModelSync> _lifeModelSyncSubscriber;
         private ISubscriber<LevelUpSignal> _levelUpSubscriber;
+        private IAudioService _audioService;
         private IDisposable _subscriptions;
 
         [Inject]
@@ -39,8 +40,10 @@ namespace ColorBlockJam.Views
             , PlayerController playerController
             , ISubscriber<CurrencyUpdateSignal> currencyUpdateSubscriber
             , ISubscriber<LifeModelSync> lifeModelSyncSubscriber
-            , ISubscriber<LevelUpSignal> levelUpSubscriber)
+            , ISubscriber<LevelUpSignal> levelUpSubscriber
+            , IAudioService audioService)
         {
+            _audioService = audioService;
             _applicationController = applicationController;
             _screenController = screenController;
             _popupService = popupService;
@@ -108,6 +111,7 @@ namespace ColorBlockJam.Views
 
         private void OnPlayClicked()
         {
+            _audioService.PlaySfx(SfxName.Buttons);
             _applicationController.PlayLevel();
         }
     }

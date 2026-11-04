@@ -1,12 +1,12 @@
-using Ami.BroAudio;
+using ColorBlockJam.Enums;
 
 namespace ColorBlockJam.Interfaces
 {
     public interface IAudioService
     {
-        void PlaySfx(SoundID id);
-        void PlayMusic(SoundID id);
-        void StopMusic(float fadeOut = 0f);
+        void PlaySfx(SfxName name);
+        void PlayMusic(SfxName name);
+        void StopMusic();
         void SetMusicEnabled(bool enabled);
         void SetSfxEnabled(bool enabled);
     }

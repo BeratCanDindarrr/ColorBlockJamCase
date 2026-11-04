@@ -1,0 +1,3 @@
+Copied from knit_Out (Assets/Plugins/QFSW/Audio Manager Pro, Demo folder left out).
+Project-side change: QFSW.AudioManagerPro(.Editor).asmdef added so ColorBlockJam.Core (an asmdef) can reference it;
+the package ships without assembly definitions.

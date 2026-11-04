@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 116fab1e7264943d198f3af8a59b5473, type: 3}
+  m_Name: SfxListData
+  m_EditorClassIdentifier: 
+  Items:
+  - Name: 0
+    Sfx: {fileID: 11400000, guid: 26735f688a9584c6da27261ab0162f53, type: 2}
+    IsLoop: 0
+  - Name: 1
+    Sfx: {fileID: 11400000, guid: 005ab607613dd4f4e85ca821353354d7, type: 2}
+    IsLoop: 1
+  - Name: 2
+    Sfx: {fileID: 11400000, guid: 2e29f543f010f4e9b9a8a44b1139fc11, type: 2}
+    IsLoop: 0
+  - Name: 3
+    Sfx: {fileID: 11400000, guid: 5c9c7d88fb5f84a579acfe9a16b2b9bd, type: 2}
+    IsLoop: 0
+  - Name: 4
+    Sfx: {fileID: 11400000, guid: fe4b51b59cfae4ee5a89324958bc5b8c, type: 2}
+    IsLoop: 0
+  - Name: 5
+    Sfx: {fileID: 11400000, guid: 369b48437e32d408b8a0c9553ce48edc, type: 2}
+    IsLoop: 0
+  - Name: 6
+    Sfx: {fileID: 11400000, guid: 1983b2aea95f34bfe8a585ea3204f0ee, type: 2}
+    IsLoop: 0

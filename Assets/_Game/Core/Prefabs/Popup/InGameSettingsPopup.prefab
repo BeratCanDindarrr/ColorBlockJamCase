@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8534690311612380027}
   - component: {fileID: 7437090191126661852}
   - component: {fileID: 6977267045910861923}
+  - component: {fileID: 9010230244268527438}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -122,6 +123,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &9010230244268527438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383885091005319538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &987583080519786085
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +358,7 @@ GameObject:
   - component: {fileID: 5751896161729569321}
   - component: {fileID: 5176817447779235416}
   - component: {fileID: 2909304535931130247}
+  - component: {fileID: 2437508473590797826}
   m_Layer: 5
   m_Name: SoundToggle
   m_TagString: Untagged
@@ -471,6 +486,19 @@ MonoBehaviour:
   - {fileID: 5751896161729569321}
   - {fileID: 3582995032952432867}
   grayscaleMaterial: {fileID: 2100000, guid: 25649ca8c1aa44654acbc1b246ba1951, type: 2}
+--- !u!114 &2437508473590797826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004253291049942357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &2763501092547008488
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,6 +512,7 @@ GameObject:
   - component: {fileID: 4173764403278861534}
   - component: {fileID: 3498363707329689794}
   - component: {fileID: 7976321746815881970}
+  - component: {fileID: 5382243722703315581}
   m_Layer: 5
   m_Name: HapticToggle
   m_TagString: Untagged
@@ -611,6 +640,19 @@ MonoBehaviour:
   - {fileID: 4173764403278861534}
   - {fileID: 3421432150513877767}
   grayscaleMaterial: {fileID: 2100000, guid: 25649ca8c1aa44654acbc1b246ba1951, type: 2}
+--- !u!114 &5382243722703315581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2763501092547008488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &4452172080285662938
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +950,7 @@ GameObject:
   - component: {fileID: 424594604599959196}
   - component: {fileID: 8163250455529236089}
   - component: {fileID: 8659229213152455728}
+  - component: {fileID: 8681927010559317699}
   m_Layer: 5
   m_Name: MusicToggle
   m_TagString: Untagged
@@ -1035,6 +1078,19 @@ MonoBehaviour:
   - {fileID: 424594604599959196}
   - {fileID: 2608691642595166186}
   grayscaleMaterial: {fileID: 2100000, guid: 25649ca8c1aa44654acbc1b246ba1951, type: 2}
+--- !u!114 &8681927010559317699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7411344926447377774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e76907eaac84ee491b85ad44ebdd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticType: 0
 --- !u!1 &8152147490415570618
 GameObject:
   m_ObjectHideFlags: 0

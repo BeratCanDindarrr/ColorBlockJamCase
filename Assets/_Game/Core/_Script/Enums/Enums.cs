@@ -14,6 +14,18 @@ namespace ColorBlockJam.Enums
         None = 99,
     }
 
+    // Sounds by name; each maps to an SFXObject in SfxListData.
+    public enum SfxName
+    {
+        Buttons = 0,
+        GameplayMusic = 1,
+        PopupOpen = 2,
+        PopupClose = 3,
+        Coin = 4,
+        CollectCoins = 5,
+        LevelUp = 6
+    }
+
     public enum CurrencyType
     {
         Coin = 0,

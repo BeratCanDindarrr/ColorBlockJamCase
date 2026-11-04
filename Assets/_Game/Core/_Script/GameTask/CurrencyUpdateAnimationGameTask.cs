@@ -30,6 +30,7 @@ namespace ColorBlockJam.GameTask
         private IMemoryPool<CoinCurrencyView> _coinPool;
         private IMemoryPool<LifeTimeCurrencyView> _lifeTimePool;
         private IMemoryPool<BoosterCurrencyView> _boosterPool;
+        private IAudioService _audioService;
         private bool _coinCounting;
 
         public void Init(CurrencyData[] currencyDataArray, Vector2[] startScreenPoints = null)
@@ -44,8 +45,10 @@ namespace ColorBlockJam.GameTask
             , CurrencySettings settings
             , IMemoryPool<CoinCurrencyView> coinPool
             , IMemoryPool<LifeTimeCurrencyView> lifeTimePool
-            , IMemoryPool<BoosterCurrencyView> boosterPool)
+            , IMemoryPool<BoosterCurrencyView> boosterPool
+            , IAudioService audioService)
         {
+            _audioService = audioService;
             _screenController = screenController;
             _currencyController = currencyController;
             _settings = settings;
@@ -72,6 +75,7 @@ namespace ColorBlockJam.GameTask
             var coins = _updatedArrayValue.Where(c => c.currencyType == CurrencyType.Coin).Sum(c => c.currencyValue);
             if (coins > 0) screen.Header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin) - coins);
 
+            _audioService.PlaySfx(SfxName.CollectCoins);
             var flights = new List<UniTask>();
             for (var i = 0; i < _updatedArrayValue.Length; i++)
                 flights.Add(FlyReward(screen, _updatedArrayValue[i], StartOf(screen, i), coins, cancellationToken));
@@ -130,6 +134,7 @@ namespace ColorBlockJam.GameTask
 
         private void Land(MainScreenView screen, Transform target, CurrencyType currencyType, long coins)
         {
+            if (currencyType == CurrencyType.Coin) _audioService.PlaySfx(SfxName.Coin);
             target.DOKill(true);
             target.DOPunchScale(Vector3.one * _settings.TargetPunch, _settings.TargetPunchDuration, 1, 0f)
                 .SetLink(target.gameObject);
