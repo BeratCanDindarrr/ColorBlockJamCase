@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace ColorBlockJam.SandBox
 {
-    // One door mesh per gate cell, laid along the gate's local x.
+    // One door mesh per gate cell, laid along the gate's local x. An iced gate looks like a frozen block (ice tint and
+    // texture, its count lying on top) and has no arrow until it thaws.
     public class GateView : ColorBlockJam.Views.BaseView, IPoolable
     {
         private const float Half = 0.5f;
@@ -15,14 +16,20 @@ namespace ColorBlockJam.SandBox
         [SerializeField] private MeshRenderer doorTemplate;
         // White triangle lying on top of the gate, its tip pointing out of the board.
         [SerializeField] private SpriteRenderer arrow;
+        // The ice count, the frozen block's own view; its height is authored in the prefab.
+        [SerializeField] private BlockIceView iceView;
 
         private readonly List<MeshRenderer> _doors = new List<MeshRenderer>();
+        private BoardSettings _settings;
+        private Color _color;
 
         public GateState Gate { get; private set; }
 
-        public void Init(GateState gate, BoardLayout layout, Color color, float arrowSize)
+        public void Init(GateState gate, BoardLayout layout, BoardSettings settings)
         {
             Gate = gate;
+            _settings = settings;
+            _color = settings.GetColor(gate.Color);
             transform.localPosition = layout.GateLocal(gate.Edge, gate.Index, gate.Length, gate.Depth);
             transform.localRotation = layout.GateRotation(gate.Edge);
             transform.localScale = Vector3.one * layout.CellSize;
@@ -40,10 +47,40 @@ namespace ColorBlockJam.SandBox
 
                 var position = door.transform.localPosition;
                 door.transform.localPosition = new Vector3(i - (gate.Length - 1) * Half, position.y, position.z);
-                RendererTint.Apply(door, color);
             }
 
-            PlaceArrow(layout.OutwardLocal(gate.Edge), arrowSize);
+            PlaceArrow(layout.OutwardLocal(gate.Edge), settings.GateArrowSize);
+            // Upright on screen like a block's count, whichever wall the gate is on.
+            iceView.transform.rotation = BoardRotation();
+            iceView.Show(gate.Ice, Vector3.zero);
+            ApplyIce();
+        }
+
+        // A block left the board: the count drops with a punch; at 0 the gate looks and works as usual again.
+        public void CrackIce()
+        {
+            iceView.Crack(Gate.Ice, _settings.IcePunch, _settings.IcePunchDuration);
+            if (Gate.Ice == 0) ApplyIce();
+        }
+
+        public void OnSpawned()
+        {
+        }
+
+        public void OnDespawned()
+        {
+            iceView.Hide();
+            Gate = null;
+        }
+
+        private void ApplyIce()
+        {
+            var iced = Gate.Ice > 0;
+            var color = iced ? Color.Lerp(_color, _settings.IceColor, _settings.IceTint) : _color;
+            var texture = iced ? _settings.IceTexture : null;
+            for (var i = 0; i < Gate.Length; i++)
+                RendererTint.Apply(_doors[i], color, texture);
+            if (arrow != null) arrow.gameObject.SetActive(!iced);
         }
 
         // In the middle of the gate, just above its doors, lying flat.
@@ -60,10 +97,6 @@ namespace ColorBlockJam.SandBox
             arrow.transform.localScale = Vector3.one * size;
         }
 
-        public void OnSpawned()
-        {
-        }
-
-        public void OnDespawned() => Gate = null;
+        private Quaternion BoardRotation() => transform.parent != null ? transform.parent.rotation : Quaternion.identity;
     }
 }

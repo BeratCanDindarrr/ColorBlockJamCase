@@ -23,19 +23,21 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndVertical();
         }
 
-        // What can be done to the selection: obstacles of blocks (LevelEditorSession.Obstacles.cs), then rotate / mirror /
-        // duplicate / delete.
+        // What can be done to the selection: obstacles of blocks and gates (LevelEditorSession.Obstacles.cs), then rotate /
+        // mirror / duplicate / delete.
         private void DrawSelectionInspector()
         {
             PruneSelection();
             DropFieldFocusOnNewSelection();
             var blocks = SelectedBlockIndices();
+            var gates = SelectedGateIndices();
+            if (blocks.Count > 0) DrawObstacles(blocks);
+            if (gates.Count > 0) DrawGateObstacles(gates);
             if (blocks.Count > 0)
             {
-                DrawObstacles(blocks);
                 DrawBlockActions();
             }
-            else if (selectedGates.Count > 0)
+            else if (gates.Count > 0)
             {
                 if (GUILayout.Button("Delete")) DeleteSelection();
             }

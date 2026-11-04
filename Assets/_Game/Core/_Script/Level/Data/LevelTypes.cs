@@ -76,5 +76,7 @@ namespace ColorBlockJam.Core.Level
         public int Length;
         public BlockColor Color;
         public int Depth;
+        // Iced (takes no block) until this many blocks have left the board; 0 = no ice.
+        public int Ice;
     }
 }

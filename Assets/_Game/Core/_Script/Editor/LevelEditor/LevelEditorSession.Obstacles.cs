@@ -81,6 +81,40 @@ namespace ColorBlockJam.LevelEditor
             EditorGUILayout.EndHorizontal();
         }
 
+        // Ice of the selected gates: a gate with ice takes no block until that many blocks have left the board.
+        private void DrawGateObstacles(List<int> gates)
+        {
+            var iced = gates.Where(i => working.Gates[i].Ice > 0).ToList();
+            if (iced.Count == 0)
+            {
+                var rect = GUILayoutUtility.GetRect(new GUIContent("+ Add Obstacle"), EditorStyles.miniButton);
+                if (GUI.Button(rect, new GUIContent("+ Add Obstacle", "Put ice on the selected gates"), EditorStyles.miniButton))
+                {
+                    var menu = new GenericMenu();
+                    menu.AddItem(new GUIContent("Ice"), false, () => SetGateIce(gates, NewIce, "Add Gate Ice"));
+                    menu.DropDown(rect);
+                }
+
+                return;
+            }
+
+            GUILayout.Label("Gate obstacles", EditorStyles.miniBoldLabel);
+            var first = working.Gates[iced[0]].Ice;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUI.showMixedValue = iced.Count < gates.Count || iced.Any(i => working.Gates[i].Ice != first);
+            EditorGUI.BeginChangeCheck();
+            var ice = Mathf.Max(1, EditorGUILayout.IntField(
+                new GUIContent("Ice", "Takes no block until this many blocks have left the board"), first));
+            if (EditorGUI.EndChangeCheck()) SetGateIce(gates, ice, "Set Gate Ice");
+            EditorGUI.showMixedValue = false;
+            if (GUILayout.Button(new GUIContent("×", "Remove the ice"), EditorStyles.miniButton, GUILayout.Width(RemoveWidth)))
+                SetGateIce(gates, 0, "Remove Gate Ice");
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void SetGateIce(List<int> gates, int ice, string undoName) =>
+            Edit(undoName, l => gates.Aggregate(false, (any, i) => Set(ref l.Gates[i].Ice, ice) | any));
+
         private static readonly string[] AxisNames = { "Horizontal", "Vertical" };
 
         private void SetIce(List<int> blocks, int ice, string undoName) =>

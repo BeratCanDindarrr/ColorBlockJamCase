@@ -43,7 +43,8 @@ namespace ColorBlockJam.SandBox.Board
         {
             foreach (var gate in _gates)
             {
-                if (GateFit.CanPushInto(block, origin, gate, Cols, Rows)) return gate;
+                // An iced gate takes nothing until it thaws.
+                if (gate.Ice == 0 && GateFit.CanPushInto(block, origin, gate, Cols, Rows)) return gate;
             }
 
             return null;

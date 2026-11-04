@@ -58,7 +58,7 @@ namespace ColorBlockJam.SandBox
             BuildFloor(simulation.Holes);
             BuildWalls(simulation.Gates, simulation.Holes);
             foreach (var gate in simulation.Gates)
-                Spawn(_gatePool, _gates).Init(gate, Layout, _boardSettings.GetColor(gate.Color), _boardSettings.GateArrowSize);
+                Spawn(_gatePool, _gates).Init(gate, Layout, _boardSettings);
             foreach (var block in simulation.Blocks)
                 SpawnBlock(block);
 
@@ -89,6 +89,16 @@ namespace ColorBlockJam.SandBox
             transform.TransformPoint(Layout.CellToLocal(cell) + Vector3.up * heightInCells * Layout.CellSize);
 
         public BlockView GetView(BlockState block) => _blocks.TryGetValue(block, out var view) ? view : null;
+
+        private GateView GateViewOf(GateState gate)
+        {
+            foreach (var view in _gates)
+            {
+                if (view.Gate == gate) return view;
+            }
+
+            return null;
+        }
 
         // Simulation events drive the held block's lift and drop, whatever ended the drag.
         public void Apply(IReadOnlyList<BoardEvent> events)
@@ -125,6 +135,12 @@ namespace ColorBlockJam.SandBox
                         SpawnBlock(boardEvent.Block);
                         break;
                     case BoardEventType.IceChanged:
+                        if (boardEvent.Gate != null)
+                        {
+                            GateViewOf(boardEvent.Gate)?.CrackIce();
+                            break;
+                        }
+
                         var iced = GetView(boardEvent.Block);
                         if (iced) iced.CrackIce();
                         break;

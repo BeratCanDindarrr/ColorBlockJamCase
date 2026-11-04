@@ -44,6 +44,16 @@ namespace ColorBlockJam.Core.Level
             ValidateBlocks(cols, rows, blocks, holeSet, issues);
             ValidateGates(cols, rows, gates, holeSet, issues);
 
+            // An iced gate opens after that many blocks have left; at least one has to leave through another gate first.
+            for (var i = 0; i < gates.Length; i++)
+            {
+                var gate = gates[i];
+                if (gate == null) continue;
+                if (gate.Ice < 0) issues.Add(new LevelIssue($"Gate #{i} has negative ice", true, gateIndex: i));
+                else if (gate.Ice > blocks.Length - 1)
+                    issues.Add(new LevelIssue($"Gate #{i} needs {gate.Ice} exits to thaw but only {blocks.Length - 1} other blocks exist", true, gateIndex: i));
+            }
+
             for (var i = 0; i < blocks.Length; i++)
             {
                 var block = blocks[i];

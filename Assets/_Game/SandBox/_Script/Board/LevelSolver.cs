@@ -57,7 +57,7 @@ namespace ColorBlockJam.SandBox.Board
 
     // Plays a level like a player, with the board's own movement and gate (GateFit) rules: whenever some
     // block can walk to a gate it fits, it leaves; otherwise the fewest drags that move blocks aside until one can are
-    // searched for. Leaving only ever frees room and thaws ice, and a drag can always be walked back, so a level solvable
+    // searched for. Leaving only ever frees room and thaws ice (of blocks and gates), and a drag can always be walked back, so a level solvable
     // at the start can never be locked by the order it is played in, and taking any exit that is open is safe.
     public static class LevelSolver
     {
@@ -197,6 +197,8 @@ namespace ColorBlockJam.SandBox.Board
             private readonly int[] _ice;
             private readonly bool[] _gone;
             private readonly List<GateState> _gates;
+            // Exits each gate waits for before it takes a block (iced gate).
+            private readonly int[] _gateIce;
             private readonly int[] _grid;
             private readonly int[] _holeGrid;
             private readonly int _cols;
@@ -211,6 +213,7 @@ namespace ColorBlockJam.SandBox.Board
                 _ice = _blocks.Select(b => b.Ice).ToArray();
                 _gone = new bool[_blocks.Count];
                 _gates = level.Gates.Select(g => new GateState(g)).ToList();
+                _gateIce = level.Gates.Select(g => Math.Max(0, g.Ice)).ToArray();
                 _holeGrid = Enumerable.Repeat(Empty, _cols * _rows).ToArray();
                 foreach (var hole in level.Holes)
                     if (Inside(hole.Col, hole.Row)) _holeGrid[hole.Row * _cols + hole.Col] = Hole;
@@ -293,13 +296,15 @@ namespace ColorBlockJam.SandBox.Board
                 return places;
             }
 
-            // The gate the block can be pushed into along its axis from `origin` (GateFit.CanPushInto), or null.
+            // The open gate the block can be pushed into along its axis from `origin` (GateFit.CanPushInto), or null. A gate
+            // still iced (fewer blocks gone than its ice) takes nothing.
             public GateState GateFrom(int i, CellCoord origin)
             {
                 var block = _blocks[i];
-                foreach (var gate in _gates)
+                for (var k = 0; k < _gates.Count; k++)
                 {
-                    if (GateFit.CanPushInto(block, origin, gate, _cols, _rows)) return gate;
+                    if (_gateIce[k] > _exits) continue;
+                    if (GateFit.CanPushInto(block, origin, _gates[k], _cols, _rows)) return _gates[k];
                 }
 
                 return null;

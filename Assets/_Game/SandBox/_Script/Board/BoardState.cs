@@ -63,9 +63,12 @@ namespace ColorBlockJam.SandBox.Board
         public BlockColor Color { get; }
         // Cells in from the outer edge; 0 is the outer wall (see GateGeometry).
         public int Depth { get; }
+        // Iced (takes no block) until this many more blocks have left the board.
+        public int Ice { get; internal set; }
 
         public GateState(GateData data)
         {
+            Ice = Math.Max(0, data.Ice);
             Depth = data.Depth;
             Edge = data.Edge;
             Index = data.Index;

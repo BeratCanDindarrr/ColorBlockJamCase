@@ -160,6 +160,17 @@ namespace ColorBlockJam.Core.Level.Tests
         }
 
         [Test]
+        public void GateIceAboveOtherBlockCount_IsError()
+        {
+            var gate = Gate(BoardEdge.Left, 0, 1, BlockColor.Red);
+            gate.Ice = 2;
+            var errors = Errors(new[] { Block("A", 0, 0, BlockColor.Red, (0, 0)), Block("B", 3, 3, BlockColor.Red, (0, 0)) },
+                new[] { gate, Gate(BoardEdge.Right, 0, 1, BlockColor.Red) });
+
+            Assert.That(errors.Single().GateIndex, Is.EqualTo(0));
+        }
+
+        [Test]
         public void IceAboveOtherBlockCount_IsError()
         {
             var iced = Block("B", 3, 3, BlockColor.Red, (0, 0));

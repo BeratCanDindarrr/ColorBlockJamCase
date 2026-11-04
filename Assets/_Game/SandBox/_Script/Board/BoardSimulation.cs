@@ -169,7 +169,7 @@ namespace ColorBlockJam.SandBox.Board
             for (var i = 0; i < _gates.Count; i++)
             {
                 var gate = _gates[i];
-                if (!GateFit.Fits(block, drop, gate, Cols, Rows))
+                if (gate.Ice > 0 || !GateFit.Fits(block, drop, gate, Cols, Rows))
                     continue;
 
                 var push = GateFit.Push(DragPosition, target, gate.Edge);
@@ -284,7 +284,7 @@ namespace ColorBlockJam.SandBox.Board
                 EndLevel(BoardStatus.Won);
         }
 
-        // Every block that leaves takes one off each frozen block's count.
+        // Every block that leaves takes one off each frozen block's and each iced gate's count.
         private void CrackIce()
         {
             for (var i = 0; i < _blocks.Count; i++)
@@ -295,6 +295,16 @@ namespace ColorBlockJam.SandBox.Board
 
                 block.Ice--;
                 _pendingEvents.Add(new BoardEvent(BoardEventType.IceChanged, block));
+            }
+
+            for (var i = 0; i < _gates.Count; i++)
+            {
+                var gate = _gates[i];
+                if (gate.Ice == 0)
+                    continue;
+
+                gate.Ice--;
+                _pendingEvents.Add(new BoardEvent(BoardEventType.IceChanged, gate: gate));
             }
         }
 

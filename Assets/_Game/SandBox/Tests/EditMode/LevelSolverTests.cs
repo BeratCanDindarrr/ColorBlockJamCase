@@ -67,6 +67,28 @@ namespace ColorBlockJam.SandBox.Board.Tests
         }
 
         [Test]
+        public void IcedGate_OpensAfterAnotherBlockLeaves()
+        {
+            var iced = Gate(BoardEdge.Left, 0, 1, BlockColor.Red);
+            iced.Ice = 1;
+            var result = Solve(2, 1, new[] { Block("A", 0, 0, BlockColor.Red), Block("B", 1, 0, BlockColor.Blue) },
+                iced, Gate(BoardEdge.Right, 0, 1, BlockColor.Blue));
+
+            Assert.That(result.Verdict, Is.EqualTo(SolveVerdict.Solvable));
+            Assert.That(result.Steps.Select(s => s.BlockId), Is.EqualTo(new[] { "B", "A" }));
+        }
+
+        [Test]
+        public void OnlyGateIcedForever_IsUnsolvable()
+        {
+            var iced = Gate(BoardEdge.Left, 0, 1, BlockColor.Red);
+            iced.Ice = 1;
+            var result = Solve(2, 1, new[] { Block("A", 0, 0, BlockColor.Red) }, iced);
+
+            Assert.That(result.Verdict, Is.EqualTo(SolveVerdict.Unsolvable));
+        }
+
+        [Test]
         public void HorizontalBlockWithOnlyATopGate_IsUnsolvable()
         {
             var block = Block("A", 0, 0, BlockColor.Red);

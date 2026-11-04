@@ -189,14 +189,20 @@ namespace ColorBlockJam.LevelEditor
                 EditorGUI.DrawRect(new Rect(cell.center.x - thickness / 2f, cell.y, thickness, cell.height), AxisMark);
         }
 
+        // An iced gate is tinted and shows its count ("❄N") on its first cell.
         private void DrawGate(GateData gate, bool selected, bool hasError)
         {
             for (var i = gate.Index; i < gate.Index + gate.Length; i++)
             {
                 var rect = StripRect(gate.Edge, i, gate.Depth);
                 if (selected || hasError) EditorGUI.DrawRect(rect, hasError ? LevelEditorStyle.Error : LevelEditorStyle.Selection);
-                EditorGUI.DrawRect(Inset(rect, selected || hasError ? 4f : Gap), LevelEditorStyle.Of(gate.Color));
+                var inner = Inset(rect, selected || hasError ? 4f : Gap);
+                EditorGUI.DrawRect(inner, LevelEditorStyle.Of(gate.Color));
+                if (gate.Ice > 0) EditorGUI.DrawRect(inner, IceTint);
             }
+
+            if (gate.Ice > 0)
+                GUI.Label(StripRect(gate.Edge, gate.Index, gate.Depth), $"❄{gate.Ice}", EditorStyles.whiteMiniLabel);
         }
 
         private Rect CellRect(int col, int row) =>
