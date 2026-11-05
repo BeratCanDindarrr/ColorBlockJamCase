@@ -109,6 +109,12 @@ write the same `LevelData` asset.
 - Popups are visually basic.
 - Particle effects are missing in most places.
 - There are only a few sound effects.
+- After a life is lost, nothing shows how many seconds are left until the next life refills.
+- A coin count above 100,000 does not fit its text field.
+- The Vacuum booster's animation is incomplete: the supplied assets have no animated vacuum object for it.
+- The Timer booster has no ice effect over the level timer while the clock is frozen.
+- The level win screen has no fireworks or similar celebration particles behind it.
+- The home screen's level path (the level nodes and their locks) is visually incomplete and not right yet.
 
 ### LLM tools
 
@@ -231,6 +237,12 @@ asset'ini okur ve yazar.
 - Popup'lar görsel açıdan yetersiz.
 - Çoğu yerde particle efektleri eksik.
 - Ses efektlerinin çeşidi az.
+- Can kaybedildiğinde, bir sonraki canın kaç saniye sonra yenileneceğini gösteren bir alan yok.
+- Coin sayısı 100.000'i geçince text alanına sığmıyor.
+- Vacuum booster'ının animasyonu eksik: verilen asset'lerde animasyon için kullanılabilecek bir vacuum objesi yok.
+- Timer booster'ı saati dondururken level timer'ının üzerine gelen buz efekti yok.
+- Level kazanma ekranında arkada havai fişek ya da benzeri kutlama particle'ları yok.
+- Ana menüdeki level yolunun (level'ların ve kilitlerin gösterildiği kısım) görseli eksik ve henüz doğru değil.
 
 ### LLM araçları
 
