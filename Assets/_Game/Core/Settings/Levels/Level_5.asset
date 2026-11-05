@@ -71,7 +71,7 @@ MonoBehaviour:
       Row: 0
     Color: 5
     Ice: 0
-    Axis: 0
+    Axis: 1
   - Id: E
     Col: 1
     Row: 5
@@ -84,31 +84,36 @@ MonoBehaviour:
       Row: 0
     Color: 0
     Ice: 0
-    Axis: 0
+    Axis: 1
   Gates:
   - Edge: 0
     Index: 0
     Length: 2
     Color: 4
     Depth: 0
+    Ice: 0
   - Edge: 0
     Index: 3
     Length: 2
     Color: 2
     Depth: 0
+    Ice: 0
   - Edge: 2
     Index: 4
     Length: 2
     Color: 5
     Depth: 0
+    Ice: 0
   - Edge: 3
     Index: 4
     Length: 2
     Color: 0
     Depth: 0
+    Ice: 0
   - Edge: 1
     Index: 1
     Length: 3
     Color: 1
     Depth: 0
+    Ice: 0
   Holes: []

@@ -27,7 +27,7 @@ MonoBehaviour:
     - Col: 0
       Row: 2
     Color: 2
-    Ice: 0
+    Ice: 1
     Axis: 0
   - Id: B
     Col: 3
@@ -48,9 +48,11 @@ MonoBehaviour:
     Length: 3
     Color: 2
     Depth: 0
+    Ice: 0
   - Edge: 1
     Index: 0
     Length: 3
     Color: 5
     Depth: 0
+    Ice: 0
   Holes: []

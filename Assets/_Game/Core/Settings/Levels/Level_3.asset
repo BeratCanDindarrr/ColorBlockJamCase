@@ -63,19 +63,23 @@ MonoBehaviour:
     Length: 2
     Color: 1
     Depth: 0
+    Ice: 2
   - Edge: 2
     Index: 2
     Length: 2
     Color: 0
     Depth: 0
+    Ice: 0
   - Edge: 3
     Index: 2
     Length: 2
     Color: 0
     Depth: 0
+    Ice: 0
   - Edge: 1
     Index: 3
     Length: 2
     Color: 3
     Depth: 0
+    Ice: 0
   Holes: []
