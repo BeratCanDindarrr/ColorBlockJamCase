@@ -15,6 +15,10 @@ A small vertical slice of Color Block Jam in Unity: a playable level flow and a 
    Play always starts from this scene, whichever scene is open.
 3. Press the level button on the home screen to start the current level.
 
+**Video:** the full game flow (about 2.5 minutes).
+
+https://github.com/user-attachments/assets/d2abdf04-d4dc-4b06-a03c-7a935ddca2bb
+
 ### How to open the editor and make a level
 
 Press **Editor** in the scene buttons at the top left of the Unity toolbar. It opens `EditorScene`, where the
@@ -130,6 +134,10 @@ Color Block Jam'in Unity'de küçük bir dikey kesiti: oynanabilir bir level ak�
 2. `Assets/Scenes/SampleScene.unity` sahnesini (açılış + ana ekran) açıp **Play**'e basın.
    Hangi sahne açık olursa olsun Play her zaman bu sahneden başlar.
 3. Ana ekrandaki level butonuna basarak güncel level'ı başlatın.
+
+**Video:** oyunun tüm akışı (yaklaşık 2,5 dakika).
+
+https://github.com/user-attachments/assets/d2abdf04-d4dc-4b06-a03c-7a935ddca2bb
 
 ### Editörü açma ve level yapma
 
