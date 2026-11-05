@@ -20,13 +20,13 @@ MonoBehaviour:
     AsideMoves: 0
     StuckBlocks: []
   - Guid: eed8693d81475422ea84b2eed864f269
-    Hash: 4a4dc2734afe245e4e4982f342ea246d
+    Hash: a6d24eb156ca4df407f61214e8c8ab67
     Verdict: 0
     Drags: 2
     AsideMoves: 0
     StuckBlocks: []
   - Guid: f15150240018b40cb9765d7863f0a592
-    Hash: c18d26a1a5b08fc45ed72df81c7272ee
+    Hash: 462fd7df99f302f0970ac84a811c8344
     Verdict: 0
     Drags: 3
     AsideMoves: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
     AsideMoves: 1
     StuckBlocks: []
   - Guid: 6142bd27e037044e1afecd0d6bb8dc34
-    Hash: 8a62eb810946628a68d60141faaf6ea4
+    Hash: 72036945280337add846043fdd55792b
     Verdict: 0
     Drags: 5
     AsideMoves: 0
