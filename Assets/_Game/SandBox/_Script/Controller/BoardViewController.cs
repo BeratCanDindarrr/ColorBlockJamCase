@@ -167,6 +167,7 @@ namespace ColorBlockJam.SandBox
                 rearEdge = Mathf.Min(rearEdge, Vector3.Dot(Layout.CellToLocal(cell), direction) - HalfCell * Layout.CellSize);
 
             view.PlayExit(direction, wall - rearEdge, _boardSettings.ExitSeconds, ExitBurst(), OnBlockShattered);
+            GateViewOf(gate)?.PlayPress(_boardSettings.ExitAlignDuration + _boardSettings.ExitSeconds);
         }
 
         private void OnBlockShattered(BlockView view) => ReleaseBlock(view.Block);

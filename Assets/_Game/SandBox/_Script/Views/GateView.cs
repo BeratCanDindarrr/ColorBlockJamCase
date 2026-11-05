@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ColorBlockJam.Pool;
 using ColorBlockJam.SandBox.Board;
+using DG.Tweening;
 using UnityEngine;
 
 namespace ColorBlockJam.SandBox
@@ -22,6 +23,8 @@ namespace ColorBlockJam.SandBox
         private readonly List<MeshRenderer> _doors = new List<MeshRenderer>();
         private BoardSettings _settings;
         private Color _color;
+        private Vector3 _restPosition;
+        private Sequence _press;
 
         public GateState Gate { get; private set; }
 
@@ -30,7 +33,8 @@ namespace ColorBlockJam.SandBox
             Gate = gate;
             _settings = settings;
             _color = settings.GetColor(gate.Color);
-            transform.localPosition = layout.GateLocal(gate.Edge, gate.Index, gate.Length, gate.Depth);
+            _restPosition = layout.GateLocal(gate.Edge, gate.Index, gate.Length, gate.Depth);
+            transform.localPosition = _restPosition;
             transform.localRotation = layout.GateRotation(gate.Edge);
             transform.localScale = Vector3.one * layout.CellSize;
 
@@ -63,12 +67,25 @@ namespace ColorBlockJam.SandBox
             if (Gate.Ice == 0) ApplyIce();
         }
 
+        // A block passes through: the gate sinks a little for `seconds`, as if pressed open, then comes back up.
+        public void PlayPress(float seconds)
+        {
+            _press?.Kill();
+            var down = _restPosition.y - _settings.GatePressDepth * transform.localScale.y;
+            _press = DOTween.Sequence().SetLink(gameObject)
+                .Append(transform.DOLocalMoveY(down, _settings.GatePressDuration).SetEase(Ease.OutQuad))
+                .AppendInterval(seconds)
+                .Append(transform.DOLocalMoveY(_restPosition.y, _settings.GatePressDuration).SetEase(Ease.OutBack));
+        }
+
         public void OnSpawned()
         {
         }
 
         public void OnDespawned()
         {
+            _press?.Kill();
+            _press = null;
             iceView.Hide();
             Gate = null;
         }

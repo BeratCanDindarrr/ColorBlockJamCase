@@ -41,6 +41,9 @@ namespace ColorBlockJam.SandBox
         public DG.Tweening.Ease ExitEase = DG.Tweening.Ease.InSine;
         // Time to settle onto the cell in front of the gate before the slide starts.
         public float ExitAlignDuration = 0.08f;
+        // A gate sinks this far (cells) while a block passes through it, taking this long to go down and up again.
+        public float GatePressDepth = 0.15f;
+        public float GatePressDuration = 0.1f;
 
         public float ShatterDuration = 0.4f;
         public float ShatterForce = 3f;
@@ -117,6 +120,8 @@ namespace ColorBlockJam.SandBox
             PushThreshold = Mathf.Max(0f, PushThreshold);
             ExitSeconds = Mathf.Max(MinPositive, ExitSeconds);
             ExitAlignDuration = Mathf.Max(0f, ExitAlignDuration);
+            GatePressDepth = Mathf.Max(0f, GatePressDepth);
+            GatePressDuration = Mathf.Max(0f, GatePressDuration);
             CellSize = Mathf.Max(MinPositive, CellSize);
             GateArrowSize = Mathf.Max(0f, GateArrowSize);
             ExitBurstCubesPerPiece = Mathf.Max(0, ExitBurstCubesPerPiece);

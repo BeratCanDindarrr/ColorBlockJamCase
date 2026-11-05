@@ -15,9 +15,9 @@ A small vertical slice of Color Block Jam in Unity: a playable level flow and a 
    Play always starts from this scene, whichever scene is open.
 3. Press the level button on the home screen to start the current level.
 
-**Video:** the full game flow (about 3 minutes).
+**Video:** the full game flow (about 2.5 minutes).
 
-https://github.com/user-attachments/assets/7a8ee856-3fdd-4f41-9227-3cde3e66a1c2
+https://github.com/user-attachments/assets/35ca495a-2915-45da-981c-f7a640626ad0
 
 ### How to open the editor and make a level
 
@@ -26,7 +26,7 @@ level editor works directly in the Scene view.
 
 ![Editor button in the toolbar](ReadmeImages/editor-toolbar.png)
 
-**Video:** making a level in the editor (about 3 minutes).
+**Video:** making a level in the editor (about 2.5 minutes).
 
 https://github.com/user-attachments/assets/9ed86082-5f14-4415-91dc-da64e29c5aa0
 
@@ -102,6 +102,8 @@ write the same `LevelData` asset.
 
 - Level editor: when a block is split in the middle (erasing cells so it falls into two separate pieces), it still
   behaves as one block instead of becoming two.
+- Timer booster tutorial: the tutorial expects a tap on the booster first, but if a block is dragged straight to its
+  gate instead, it still goes through.
 
 ### Incomplete parts
 
@@ -138,9 +140,9 @@ Color Block Jam'in Unity'de küçük bir dikey kesiti: oynanabilir bir level ak�
    Hangi sahne açık olursa olsun Play her zaman bu sahneden başlar.
 3. Ana ekrandaki level butonuna basarak güncel level'ı başlatın.
 
-**Video:** oyunun tüm akışı (yaklaşık 3 dakika).
+**Video:** oyunun tüm akışı (yaklaşık 2,5 dakika).
 
-https://github.com/user-attachments/assets/7a8ee856-3fdd-4f41-9227-3cde3e66a1c2
+https://github.com/user-attachments/assets/35ca495a-2915-45da-981c-f7a640626ad0
 
 ### Editörü açma ve level yapma
 
@@ -149,7 +151,7 @@ doğrudan Scene view içinde çalışır.
 
 ![Araç çubuğundaki Editor butonu](ReadmeImages/editor-toolbar.png)
 
-**Video:** editörde level yapımı (yaklaşık 3 dakika).
+**Video:** editörde level yapımı (yaklaşık 2,5 dakika).
 
 https://github.com/user-attachments/assets/9ed86082-5f14-4415-91dc-da64e29c5aa0
 
@@ -228,6 +230,8 @@ asset'ini okur ve yazar.
 
 - Level editörü: bir blok ortasından bölündüğünde (hücreleri silinerek iki ayrı parçaya ayrıldığında) iki ayrı
   blok olmak yerine hâlâ tek bir blok gibi davranıyor.
+- Timer booster tutorial'ı: tutorial önce booster'a dokunmayı bekliyor, ama bunun yerine bir blok doğrudan kapısına
+  sürüklenirse yine de kapıdan geçebiliyor.
 
 ### Eksik kısımlar
 
