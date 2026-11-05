@@ -11,7 +11,9 @@ namespace ColorBlockJam.Core.Level
         Purple = 4,
         Orange = 5,
         Pink = 6,
-        Cyan = 7
+        Cyan = 7,
+        Purplev2 = 8,
+        NewRenk = 9
     }
 
     public enum BoardEdge

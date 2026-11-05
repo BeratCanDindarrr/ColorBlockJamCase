@@ -33,6 +33,36 @@ namespace ColorBlockJam.LevelEditor
 
         public static void Delete(LevelData level, int index) => DeleteMany(level, new List<int> { index });
 
+        // Takes one wall place out of a gate: an end shortens it, a middle place splits it in two (same colour, ice,
+        // edge and depth), the only place deletes it. False when the slot is not the gate's.
+        public static bool RemoveSlot(LevelData level, int index, int slot)
+        {
+            var gate = level.Gates[index];
+            var end = gate.Index + gate.Length - 1;
+            if (slot < gate.Index || slot > end) return false;
+
+            if (gate.Length == 1)
+            {
+                Delete(level, index);
+                return true;
+            }
+
+            if (slot == gate.Index || slot == end)
+            {
+                if (slot == gate.Index) gate.Index++;
+                gate.Length--;
+                return true;
+            }
+
+            var tail = new GateData
+            {
+                Edge = gate.Edge, Index = slot + 1, Length = end - slot, Color = gate.Color, Depth = gate.Depth, Ice = gate.Ice
+            };
+            gate.Length = slot - gate.Index;
+            level.Gates = level.Gates.Append(tail).ToArray();
+            return true;
+        }
+
         public static void DeleteMany(LevelData level, List<int> indices)
         {
             var gates = level.Gates.ToList();

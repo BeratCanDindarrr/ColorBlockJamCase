@@ -124,8 +124,9 @@ namespace ColorBlockJam.LevelEditor
 
             if (tool == LevelEditorTool.Gate)
             {
-                // Dragging along the wall keeps growing the picked gate.
-                if (!_erasing && IsGateGrowHit(hit)) GrowGate(hit);
+                // Dragging along the wall keeps growing the picked gate, or keeps erasing gate places.
+                if (_erasing && hit.Kind == BoardHitKind.Wall) EraseGateSlot(hit);
+                else if (!_erasing && IsGateGrowHit(hit)) GrowGate(hit);
                 return;
             }
 
@@ -269,20 +270,14 @@ namespace ColorBlockJam.LevelEditor
             PruneSelection();
         }
 
-        // Gate tool press: "−" (or Shift on "+") deletes; a gate picks it (its "+" places show); a "+" grows the picked gate; any other
+        // Gate tool press: "−" (or Shift on "+") erases the pressed wall place; a gate picks it (its "+" places show); a "+" grows the picked gate; any other
         // free slot leaves the picked gate, or adds a new one when nothing is picked.
         private void PressGate(BoardHit hit)
         {
             var gate = LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index, hit.Depth);
             if (_erasing)
             {
-                if (gate < 0) return;
-                Edit("Delete Gate", l =>
-                {
-                    LevelEditorGateOps.Delete(l, gate);
-                    return true;
-                });
-                PruneSelection();
+                EraseGateSlot(hit);
                 return;
             }
 
@@ -312,6 +307,15 @@ namespace ColorBlockJam.LevelEditor
                 return true;
             });
             SelectOnly(-1, added);
+        }
+
+        // Gate tool erase: only the wall place pressed leaves its gate (an end shortens it, a middle splits it).
+        private void EraseGateSlot(BoardHit hit)
+        {
+            var gate = LevelEditorGateOps.GateAt(working, hit.Edge, hit.Index, hit.Depth);
+            if (gate < 0) return;
+            Edit("Erase Gate Place", l => LevelEditorGateOps.RemoveSlot(l, gate, hit.Index));
+            PruneSelection();
         }
 
         private void HandleShortcuts()

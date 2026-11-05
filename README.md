@@ -29,6 +29,21 @@ level editor works directly in the Scene view.
 5. Problems (an error blocks Save) are listed in the card at the bottom right.
 6. Press **Save**, then **Play** to play the level right away.
 
+**Shortcuts** (in the Scene view or the Level Editor window; `Ctrl` or `Cmd`):
+
+| Key | Action |
+|-----|--------|
+| `1` / `2` / `3` / `4` | Select / Block / Gate / Cell tool |
+| `Shift` (held) | Flip the tool's add / erase mode |
+| `Shift` or `Ctrl` + click | Add to the selection (Select tool) |
+| `R` | Rotate the selected blocks |
+| `Ctrl + D` | Duplicate the selection |
+| `Ctrl + C` / `Ctrl + V` | Copy / paste blocks |
+| `Delete` / `Backspace` | Delete the selection |
+| `Ctrl + S` | Save the level |
+| `Esc` | Clear the selection (or cancel the eyedropper) |
+| `Ctrl + Z` / `Ctrl + Shift + Z` | Undo / redo (Unity's own) |
+
 The editor can also be opened from `Tools > Level Editor > Open Level Editor`. The game and the editor read and
 write the same `LevelData` asset.
 
@@ -75,7 +90,8 @@ write the same `LevelData` asset.
 
 ### Known problems
 
--
+- Level editor: when a block is split in the middle (erasing cells so it falls into two separate pieces), it still
+  behaves as one block instead of becoming two.
 
 ### Incomplete parts
 
@@ -121,6 +137,21 @@ doğrudan Scene view içinde çalışır.
 4. **Gate** aracını seçip bir duvar yuvasına tıklayarak kapı yerleştirin.
 5. Sorunlar sağ alttaki kartta listelenir (hata varken kaydedilemez).
 6. **Save**'e, ardından **Play**'e basarak level'ı hemen oynayın.
+
+**Kısayollar** (Scene view'da ya da Level Editor penceresinde; `Ctrl` veya `Cmd`):
+
+| Tuş | İşlev |
+|-----|-------|
+| `1` / `2` / `3` / `4` | Select / Block / Gate / Cell aracı |
+| `Shift` (basılı) | Aracın ekleme / silme modunu çevirir |
+| `Shift` veya `Ctrl` + tıklama | Seçime ekler (Select aracı) |
+| `R` | Seçili blokları döndürür |
+| `Ctrl + D` | Seçimi çoğaltır |
+| `Ctrl + C` / `Ctrl + V` | Blokları kopyalar / yapıştırır |
+| `Delete` / `Backspace` | Seçimi siler |
+| `Ctrl + S` | Level'ı kaydeder |
+| `Esc` | Seçimi kaldırır (ya da damlalığı iptal eder) |
+| `Ctrl + Z` / `Ctrl + Shift + Z` | Geri al / yinele (Unity'nin kendi kısayolu) |
 
 Editör `Tools > Level Editor > Open Level Editor` menüsünden de açılabilir. Oyun ve editör aynı `LevelData`
 asset'ini okur ve yazar.
@@ -170,7 +201,8 @@ asset'ini okur ve yazar.
 
 ### Bilinen sorunlar
 
--
+- Level editörü: bir blok ortasından bölündüğünde (hücreleri silinerek iki ayrı parçaya ayrıldığında) iki ayrı
+  blok olmak yerine hâlâ tek bir blok gibi davranıyor.
 
 ### Eksik kısımlar
 

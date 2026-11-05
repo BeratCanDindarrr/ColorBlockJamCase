@@ -32,8 +32,9 @@ namespace ColorBlockJam.LevelEditor
             return _content;
         }
 
+        // Not remembered: it follows the current tool and sticks to its button.
         public override void OnCreated() => _visibility = new EditingVisibility(this, Refresh,
-            () => LevelEditorSceneOverlays.IsEditing && LevelEditorSession.Current.HasModes);
+            () => LevelEditorSceneOverlays.IsEditing && LevelEditorSession.Current.HasModes, remember: false);
 
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
 
@@ -104,7 +105,7 @@ namespace ColorBlockJam.LevelEditor
                 case LevelEditorTool.Block:
                     return erase ? "Erase: remove block cells (red shows what goes)" : "Add: paint new blocks, grow a picked one";
                 case LevelEditorTool.Gate:
-                    return erase ? "Erase: delete gates (red shows what goes)" : "Add: put gates on walls, lengthen a picked one";
+                    return erase ? "Erase: remove gate places, one at a time (red shows what goes)" : "Add: put gates on walls, lengthen a picked one";
                 default:
                     return erase ? "Erase: remove board cells (red shows what goes)" : "Add: put removed cells back";
             }

@@ -68,25 +68,36 @@ namespace ColorBlockJam.LevelEditor
         }
     }
 
-    // Shows itself when editing starts (unless `opensItself` is false: then only the user opens it) and hides when it
-    // stops, following LevelEditorSession.StateChanged.
+    // Shows the panel when editing starts and hides it when it stops, following LevelEditorSession.StateChanged. While
+    // editing, what the user does to it (closing, folding, moving) is remembered (LevelEditorPanelMemory, unless
+    // `remember` is false) and given back the next time editing starts; a panel never opened or closed by hand opens by
+    // itself only when `opensItself`.
     internal sealed class EditingVisibility
     {
         private readonly Overlay _overlay;
         private readonly Action _onState;
         private readonly Func<bool> _shouldShow;
         private readonly bool _opensItself;
+        private readonly LevelEditorPanelMemory _memory;
         private bool _wasEditing;
         private bool _synced;
+        // Set while this class itself shows, hides or places the panel, so that is not taken for the user's doing.
+        private bool _applying;
 
-        public EditingVisibility(Overlay overlay, Action onState = null, Func<bool> shouldShow = null, bool opensItself = true)
+        public EditingVisibility(Overlay overlay, Action onState = null, Func<bool> shouldShow = null, bool opensItself = true,
+            bool remember = true)
         {
             _overlay = overlay;
             _onState = onState;
             _shouldShow = shouldShow ?? (() => LevelEditorSceneOverlays.IsEditing);
             _opensItself = opensItself;
+            _memory = remember ? new LevelEditorPanelMemory(overlay.id) : null;
             _wasEditing = _shouldShow();
-            _overlay.displayed = _wasEditing && _opensItself;
+            Apply(_wasEditing);
+            _overlay.displayedChanged += OnDisplayedChanged;
+            _overlay.collapsedChanged += OnCollapsedChanged;
+            _overlay.floatingChanged += OnPlaced;
+            _overlay.floatingPositionChanged += OnPlaced;
             LevelEditorSession.StateChanged += Sync;
             EditorApplication.hierarchyChanged += Sync;
             EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
@@ -95,16 +106,18 @@ namespace ColorBlockJam.LevelEditor
             SceneView.duringSceneGui += OnSceneGui;
         }
 
+        public bool HasSavedPosition => _memory != null && _memory.HasPosition;
+
         private void OnSceneGui(SceneView sceneView)
         {
             if (Event.current.type != EventType.Layout) return;
             if (!_synced)
             {
                 // Unity restores an overlay's saved visibility after creating it, so the first Scene view draw sets it
-                // once to the editing state, whatever was restored.
+                // once to the editing state and the remembered look, whatever was restored.
                 _synced = true;
                 _wasEditing = _shouldShow();
-                _overlay.displayed = _wasEditing && _opensItself;
+                Apply(_wasEditing);
             }
 
             Sync();
@@ -112,6 +125,10 @@ namespace ColorBlockJam.LevelEditor
 
         public void Dispose()
         {
+            _overlay.displayedChanged -= OnDisplayedChanged;
+            _overlay.collapsedChanged -= OnCollapsedChanged;
+            _overlay.floatingChanged -= OnPlaced;
+            _overlay.floatingPositionChanged -= OnPlaced;
             SceneView.duringSceneGui -= OnSceneGui;
             LevelEditorSession.StateChanged -= Sync;
             EditorApplication.hierarchyChanged -= Sync;
@@ -125,7 +142,7 @@ namespace ColorBlockJam.LevelEditor
             // Outside the editor scene the level editor's overlays are never shown, whatever a saved layout says.
             if (!LevelEditorSceneOverlays.InEditorScene)
             {
-                if (_overlay.displayed) _overlay.displayed = false;
+                if (_overlay.displayed) Apply(false);
                 _wasEditing = false;
                 return;
             }
@@ -134,10 +151,48 @@ namespace ColorBlockJam.LevelEditor
             if (isEditing != _wasEditing)
             {
                 _wasEditing = isEditing;
-                if (!isEditing || _opensItself) _overlay.displayed = isEditing;
+                Apply(isEditing);
             }
 
             _onState?.Invoke();
+        }
+
+        // Shows the panel the way it was left (open or closed, folded, where it floated) while editing, hides it otherwise.
+        private void Apply(bool editing)
+        {
+            _applying = true;
+            try
+            {
+                var open = editing && (_memory?.Shown(_opensItself) ?? _opensItself);
+                if (_overlay.displayed != open) _overlay.displayed = open;
+                if (open) _memory?.Restore(_overlay);
+            }
+            finally
+            {
+                _applying = false;
+            }
+        }
+
+        private bool IsUsersDoing => _memory != null && _synced && !_applying && _wasEditing &&
+                                     LevelEditorSceneOverlays.InEditorScene;
+
+        private void OnDisplayedChanged(bool shown)
+        {
+            if (IsUsersDoing) _memory.SaveShown(shown);
+        }
+
+        private void OnCollapsedChanged(bool collapsed)
+        {
+            if (IsUsersDoing) _memory.SaveCollapsed(collapsed);
+        }
+
+        private void OnPlaced(bool floating) => OnPlaced();
+
+        private void OnPlaced(Vector3 position) => OnPlaced();
+
+        private void OnPlaced()
+        {
+            if (IsUsersDoing && _overlay.displayed) _memory.SaveFloating(_overlay);
         }
     }
 
@@ -178,8 +233,9 @@ namespace ColorBlockJam.LevelEditor
 
         public override void OnCreated()
         {
-            floatingPosition = StartPosition;
             _visibility = new EditingVisibility(this, () => _content?.MarkDirtyRepaint());
+            // First place only; after that it goes back to where it was left.
+            if (!_visibility.HasSavedPosition) floatingPosition = StartPosition;
         }
 
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
@@ -207,17 +263,8 @@ namespace ColorBlockJam.LevelEditor
             return _content;
         }
 
-        private bool _wasDisplayed;
-
-        public override void OnCreated() => _visibility = new EditingVisibility(this, OnState);
-
-        // Editing opens it unfolded; folding it by hand afterwards is left alone.
-        private void OnState()
-        {
-            if (displayed && !_wasDisplayed) collapsed = false;
-            _wasDisplayed = displayed;
-            _content?.MarkDirtyRepaint();
-        }
+        // Open / folded / where it is are remembered by EditingVisibility.
+        public override void OnCreated() => _visibility = new EditingVisibility(this, () => _content?.MarkDirtyRepaint());
 
         public override void OnWillBeDestroyed() => _visibility?.Dispose();
     }
@@ -373,7 +420,7 @@ namespace ColorBlockJam.LevelEditor
         public const string Id = "ColorBlockJam/LevelEditor/Gate";
 
         public GateToolButton() : base(LevelEditorTool.Gate, "Grid.BoxTool",
-            "Gate (3)\n+ adds a gate on a wall around the board or beside a removed cell, − deletes gates (Shift flips)")
+            "Gate (3)\n+ adds a gate on a wall around the board or beside a removed cell, − removes the pressed gate place (Shift flips)")
         {
         }
     }
