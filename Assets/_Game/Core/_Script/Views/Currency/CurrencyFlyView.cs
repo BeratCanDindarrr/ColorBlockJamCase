@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 namespace ColorBlockJam.Views.Currency
@@ -16,6 +17,8 @@ namespace ColorBlockJam.Views.Currency
     public abstract class CurrencyFlyView : BaseView, ICurrencyUpdate, IPoolable
     {
         [SerializeField] private TextMeshProUGUI valueLabel;
+        // Optional: takes the reward type's icon from CurrencySettings (one booster view serves every booster).
+        [SerializeField] private Image icon;
 
         private CurrencySettings _settings;
 
@@ -33,6 +36,7 @@ namespace ColorBlockJam.Views.Currency
             transform.position = position;
             transform.localScale = Vector3.zero;
             transform.SetAsLastSibling();
+            if (icon != null) icon.sprite = _settings.IconOf(currencyType);
 
             var text = FormatValue(currencyType, value);
             if (valueLabel != null)

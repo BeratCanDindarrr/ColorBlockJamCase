@@ -33,6 +33,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 085d29b4e20b44c58b890307d0ec30c2, type: 2}
   - {fileID: 11400000, guid: d7cf12aefaffc459a971028c7c6976f2, type: 2}
   - {fileID: 11400000, guid: 20dd00fb072ab442584e7dabeb20787f, type: 2}
+  - {fileID: 11400000, guid: 304cb137f7c72444086a214b89314420, type: 2}
   EndlessLoopCount: 5
   LevelReward: 20
   WinLevelDelaySeconds: 1.5
