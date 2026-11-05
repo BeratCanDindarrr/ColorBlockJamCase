@@ -17,6 +17,11 @@ namespace ColorBlockJam.Core.Controller
         private readonly IPublisher<CoinUpdateSignal> _coinUpdatePublisher;
 
         private CurrencyModel _model;
+        // Coins added for a reward fly animation that has not counted them into the header yet.
+        private long _coinsInFlight;
+
+        // The coin total a label should show now: the flying coins are counted in by the animation.
+        public long ShownCoin => _model.coin - _coinsInFlight;
 
         public CurrencyController(StorageService storageService
             , LifeController lifeController
@@ -124,11 +129,16 @@ namespace ColorBlockJam.Core.Controller
             var newValue = GetCurrency(currencyData.currencyType) + currencyData.currencyValue;
             UpdateCurrency(new CurrencyData(currencyData.currencyType, newValue));
 
+            // Without fireSignal a reward fly animation shows the gain (CurrencyUpdateAnimationGameTask).
+            if (currencyData.currencyType == CurrencyType.Coin && !fireSignal) _coinsInFlight += currencyData.currencyValue;
             if (currencyData.currencyType == CurrencyType.Coin && fireSignal)
                 _coinUpdatePublisher.Publish(new CoinUpdateSignal(currencyData.currencyValue));
 
             _currencyUpdatePublisher.Publish(new CurrencyUpdateSignal(currencyData, CurrencyUpdateType.Gain));
         }
+
+        // The fly animation starts counting these coins into the header.
+        public void LandCoins(long coins) => _coinsInFlight = System.Math.Max(0, _coinsInFlight - coins);
 
         public CurrencySpendResult TryConsume(CurrencyData currencyData)
         {

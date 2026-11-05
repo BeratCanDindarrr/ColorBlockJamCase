@@ -105,7 +105,7 @@ namespace ColorBlockJam.Views
 
         private void RefreshHeader()
         {
-            header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin));
+            header.SetCoin(_currencyController.ShownCoin);
             RefreshLife();
         }
 

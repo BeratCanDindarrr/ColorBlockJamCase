@@ -61,6 +61,20 @@ namespace ColorBlockJam.GameTask
         {
             if (_updatedArrayValue == null || _updatedArrayValue.Length == 0) return;
 
+            var coins = _updatedArrayValue.Where(c => c.currencyType == CurrencyType.Coin).Sum(c => c.currencyValue);
+            try
+            {
+                await Fly(coins, cancellationToken);
+            }
+            finally
+            {
+                // Cancelled or no screen: the header must not keep hiding these coins.
+                if (!_coinCounting) _currencyController.LandCoins(coins);
+            }
+        }
+
+        private async UniTask Fly(long coins, CancellationToken cancellationToken)
+        {
             // Queued while leaving a level: the icons fly once the main screen is up.
             await UniTask.WaitUntil(() => _screenController.ScreenStatus == ScreenType.MainScreen,
                 cancellationToken: cancellationToken);
@@ -71,9 +85,8 @@ namespace ColorBlockJam.GameTask
                 return;
             }
 
-            // The coins are in the save already; the label starts from before them and counts up as they land.
-            var coins = _updatedArrayValue.Where(c => c.currencyType == CurrencyType.Coin).Sum(c => c.currencyValue);
-            if (coins > 0) screen.Header.SetCoin(_currencyController.GetCurrency(CurrencyType.Coin) - coins);
+            // The coins are in the save already; the label shows the total without them and counts up as they land.
+            screen.Header.SetCoin(_currencyController.ShownCoin);
 
             _audioService.PlaySfx(SfxName.CollectCoins);
             var flights = new List<UniTask>();
@@ -141,8 +154,9 @@ namespace ColorBlockJam.GameTask
 
             if (currencyType != CurrencyType.Coin || _coinCounting) return;
             _coinCounting = true;
-            var now = _currencyController.GetCurrency(CurrencyType.Coin);
-            screen.Header.CountCoin(now - coins, now, _settings.CoinCountDuration);
+            var from = _currencyController.ShownCoin;
+            _currencyController.LandCoins(coins);
+            screen.Header.CountCoin(from, _currencyController.ShownCoin, _settings.CoinCountDuration);
         }
 
         private static Transform TargetOf(MainScreenView screen, CurrencyType currencyType)
