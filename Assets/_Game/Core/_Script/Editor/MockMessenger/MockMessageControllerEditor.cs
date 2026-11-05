@@ -130,16 +130,14 @@ namespace ColorBlockJam.MockMessenger
             using (new GUILayout.HorizontalScope())
             {
                 Button("More Lives", Mock.OpenMoreLivesPopup, ready);
-                Button("Out Of Moves", Mock.OpenOutOfMovesPopup, inLevel);
+                Button("Out Of Time", Mock.OpenOutOfTimePopup, inLevel);
                 Button("Level Failed", Mock.OpenLevelFailedPopup, ready);
             }
 
             using (new GUILayout.HorizontalScope())
             {
-                Button("Quit Level", Mock.OpenQuitLevelPopup, inLevel);
                 Button("Menu Settings", Mock.OpenMenuSettingsPopup, ready);
                 Button("In-Game Settings", Mock.OpenInGameSettingsPopup, inLevel);
-                Button("Test", Mock.OpenTestPopup, ready);
             }
         }
 

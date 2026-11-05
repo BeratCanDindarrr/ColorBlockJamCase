@@ -38,7 +38,6 @@ namespace ColorBlockJam.Views
         private CurrencyController _currencyController;
         private LifeController _lifeController;
         private SceneLoaderController _sceneLoaderController;
-        private IPopupService _popupService;
         private ITaskService _taskService;
         private StorageService _storageService;
 
@@ -71,7 +70,7 @@ namespace ColorBlockJam.Views
         [Inject]
         public void Construct(ApplicationController applicationController, PlayerController playerController,
             CurrencyController currencyController, LifeController lifeController,
-            SceneLoaderController sceneLoaderController, IPopupService popupService, ITaskService taskService,
+            SceneLoaderController sceneLoaderController, ITaskService taskService,
             StorageService storageService)
         {
             _applicationController = applicationController;
@@ -79,7 +78,6 @@ namespace ColorBlockJam.Views
             _currencyController = currencyController;
             _lifeController = lifeController;
             _sceneLoaderController = sceneLoaderController;
-            _popupService = popupService;
             _taskService = taskService;
             _storageService = storageService;
         }

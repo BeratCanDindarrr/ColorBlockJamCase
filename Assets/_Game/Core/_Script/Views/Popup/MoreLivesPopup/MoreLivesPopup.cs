@@ -14,8 +14,8 @@ using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // Out of lives: shows the life count and the time to the next refill, and sells a full refill for coins.
-    // Closes by itself once the lives are full again.
+    // Refill Your Lives: the life count on the heart, the time to the next life, and a full refill for coins. Without
+    // enough coins the popup closes and the main screen goes to the shop. Closes by itself once the lives are full.
     public class MoreLivesPopup : BasePopup<MoreLivesPopupParameters>, ITimerOwner
     {
         [SerializeField] private TextMeshProUGUI lifeLabel;
@@ -28,6 +28,7 @@ namespace ColorBlockJam.Views
         private CurrencyController _currencyController;
         private LifeSettings _lifeSettings;
         private ITimerSubscriber _timerSubscriber;
+        private ScreenController _screenController;
         private ISubscriber<LifeModelSync> _lifeModelSyncSubscriber;
         private IDisposable _lifeModelSyncSubscription;
 
@@ -36,8 +37,10 @@ namespace ColorBlockJam.Views
             , CurrencyController currencyController
             , LifeSettings lifeSettings
             , ITimerSubscriber timerSubscriber
-            , ISubscriber<LifeModelSync> lifeModelSyncSubscriber)
+            , ISubscriber<LifeModelSync> lifeModelSyncSubscriber
+            , ScreenController screenController)
         {
+            _screenController = screenController;
             _lifeController = lifeController;
             _currencyController = currencyController;
             _lifeSettings = lifeSettings;
@@ -68,7 +71,7 @@ namespace ColorBlockJam.Views
         {
             var (life, secondsLeft) = _lifeController.GetLifeTime();
             lifeLabel.SetText(life);
-            timerLabel.SetText(secondsLeft < 0 ? "Full" : $"{secondsLeft / 60:00}:{secondsLeft % 60:00}");
+            timerLabel.SetText(CurrencyText.Countdown(secondsLeft));
 
             if (_lifeController.IsLimitless() || !_lifeController.IsTimerActive()) ClosePopup();
         }
@@ -83,8 +86,9 @@ namespace ColorBlockJam.Views
             var price = new CurrencyData(CurrencyType.Coin, _lifeSettings.RefillCoinCost);
             if (_currencyController.TryConsume(price) != CurrencySpendResult.Success)
             {
-                // TODO: open ShopPopup and reopen this popup after a purchase (not in this project yet).
-                DebugExtension.Log("Not enough coins to refill lives");
+                ClosePopup();
+                if (_screenController.ScreenStatus == ScreenType.MainScreen)
+                    _screenController.MainScreenView.SnapToPage(MainScreenView.ShopPage);
                 return;
             }
 
@@ -92,7 +96,5 @@ namespace ColorBlockJam.Views
             _lifeController.SyncModel();
             ClosePopup();
         }
-
-        // TODO: one life for a rewarded ad (no AdService yet).
     }
 }

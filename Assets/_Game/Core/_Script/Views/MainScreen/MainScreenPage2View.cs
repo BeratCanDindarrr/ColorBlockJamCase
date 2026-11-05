@@ -14,7 +14,6 @@ namespace ColorBlockJam.Views
     public class MainScreenPage2View : MainScreenBasePageView, ITimerOwner
     {
         // Page 0 of the main screen is the shop.
-        private const int ShopPage = 0;
 
         [SerializeField] private Button playButton;
         [SerializeField] private LevelButtonView levelButton;
@@ -124,7 +123,7 @@ namespace ColorBlockJam.Views
 
         private void OnCoinClicked()
         {
-            _screenController.MainScreenView.SnapToPage(ShopPage);
+            _screenController.MainScreenView.SnapToPage(MainScreenView.ShopPage);
         }
 
         private void OnLifeClicked()

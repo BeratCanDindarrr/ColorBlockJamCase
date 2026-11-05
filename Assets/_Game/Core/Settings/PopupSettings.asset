@@ -13,9 +13,7 @@ MonoBehaviour:
   m_Name: PopupSettings
   m_EditorClassIdentifier: 
   PopupPrefabs:
-  - {fileID: 2052045220015877861, guid: fd27ad443a3034fe993406be3094d4b4, type: 3}
   - {fileID: 532645362845374875, guid: 0941bcfd41f784f03a6d506f61742b20, type: 3}
-  - {fileID: 1697729881866923387, guid: d22a96f5dacc74f1caff858f37724369, type: 3}
   - {fileID: 3706824116624439547, guid: 12b8730be926e42d7997bf13d51fef26, type: 3}
   - {fileID: 145709765638496898, guid: 18992cdb048734c6e95f05d555477e6a, type: 3}
   - {fileID: 6154469009703768481, guid: 4a7155863e18e4958814a276b76891ba, type: 3}

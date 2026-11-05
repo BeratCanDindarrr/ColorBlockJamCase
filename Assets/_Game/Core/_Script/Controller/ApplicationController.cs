@@ -138,7 +138,7 @@ namespace ColorBlockJam.Core.Controller
         private void OnLevelEnded(LevelEndedSignal signal)
         {
             if (signal.Won) PlayWinFlow();
-            else OpenOutOfMovesPopup();
+            else OpenOutOfTimePopup();
         }
 
         // The won board stays on screen for WinLevelDelaySeconds with input locked, then the flow returns to the menu.
@@ -191,6 +191,16 @@ namespace ColorBlockJam.Core.Controller
             // TODO: post-level flow (level-up flow after a loss; not built yet).
         }
 
+        // Gives up the running level (the life stays spent) and shows Level Failed: the settings popup's Quit Level, and
+        // closing the Out of Time popup.
+        public void QuitLevel()
+        {
+            if (!_sceneLoaderController.IsGamePlaySceneLoaded()) return;
+
+            LoseLevel();
+            _popupService.AddPopup(new LevelFailedPopupParameters());
+        }
+
         // Try Again: gives up the running level (if any) and starts it again, spending a life.
         public async UniTaskVoid RetryLevel()
         {
@@ -207,9 +217,9 @@ namespace ColorBlockJam.Core.Controller
             await _sceneLoaderController.CloseGamePlayScene();
         }
 
-        public void OpenOutOfMovesPopup()
+        public void OpenOutOfTimePopup()
         {
-            _popupService.AddPopup(new OutOfMovesPopupParameters
+            _popupService.AddPopup(new OutOfTimePopupParameters
             {
                 AddTimeCoinValue = _levelSettings.PlayOnCoinCost,
                 AddTimeSeconds = _levelSettings.PlayOnSeconds

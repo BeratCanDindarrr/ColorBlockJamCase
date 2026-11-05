@@ -3,6 +3,7 @@ using ColorBlockJam.Utils;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ColorBlockJam.Views
@@ -10,15 +11,18 @@ namespace ColorBlockJam.Views
     // Top bar of the home page: profile, coin, life and settings; coin and life are buttons too.
     public class MainScreenHeaderView : BaseView
     {
+        private const string FullText = "FULL";
+
         [SerializeField] private Button profileButton;
         [SerializeField] private Button settingsButton;
         [SerializeField] private Button coinButton;
         [SerializeField] private Button lifeButton;
         [SerializeField] private TextMeshProUGUI coinText;
-        [SerializeField] private TextMeshProUGUI lifeText;
-        // Under the life icon: how long limitless lives last; hidden otherwise.
-        [SerializeField] private TextMeshProUGUI lifeTimeText;
-        // The ∞ shown while lives are limitless is drawn this many times the count's size.
+        // Beside the heart: the time to the next life, how long limitless lives last, or FULL.
+        [FormerlySerializedAs("lifeText")] [SerializeField] private TextMeshProUGUI lifeTimerText;
+        // On the heart: the life count, or ∞ while lives are limitless.
+        [FormerlySerializedAs("lifeTimeText")] [SerializeField] private TextMeshProUGUI lifeCountText;
+        // The ∞ is drawn this many times the count's size.
         [SerializeField] private float infinityScale = 1.6f;
         [SerializeField] private Transform coinImageTransform;
         [SerializeField] private Transform lifeImageTransform;
@@ -66,11 +70,11 @@ namespace ColorBlockJam.Views
                 .SetLink(gameObject);
         }
 
+        // secondsLeft: until the next life (or the end of limitless lives); below zero when the lives are full.
         public void SetLife(string life, bool limitless, long secondsLeft)
         {
-            lifeText.SetText(limitless ? $"<size={infinityScale * 100f:0}%>{life}</size>" : life);
-            lifeTimeText.gameObject.SetActive(limitless);
-            if (limitless) lifeTimeText.SetText(CurrencyText.Countdown(secondsLeft));
+            lifeCountText.SetText(limitless ? $"<size={infinityScale * 100f:0}%>{life}</size>" : life);
+            lifeTimerText.SetText(secondsLeft < 0 ? FullText : CurrencyText.Countdown(secondsLeft));
         }
 
         private void OnProfileClicked() => ProfileClicked?.Invoke();

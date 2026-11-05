@@ -6,7 +6,6 @@ using ColorBlockJam.Enums;
 using ColorBlockJam.GameTask;
 using ColorBlockJam.Interfaces;
 using ColorBlockJam.Views;
-using ColorBlockJam.Views.TestPopup;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
@@ -137,12 +136,10 @@ namespace ColorBlockJam.Core.Controller.Mock
         #region Popups
 
         public void OpenMoreLivesPopup() => _applicationController.OpenMoreLivesPopup();
-        public void OpenOutOfMovesPopup() => _applicationController.OpenOutOfMovesPopup();
+        public void OpenOutOfTimePopup() => _applicationController.OpenOutOfTimePopup();
         public void OpenLevelFailedPopup() => _popupService.AddPopup(new LevelFailedPopupParameters());
-        public void OpenQuitLevelPopup() => _popupService.AddPopup(new QuitLevelPopupParameters());
         public void OpenMenuSettingsPopup() => _popupService.AddPopup(new MenuSettingsPopupParameters());
         public void OpenInGameSettingsPopup() => _popupService.AddPopup(new InGameSettingsPopupParameters());
-        public void OpenTestPopup() => _popupService.AddPopup(new TestPopupParameter());
 
         #endregion
 

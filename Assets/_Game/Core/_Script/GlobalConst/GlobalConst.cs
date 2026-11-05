@@ -4,9 +4,7 @@ namespace ColorBlockJam.Const
     {
         public struct PopupName
         {
-            public const string TestPopup = "TestPopup";
-            public const string OutOfMovesPopup = "OutOfMovesPopup";
-            public const string QuitLevelPopup = "QuitLevelPopup";
+            public const string OutOfTimePopup = "OutOfTimePopup";
             public const string LevelFailedPopup = "LevelFailedPopup";
             public const string MoreLivesPopup = "MoreLivesPopup";
             public const string MenuSettingsPopup = "MenuSettingsPopup";

@@ -17,8 +17,6 @@ namespace ColorBlockJam.Views
     // the home page and hands its rewards to the Collect popup, whose Collect adds them and flies them in.
     public class MainScreenPage1View : MainScreenBasePageView
     {
-        private const int HomePage = 1;
-
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private Transform coinPackRoot;
         [SerializeField] private ShopCoinPackView coinPackTemplate;
@@ -87,7 +85,7 @@ namespace ColorBlockJam.Views
 
         private void OnBought(ShopSettings.ShopOffer offer)
         {
-            _screenController.MainScreenView.SnapToPage(HomePage);
+            _screenController.MainScreenView.SnapToPage(MainScreenView.HomePage);
             _popupService.AddPopup(new CollectPopupParameters { Rewards = offer.Rewards });
         }
     }

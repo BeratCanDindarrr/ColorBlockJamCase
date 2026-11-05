@@ -16,7 +16,7 @@ namespace ColorBlockJam.Core.Settings
         public float WinLevelDelaySeconds = 1.5f;
         // "Play On" in the out-of-time popup: its coin price and the seconds it adds.
         public int PlayOnCoinCost = 900;
-        public float PlayOnSeconds = 30f;
+        public float PlayOnSeconds = 20f;
         // The main screen's level button after a win: shrinks to this scale, takes the new number, springs back with a
         // jolt of this many degrees while a white shine flashes up to this alpha.
         public float LevelButtonShrinkScale = 0.8f;

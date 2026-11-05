@@ -2,14 +2,14 @@ using ColorBlockJam.Const;
 
 namespace ColorBlockJam.Views
 {
-    public class OutOfMovesPopupParameters : BasePopupParameters
+    public class OutOfTimePopupParameters : BasePopupParameters
     {
         public int AddTimeCoinValue;
         public float AddTimeSeconds;
 
         public override string GetPopupName()
         {
-            return GlobalConst.PopupName.OutOfMovesPopup;
+            return GlobalConst.PopupName.OutOfTimePopup;
         }
     }
 }

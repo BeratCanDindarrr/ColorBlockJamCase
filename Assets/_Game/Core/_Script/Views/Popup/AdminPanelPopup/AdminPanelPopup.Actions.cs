@@ -77,14 +77,13 @@ namespace ColorBlockJam.Views
             _taskService.AddTask(new LevelButtonUpdateGameTask());
         }
 
-        // Gives the level up like Quit Level does (the life stays spent), then shows Level Failed.
+        // Gives the level up like the settings popup's Quit Level (the life stays spent), then shows Level Failed.
         private void LoseLevel()
         {
             if (!_sceneLoaderController.IsGamePlaySceneLoaded()) return;
 
             ClosePopup();
-            _applicationController.LoseLevel();
-            _popupService.AddPopup(new LevelFailedPopupParameters());
+            _applicationController.QuitLevel();
         }
 
         private void Add(CurrencyType type, long amount) => _currencyController.AddCurrency(new CurrencyData(type, amount), true);

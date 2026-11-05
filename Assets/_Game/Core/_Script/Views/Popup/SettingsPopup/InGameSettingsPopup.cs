@@ -1,12 +1,11 @@
 using ColorBlockJam.Core.Controller;
-using ColorBlockJam.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
 namespace ColorBlockJam.Views
 {
-    // Gameplay settings: the same switches plus quitting the level (asks again in QuitLevelPopup).
+    // Gameplay settings: the same switches plus quitting the level (straight to Level Failed).
     public class InGameSettingsPopup : BasePopup<InGameSettingsPopupParameters>
     {
         [SerializeField] private SettingsToggleButtonView musicToggle;
@@ -16,13 +15,13 @@ namespace ColorBlockJam.Views
         [SerializeField] private Button closeButton;
 
         private SettingsController _settingsController;
-        private IPopupService _popupService;
+        private ApplicationController _applicationController;
 
         [Inject]
-        public void Construct(SettingsController settingsController, IPopupService popupService)
+        public void Construct(SettingsController settingsController, ApplicationController applicationController)
         {
             _settingsController = settingsController;
-            _popupService = popupService;
+            _applicationController = applicationController;
         }
 
         public override void ShowPopup()
@@ -45,8 +44,8 @@ namespace ColorBlockJam.Views
 
         private void QuitButtonClicked()
         {
-            _popupService.AddPopup(new QuitLevelPopupParameters());
             ClosePopup();
+            _applicationController.QuitLevel();
         }
     }
 }

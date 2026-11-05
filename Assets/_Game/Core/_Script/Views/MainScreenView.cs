@@ -6,6 +6,10 @@ namespace ColorBlockJam.Views
 {
     public class MainScreenView : BaseView
     {
+        // Page indices of the main screen.
+        public const int ShopPage = 0;
+        public const int HomePage = 1;
+
         [SerializeField] private GraphicRaycaster[] raycasterArray;
         [SerializeField] private MainScreenPageSnapperView pageSnapper;
         [SerializeField] private MainScreenBasePageView[] pages;
