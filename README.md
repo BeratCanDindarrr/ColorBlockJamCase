@@ -22,12 +22,17 @@ level editor works directly in the Scene view.
 
 ![Editor button in the toolbar](ReadmeImages/editor-toolbar.png)
 
+**Video:** [making a level in the editor](ReadmeImages/editor-video.mp4) (about 3 minutes).
+
 1. In the level bar at the top, press **New** (or pick an existing level).
 2. Set the board size (width / height) and the timer in the level bar.
 3. Pick the **Block** tool and paint cells to place blocks; pick a colour from the palette.
 4. Pick the **Gate** tool and click a wall slot to place a door.
 5. Problems (an error blocks Save) are listed in the card at the bottom right.
 6. Press **Save**, then **Play** to play the level right away.
+
+> **Note:** **Play** in the level bar opens the game straight into the level you are editing: no need to go
+> through the home screen, and no life is spent.
 
 **Shortcuts** (in the Scene view or the Level Editor window; `Ctrl` or `Cmd`):
 
@@ -131,12 +136,17 @@ doğrudan Scene view içinde çalışır.
 
 ![Araç çubuğundaki Editor butonu](ReadmeImages/editor-toolbar.png)
 
+**Video:** [editörde level yapımı](ReadmeImages/editor-video.mp4) (yaklaşık 3 dakika).
+
 1. Üstteki level çubuğunda **New**'a basın (ya da var olan bir level'ı seçin).
 2. Level çubuğundan tahta boyutunu (genişlik / yükseklik) ve süreyi ayarlayın.
 3. **Block** aracını seçip hücreleri boyayarak blok yerleştirin; rengi paletten seçin.
 4. **Gate** aracını seçip bir duvar yuvasına tıklayarak kapı yerleştirin.
 5. Sorunlar sağ alttaki kartta listelenir (hata varken kaydedilemez).
 6. **Save**'e, ardından **Play**'e basarak level'ı hemen oynayın.
+
+> **Not:** Level çubuğundaki **Play**, oyunu doğrudan düzenlediğiniz level'da açar: ana ekrandan geçmeye gerek
+> yoktur ve can harcanmaz.
 
 **Kısayollar** (Scene view'da ya da Level Editor penceresinde; `Ctrl` veya `Cmd`):
 
