@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2089053345006362607}
   - component: {fileID: 6978757419412616288}
   - component: {fileID: 3444474686499542027}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Link
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 4863787577399519952}
   - component: {fileID: 3264869198236299596}
   - component: {fileID: 6923326196331426566}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LevelPath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 2935540483851958251}
   - component: {fileID: 7144277800714401791}
   - component: {fileID: 658305582175474384}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 6882300476630905194}
   - component: {fileID: 2751030191258629163}
   - component: {fileID: 7866965212774720128}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BundleTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -589,7 +589,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2840641633431780475}
   - component: {fileID: 5684983222906817680}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Bundles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -930,7 +930,7 @@ GameObject:
   - component: {fileID: 2845396856030989022}
   - component: {fileID: 8316014281568084613}
   - component: {fileID: 1100712498806461539}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BundlesHeader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1043,7 +1043,7 @@ GameObject:
   - component: {fileID: 5399401235598177072}
   - component: {fileID: 7092370764911384792}
   - component: {fileID: 508424321717338392}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1179,7 +1179,7 @@ GameObject:
   - component: {fileID: 1183106870028359482}
   - component: {fileID: 4885325415335648340}
   - component: {fileID: 2345544584258157555}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Lock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1256,7 +1256,7 @@ GameObject:
   - component: {fileID: 7134557195302130498}
   - component: {fileID: 8655925536362676}
   - component: {fileID: 5619361125341596437}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BuyButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1476,7 +1476,7 @@ GameObject:
   - component: {fileID: 6259959210500514586}
   - component: {fileID: 3034794373000572641}
   - component: {fileID: 1245241223740851402}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1610,7 +1610,7 @@ GameObject:
   - component: {fileID: 1841737380492876792}
   - component: {fileID: 7683282327156906258}
   - component: {fileID: 8900700717229107575}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1896,7 +1896,7 @@ GameObject:
   - component: {fileID: 5786711431760515845}
   - component: {fileID: 1834109624409857665}
   - component: {fileID: 5062881881480926409}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2356,7 +2356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5769545852297367656}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Shop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2832,7 +2832,7 @@ GameObject:
   - component: {fileID: 2635771355805862575}
   - component: {fileID: 5034433681768247116}
   - component: {fileID: 774555589383439870}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BuyButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3144,7 +3144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5118713536783182042}
   - component: {fileID: 1873383492576368431}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoinPacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3913,7 +3913,7 @@ GameObject:
   - component: {fileID: 2950847242207380863}
   - component: {fileID: 298821209954999895}
   - component: {fileID: 1360181220716443395}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4291,7 +4291,7 @@ GameObject:
   - component: {fileID: 5569080499797828823}
   - component: {fileID: 8009723542093296517}
   - component: {fileID: 5515391324430281194}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4707,7 +4707,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3562652242177465142}
   - component: {fileID: 359032965088277430}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4943,7 +4943,7 @@ GameObject:
   - component: {fileID: 1072847071492951760}
   - component: {fileID: 2301759075598421679}
   - component: {fileID: 704777279076192661}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5292,7 +5292,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2530072545635401077}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5406,7 +5406,7 @@ GameObject:
   - component: {fileID: 1873061356065112406}
   - component: {fileID: 8857757030782071159}
   - component: {fileID: 2663024456002653211}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoinsHeader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5482,7 +5482,7 @@ GameObject:
   - component: {fileID: 3040166885109430120}
   - component: {fileID: 6609104885572770709}
   - component: {fileID: 6339994008066089557}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5846,7 +5846,7 @@ GameObject:
   - component: {fileID: 4609899578310233248}
   - component: {fileID: 1663254062501317813}
   - component: {fileID: 2030945398569223101}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoinIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5920,7 +5920,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6299603252802906742}
   - component: {fileID: 4995580492376818963}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Items
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6173,7 +6173,7 @@ GameObject:
   - component: {fileID: 433470077662734059}
   - component: {fileID: 6770447369740947119}
   - component: {fileID: 8218211117101776300}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoinText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6307,7 +6307,7 @@ GameObject:
   - component: {fileID: 310755753907384973}
   - component: {fileID: 7747103579786443783}
   - component: {fileID: 7760321102205468556}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6382,7 +6382,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4260753747423462833}
   - component: {fileID: 515107359541687617}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: NodeTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6438,7 +6438,7 @@ GameObject:
   - component: {fileID: 6257484353040947968}
   - component: {fileID: 7523187842845321256}
   - component: {fileID: 2993317033933939153}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6588,7 +6588,7 @@ GameObject:
   - component: {fileID: 8503011621215775025}
   - component: {fileID: 6657807097283310411}
   - component: {fileID: 4104378774375056561}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6810,7 +6810,7 @@ GameObject:
   - component: {fileID: 2182038475703449145}
   - component: {fileID: 5554379031031570304}
   - component: {fileID: 4276044867096187211}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7406,7 +7406,7 @@ GameObject:
   - component: {fileID: 7520658339968724380}
   - component: {fileID: 5736311953610614121}
   - component: {fileID: 5079481005385233041}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoinPackTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7859,7 +7859,7 @@ GameObject:
   - component: {fileID: 4807969640455447574}
   - component: {fileID: 8820610420918648731}
   - component: {fileID: 3490536455267608421}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}

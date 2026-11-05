@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1046680822143688758}
   - component: {fileID: 7256187009910811606}
   - component: {fileID: 8408933717151349685}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 5646216974735034004}
   - component: {fileID: 740334674069282380}
   - component: {fileID: 4260607547737718379}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 726260100795464761}
   - component: {fileID: 8788883243993813737}
   - component: {fileID: 1842073996379027893}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}

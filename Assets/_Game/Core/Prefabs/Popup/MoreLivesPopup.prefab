@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 466738665291740086}
   - component: {fileID: 8148175048858935278}
   - component: {fileID: 6280911466007726059}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: RefillButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 6654067146152873151}
   - component: {fileID: 316660750839767766}
   - component: {fileID: 1395609539212982875}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TimerLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 7492991647285660580}
   - component: {fileID: 7429342495882456660}
   - component: {fileID: 4147850498809036784}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LifeLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 1666856608325906347}
   - component: {fileID: 3764321800907142888}
   - component: {fileID: 5370043510738906771}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: NextLifeLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -560,7 +560,7 @@ GameObject:
   - component: {fileID: 1483524269925975261}
   - component: {fileID: 2476264815503220840}
   - component: {fileID: 8729065816339009993}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: RefillCostLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -694,7 +694,7 @@ GameObject:
   - component: {fileID: 6724405732577675337}
   - component: {fileID: 8173638370576032322}
   - component: {fileID: 159668633697658633}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}

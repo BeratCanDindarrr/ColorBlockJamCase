@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8217625668185618359}
   - component: {fileID: 7544917159679990362}
   - component: {fileID: 4480990108594015486}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ValueLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68,7 +68,7 @@ MonoBehaviour:
   m_text: +1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 492528311574450012}
   - component: {fileID: 2539306631102355594}
   - component: {fileID: 8260779201235931853}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LifeTimeCurrencyView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,3 +224,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   valueLabel: {fileID: 4480990108594015486}
+  icon: {fileID: 0}

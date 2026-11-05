@@ -23,6 +23,7 @@ namespace ColorBlockJam.Core
             builder.RegisterMessageBroker<TimePurchasedSignal>(options);
             builder.RegisterMessageBroker<BoosterRequestedSignal>(options);
             builder.RegisterMessageBroker<BoosterEndedSignal>(options);
+            builder.RegisterMessageBroker<PopupOpenedSignal>(options);
             builder.RegisterMessageBroker<BoosterTutorialSignal>(options);
             builder.RegisterMessageBroker<BoosterTutorialTargetSignal>(options);
             builder.RegisterMessageBroker<DragTutorialSignal>(options);

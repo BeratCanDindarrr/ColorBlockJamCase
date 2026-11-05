@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5372396813314833426}
   - component: {fileID: 4653222110525395270}
   - component: {fileID: 3485570586422178638}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CostText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 7265317371075355747}
   - component: {fileID: 1653110966670343489}
   - component: {fileID: 2208717235552929748}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 725375392826525682}
   - component: {fileID: 899159924339217016}
   - component: {fileID: 7816669152843922116}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -415,7 +415,7 @@ GameObject:
   - component: {fileID: 5536157866022442141}
   - component: {fileID: 3178123353862673144}
   - component: {fileID: 1327665293797621637}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayOnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}

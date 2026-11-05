@@ -148,6 +148,9 @@ namespace ColorBlockJam.Views
                 if (_frame[i] != null) continue;
 
                 var piece = new GameObject("TutorialFrame", typeof(RectTransform), typeof(Image));
+                // On the view's (UI) layer: input counts a press as "over the GUI" only on that layer, so the board
+                // under the frame takes no tap.
+                piece.layer = gameObject.layer;
                 var rect = (RectTransform)piece.transform;
                 rect.SetParent(transform, false);
                 rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3510643418460008377}
   - component: {fileID: 7840914481718457658}
   - component: {fileID: 8015666207164503371}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Count
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2883341313806215585}
   - component: {fileID: 7036718466722851125}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CollectRewardItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 5497439842833999636}
   - component: {fileID: 2770712853343162739}
   - component: {fileID: 2077184458859948875}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}

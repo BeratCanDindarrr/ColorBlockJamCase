@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2127391885903281563}
   - component: {fileID: 8298294627956656355}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CollectButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -170,7 +170,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5445336667087516148}
   - component: {fileID: 5963641345468914600}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Items
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -231,7 +231,7 @@ GameObject:
   - component: {fileID: 3603496015274942327}
   - component: {fileID: 5356470849460452910}
   - component: {fileID: 3780448823683182578}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +414,7 @@ GameObject:
   - component: {fileID: 7612504468131215608}
   - component: {fileID: 1145274191265454850}
   - component: {fileID: 6722689194421991005}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}

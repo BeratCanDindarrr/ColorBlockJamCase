@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6473131623078522030}
   - component: {fileID: 8779614510733025192}
   - component: {fileID: 9123032671159972551}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TryAgainButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 653989588676289287}
   - component: {fileID: 4077284852421672653}
   - component: {fileID: 2174619288233936609}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}

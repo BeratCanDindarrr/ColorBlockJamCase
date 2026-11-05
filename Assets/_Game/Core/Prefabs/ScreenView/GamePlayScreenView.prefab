@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5432200010404931478}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HandParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3376,7 +3376,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1408681598254078556}
   - component: {fileID: 860185821346205103}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Tutorial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5535,7 +5535,7 @@ GameObject:
   - component: {fileID: 5050825327005371933}
   - component: {fileID: 7803889631646969313}
   - component: {fileID: 8584467756662099054}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}

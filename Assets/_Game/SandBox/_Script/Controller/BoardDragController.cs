@@ -21,6 +21,7 @@ namespace ColorBlockJam.SandBox
         private readonly ISubscriber<OnFingerDownSignal> _fingerDownSubscriber;
         private readonly ISubscriber<OnFingerUpdateSignal> _fingerUpdateSubscriber;
         private readonly ISubscriber<OnFingerUpSignal> _fingerUpSubscriber;
+        private readonly ISubscriber<PopupOpenedSignal> _popupOpenedSubscriber;
         private readonly IAudioService _audioService;
         private readonly IHapticService _hapticService;
         private readonly BoardBoosterController _boosterController;
@@ -37,6 +38,7 @@ namespace ColorBlockJam.SandBox
             ISubscriber<OnFingerDownSignal> fingerDownSubscriber,
             ISubscriber<OnFingerUpdateSignal> fingerUpdateSubscriber,
             ISubscriber<OnFingerUpSignal> fingerUpSubscriber,
+            ISubscriber<PopupOpenedSignal> popupOpenedSubscriber,
             IAudioService audioService, IHapticService hapticService, BoardBoosterController boosterController,
             BoardTutorialController tutorialController)
         {
@@ -51,6 +53,7 @@ namespace ColorBlockJam.SandBox
             _fingerDownSubscriber = fingerDownSubscriber;
             _fingerUpdateSubscriber = fingerUpdateSubscriber;
             _fingerUpSubscriber = fingerUpSubscriber;
+            _popupOpenedSubscriber = popupOpenedSubscriber;
         }
 
         public void Init()
@@ -58,7 +61,8 @@ namespace ColorBlockJam.SandBox
             _subscriptions = DisposableBag.Create(
                 _fingerDownSubscriber.Subscribe(signal => OnFingerDown(signal.Finger)),
                 _fingerUpdateSubscriber.Subscribe(signal => OnFingerUpdate(signal.Finger)),
-                _fingerUpSubscriber.Subscribe(signal => OnFingerUp(signal.Finger)));
+                _fingerUpSubscriber.Subscribe(signal => OnFingerUp(signal.Finger)),
+                _popupOpenedSubscriber.Subscribe(_ => DropHeld()));
         }
 
         public void Dispose()
@@ -130,7 +134,16 @@ namespace ColorBlockJam.SandBox
 
         private void OnFingerUp(LeanFinger finger)
         {
-            if (finger != _finger || !IsDragging()) return;
+            if (finger != _finger) return;
+
+            DropHeld();
+        }
+
+        // Sets the held block down where it is (finger up, or a popup opened over the board). The finger's own up later
+        // finds nothing held.
+        private void DropHeld()
+        {
+            if (!IsDragging()) return;
 
             _boardController.Simulation.EndDrag();
             _boardController.Flush();

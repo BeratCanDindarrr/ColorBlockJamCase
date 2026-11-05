@@ -173,6 +173,11 @@ namespace ColorBlockJam.Signals
         }
     }
 
+    // A popup has just opened (any popup). The board lets go of a held block, so nothing stays in hand behind it.
+    public readonly struct PopupOpenedSignal
+    {
+    }
+
     // "Play On" in the out-of-time popup bought more time for the running level.
     public readonly struct TimePurchasedSignal
     {
