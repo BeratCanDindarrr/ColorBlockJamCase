@@ -138,6 +138,8 @@ doğrudan Scene view içinde çalışır.
 
 **Video:** [editörde level yapımı](ReadmeImages/editor-video.mp4) (yaklaşık 3 dakika).
 
+
+
 1. Üstteki level çubuğunda **New**'a basın (ya da var olan bir level'ı seçin).
 2. Level çubuğundan tahta boyutunu (genişlik / yükseklik) ve süreyi ayarlayın.
 3. **Block** aracını seçip hücreleri boyayarak blok yerleştirin; rengi paletten seçin.
