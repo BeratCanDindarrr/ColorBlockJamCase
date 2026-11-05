@@ -22,7 +22,9 @@ level editor works directly in the Scene view.
 
 ![Editor button in the toolbar](ReadmeImages/editor-toolbar.png)
 
-**Video:** [making a level in the editor](ReadmeImages/editor-video.mp4) (about 3 minutes).
+**Video:** making a level in the editor (about 3 minutes).
+
+https://github.com/user-attachments/assets/9ed86082-5f14-4415-91dc-da64e29c5aa0
 
 1. In the level bar at the top, press **New** (or pick an existing level).
 2. Set the board size (width / height) and the timer in the level bar.
@@ -136,9 +138,9 @@ doğrudan Scene view içinde çalışır.
 
 ![Araç çubuğundaki Editor butonu](ReadmeImages/editor-toolbar.png)
 
-**Video:** [editörde level yapımı](ReadmeImages/editor-video.mp4) (yaklaşık 3 dakika).
+**Video:** editörde level yapımı (yaklaşık 3 dakika).
 
-
+https://github.com/user-attachments/assets/9ed86082-5f14-4415-91dc-da64e29c5aa0
 
 1. Üstteki level çubuğunda **New**'a basın (ya da var olan bir level'ı seçin).
 2. Level çubuğundan tahta boyutunu (genişlik / yükseklik) ve süreyi ayarlayın.
