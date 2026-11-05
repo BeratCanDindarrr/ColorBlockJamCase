@@ -15,9 +15,9 @@ A small vertical slice of Color Block Jam in Unity: a playable level flow and a 
    Play always starts from this scene, whichever scene is open.
 3. Press the level button on the home screen to start the current level.
 
-**Video:** the full game flow (about 2.5 minutes).
+**Video:** the full game flow (about 3 minutes).
 
-https://github.com/user-attachments/assets/d2abdf04-d4dc-4b06-a03c-7a935ddca2bb
+https://github.com/user-attachments/assets/7a8ee856-3fdd-4f41-9227-3cde3e66a1c2
 
 ### How to open the editor and make a level
 
@@ -92,8 +92,7 @@ write the same `LevelData` asset.
 
 #### Scope decisions
 
-- **Popups** (level complete, out of time, quit, level failed, more lives, collect) were added to complete the game
-  flow.
+- **Popups** (level complete, out of time, level failed, more lives, collect) were added to complete the game flow.
 - **Shop** is an optional decision: the shop page shows coin packs and a bundle, but it is **not connected to IAP**.
   Buying an offer only grants its rewards through the Collect popup.
 - Optional scope done: functional boosters, ice blocks, arrow (one-way) blocks, ice gates, level validation and a
@@ -106,11 +105,9 @@ write the same `LevelData` asset.
 
 ### Incomplete parts
 
-- Popups are visually basic.
+- Popups other than Out of Time and Refill Your Lives are visually basic.
 - Particle effects are missing in most places.
 - There are only a few sound effects.
-- After a life is lost, nothing shows how many seconds are left until the next life refills.
-- A coin count above 100,000 does not fit its text field.
 - The Vacuum booster's animation is incomplete: the supplied assets have no animated vacuum object for it.
 - The Timer booster has no ice effect over the level timer while the clock is frozen.
 - The level win screen has no fireworks or similar celebration particles behind it.
@@ -141,9 +138,9 @@ Color Block Jam'in Unity'de küçük bir dikey kesiti: oynanabilir bir level ak�
    Hangi sahne açık olursa olsun Play her zaman bu sahneden başlar.
 3. Ana ekrandaki level butonuna basarak güncel level'ı başlatın.
 
-**Video:** oyunun tüm akışı (yaklaşık 2,5 dakika).
+**Video:** oyunun tüm akışı (yaklaşık 3 dakika).
 
-https://github.com/user-attachments/assets/d2abdf04-d4dc-4b06-a03c-7a935ddca2bb
+https://github.com/user-attachments/assets/7a8ee856-3fdd-4f41-9227-3cde3e66a1c2
 
 ### Editörü açma ve level yapma
 
@@ -220,8 +217,8 @@ asset'ini okur ve yazar.
 
 #### Kapsam kararları
 
-- **Popup'lar** (level tamamlandı, süre bitti, çıkış, level başarısız, daha fazla can, toplama) oyun akışını
-  tamamlamak için eklendi.
+- **Popup'lar** (level tamamlandı, süre bitti, level başarısız, daha fazla can, toplama) oyun akışını tamamlamak
+  için eklendi.
 - **Shop** isteğe bağlı bir karar: sayfa altın paketlerini ve bir bundle'ı gösterir, ancak **IAP ile bağlantısı yok**.
   Bir teklifi almak ödüllerini sadece Collect popup'ı üzerinden verir.
 - Yapılan opsiyonel kapsam: çalışan boosterlar, buzlu bloklar, tek yönlü (arrow) bloklar, buzlu kapılar, level
@@ -234,11 +231,9 @@ asset'ini okur ve yazar.
 
 ### Eksik kısımlar
 
-- Popup'lar görsel açıdan yetersiz.
+- Out of Time ve Refill Your Lives dışındaki popup'lar görsel açıdan yetersiz.
 - Çoğu yerde particle efektleri eksik.
 - Ses efektlerinin çeşidi az.
-- Can kaybedildiğinde, bir sonraki canın kaç saniye sonra yenileneceğini gösteren bir alan yok.
-- Coin sayısı 100.000'i geçince text alanına sığmıyor.
 - Vacuum booster'ının animasyonu eksik: verilen asset'lerde animasyon için kullanılabilecek bir vacuum objesi yok.
 - Timer booster'ı saati dondururken level timer'ının üzerine gelen buz efekti yok.
 - Level kazanma ekranında arkada havai fişek ya da benzeri kutlama particle'ları yok.
