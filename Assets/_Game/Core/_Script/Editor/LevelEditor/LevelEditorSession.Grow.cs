@@ -27,6 +27,32 @@ namespace ColorBlockJam.LevelEditor
             return places;
         }
 
+        // What the board marks for the current mode (Shift flips it): adding shows the picked block's or gate's green "+"
+        // places; erasing shows a red "−" on everything a press would take away (every block's cells with the Block tool,
+        // every gate's wall places with the Gate tool), so leftover "+" places never suggest the wrong action.
+        internal void MarkPlaces(bool shift, List<CellCoord> grow, List<CellCoord> shrink)
+        {
+            grow.Clear();
+            shrink.Clear();
+            if (working == null) return;
+            if (!ErasesNow(shift))
+            {
+                grow.AddRange(GrowPlaces());
+                return;
+            }
+
+            if (tool == LevelEditorTool.Block)
+            {
+                foreach (var block in working.Blocks) shrink.AddRange(LevelValidator.AbsoluteCells(block));
+            }
+            else if (tool == LevelEditorTool.Gate)
+            {
+                foreach (var gate in working.Gates)
+                for (var k = gate.Index; k < gate.Index + gate.Length; k++)
+                    shrink.Add(GateGeometry.Outside(gate.Edge, gate.Depth, k, working.Cols, working.Rows));
+            }
+        }
+
         private bool IsGrowPlace(CellCoord point) => GrowPlaces().Contains(point);
 
         // A wall place right before or after the picked gate on its own wall line.

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ColorBlockJam.Core.Level;
 using UnityEditor;
@@ -25,6 +26,8 @@ namespace ColorBlockJam.LevelEditor
         private static readonly string[] ToolNames = { "1 Select", "2 Block", "3 Gate", "4 Cell" };
         private static readonly string[] ModeNames = { "+ Add", "− Erase" };
         private bool _lastShift;
+        private readonly List<CellCoord> _growMarks = new List<CellCoord>();
+        private readonly List<CellCoord> _shrinkMarks = new List<CellCoord>();
 
         private Vector2 _statusScroll;
         private Vector2 _inspectorScroll;
@@ -335,7 +338,8 @@ namespace ColorBlockJam.LevelEditor
             _board.Layout(new Rect(rect.x + 8f, rect.y + 8f, rect.width - 16f, rect.height - 16f), working);
             if (Event.current.type == EventType.Repaint)
             {
-                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, GrowPlaces(),
+                MarkPlaces(Event.current.shift, _growMarks, _shrinkMarks);
+                _board.Draw(working, IsBlockSelected, IsGateSelected, _errorBlocks, _errorGates, _hover, _growMarks, _shrinkMarks,
                     HoverColor(Event.current.shift));
                 if (_boxing) _board.DrawBox(BoxMin, BoxMax);
                 if (_ghost.Count > 0) _board.DrawGhost(_ghost, _ghostFits);

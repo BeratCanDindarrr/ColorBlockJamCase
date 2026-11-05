@@ -20,6 +20,8 @@ namespace ColorBlockJam.SandBox.Editor
         private static readonly int ControlHint = "LevelEditorSceneInput".GetHashCode();
         private static readonly List<CellCoord> Marks = new List<CellCoord>();
         private static readonly List<CellCoord> GrowPlaces = new List<CellCoord>();
+        private static readonly List<CellCoord> ShrinkPlaces = new List<CellCoord>();
+        private static readonly Color ShrinkFill = new Color(0.85f, 0.22f, 0.22f, 0.9f);
         private static readonly List<CellCoord> Ghost = new List<CellCoord>();
         private static readonly Color GhostFits = new Color(0.2f, 0.8f, 0.3f, 0.55f);
         private static readonly Color GhostBlocked = new Color(1f, 0.25f, 0.25f, 0.55f);
@@ -178,9 +180,11 @@ namespace ColorBlockJam.SandBox.Editor
                 DrawPath(board, PlayPath);
             }
 
-            var boxing = LevelEditorSession.GetSceneMarks(Marks, GrowPlaces, out var boxMin, out var boxMax);
+            var boxing = LevelEditorSession.GetSceneMarks(Event.current.shift, Marks, GrowPlaces, ShrinkPlaces, out var boxMin,
+                out var boxMax);
             foreach (var cell in Marks) DrawRect(board, cell, cell, SelectionFill, Color.white);
             foreach (var place in GrowPlaces) DrawPlus(board, place);
+            foreach (var place in ShrinkPlaces) DrawMinus(board, place);
             if (LevelEditorSession.GetShapeGhost(Ghost, out var fits))
             {
                 var fill = fits ? GhostFits : GhostBlocked;
@@ -200,6 +204,20 @@ namespace ColorBlockJam.SandBox.Editor
             for (var i = 0; i < path.Count; i++)
                 points[i] = (CornerWorld(board, path[i].Col, path[i].Row) + CornerWorld(board, path[i].Col + 1, path[i].Row + 1)) * 0.5f;
             using (new Handles.DrawingScope(PlayBlockLine)) Handles.DrawAAPolyLine(PlayPathWidth, points);
+        }
+
+        // A red "−" on what an erase press would take away: a small square in the cell's middle, so the block shows round it.
+        private static void DrawMinus(BoardViewController board, CellCoord place)
+        {
+            var centre = (CornerWorld(board, place.Col, place.Row) + CornerWorld(board, place.Col + 1, place.Row + 1)) * 0.5f;
+            var half = board.Layout.CellSize * 0.22f;
+            Quad[0] = centre + new Vector3(-half, 0f, -half);
+            Quad[1] = centre + new Vector3(half, 0f, -half);
+            Quad[2] = centre + new Vector3(half, 0f, half);
+            Quad[3] = centre + new Vector3(-half, 0f, half);
+            Handles.DrawSolidRectangleWithOutline(Quad, ShrinkFill, ShrinkFill);
+            using (new Handles.DrawingScope(Color.white))
+                Handles.DrawLine(centre + Vector3.left * half * 0.7f, centre + Vector3.right * half * 0.7f, 4f);
         }
 
         // A green "+" where the picked block or gate can grow.

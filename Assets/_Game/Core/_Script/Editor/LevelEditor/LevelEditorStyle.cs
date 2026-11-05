@@ -13,6 +13,8 @@ namespace ColorBlockJam.LevelEditor
         public static readonly Color Error = new Color(1f, 0.25f, 0.25f);
         // "+" places where the picked block or gate can grow.
         public static readonly Color Grow = new Color(0.20f, 0.72f, 0.30f, 0.9f);
+        // Red "−" marks on what an erase press takes away.
+        public static readonly Color Shrink = new Color(0.85f, 0.22f, 0.22f, 0.9f);
 
         // The game's colour for a block colour (BoardSettings), so the editor and the game agree.
         public static Color Of(BlockColor color) => LevelEditorColors.Of(color);

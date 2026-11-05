@@ -49,7 +49,8 @@ namespace ColorBlockJam.LevelEditor
         }
 
         public void Draw(LevelData level, Func<int, bool> isBlockSelected, Func<int, bool> isGateSelected,
-            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces, Color hoverColor)
+            HashSet<int> errorBlocks, HashSet<int> errorGates, BoardHit hover, List<CellCoord> growPlaces,
+            List<CellCoord> shrinkPlaces, Color hoverColor)
         {
             EditorGUI.DrawRect(new Rect(_origin, new Vector2((_cols + 2) * _cell, (_rows + 2) * _cell)), LevelEditorStyle.Wall);
             var holes = new HashSet<CellCoord>(level.Holes ?? new CellCoord[0]);
@@ -66,6 +67,7 @@ namespace ColorBlockJam.LevelEditor
             var blocks = level.Blocks ?? new BlockData[0];
             for (var i = 0; i < blocks.Length; i++) DrawBlock(blocks[i], isBlockSelected(i), errorBlocks.Contains(i));
             foreach (var place in growPlaces) DrawPlus(CellRect(place.Col, place.Row));
+            foreach (var place in shrinkPlaces) DrawMinus(CellRect(place.Col, place.Row));
 
             // Over the blocks and gates, so the red of an erase shows on what it takes away.
             if (hover.Kind == BoardHitKind.Wall)
@@ -83,6 +85,16 @@ namespace ColorBlockJam.LevelEditor
             var arm = inner.width * 0.6f;
             EditorGUI.DrawRect(new Rect(inner.center.x - arm / 2f, inner.center.y - bar / 2f, arm, bar), Color.white);
             EditorGUI.DrawRect(new Rect(inner.center.x - bar / 2f, inner.center.y - arm / 2f, bar, arm), Color.white);
+        }
+
+        // A red "−" on what an erase press would take away.
+        private void DrawMinus(Rect rect)
+        {
+            var inner = Inset(rect, Mathf.Max(Gap, rect.width * 0.28f));
+            EditorGUI.DrawRect(inner, LevelEditorStyle.Shrink);
+            var bar = Mathf.Max(2f, inner.width * 0.16f);
+            var arm = inner.width * 0.7f;
+            EditorGUI.DrawRect(new Rect(inner.center.x - arm / 2f, inner.center.y - bar / 2f, arm, bar), Color.white);
         }
 
         // Where a dragged shape would go: green when it fits, red when it does not.

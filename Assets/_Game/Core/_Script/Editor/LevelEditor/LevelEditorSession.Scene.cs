@@ -38,12 +38,13 @@ namespace ColorBlockJam.LevelEditor
         }
 
         // What the scene overlay draws: every grid position of the selected blocks and gates, the "+" places where the
-        // picked one can grow, and the box being dragged out, if any.
-        public static bool GetSceneMarks(List<CellCoord> selected, List<CellCoord> growPlaces, out CellCoord boxMin,
-            out CellCoord boxMax)
+        // picked one can grow or, erasing, the red "−" places (MarkPlaces), and the box being dragged out, if any.
+        public static bool GetSceneMarks(bool shift, List<CellCoord> selected, List<CellCoord> growPlaces,
+            List<CellCoord> shrinkPlaces, out CellCoord boxMin, out CellCoord boxMax)
         {
             selected.Clear();
             growPlaces.Clear();
+            shrinkPlaces.Clear();
             boxMin = boxMax = default;
             if (!CanEditFromScene) return false;
 
@@ -57,7 +58,7 @@ namespace ColorBlockJam.LevelEditor
                     selected.Add(GateGeometry.Outside(gate.Edge, gate.Depth, k, level.Cols, level.Rows));
             }
 
-            growPlaces.AddRange(window.GrowPlaces());
+            window.MarkPlaces(shift, growPlaces, shrinkPlaces);
             boxMin = window.BoxMin;
             boxMax = window.BoxMax;
             return window._boxing;
